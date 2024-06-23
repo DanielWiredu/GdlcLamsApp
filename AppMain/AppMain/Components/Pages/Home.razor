@@ -1,0 +1,59 @@
+﻿@page "/"
+@using DataAccess.Models
+@using AppModels
+@using BusinessLogic.Repository.IRepository
+
+@inject IUnitOfWork _db
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<hr />
+
+<h4>Current Locations</h4>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>LocationID</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (locations.Any())
+            { 
+                @foreach (var loc in locations)
+                {
+                    <tr>
+                        <td>@loc.LocationId</td>
+                        <td>@loc.Location</td>
+                    </tr>
+                }
+             } 
+        </tbody>
+    </table>
+
+@code
+{
+    private IEnumerable<TblLocation> locations { get; set; } = new List<TblLocation>();
+    private LocationModel location = new LocationModel();
+    protected override async Task OnInitializedAsync()
+    {
+        locations = await _db.Location.GetAll();
+    }
+    // private async Task InsertLocation()
+    // {
+    //     TblLocation b = new TblLocation
+    //     {
+    //         LocationId = location.LocationId,
+    //         Location = location.Location
+    //     };
+
+    //     await _db.Location.Add(b);
+    //     locations.tol;
+    //     location = new LocationModel();
+    // }
+ }
