@@ -29,6 +29,6 @@ namespace BusinessLogic.Repository
 
         public async Task<int> Remove(string Id) => await _db.SaveData(query: "Delete from tblLocation where LocationId=@LocationId", new { LocationId = int.Parse(Id) });
 
-        public async Task<int> Update(TblLocation model) => await _db.SaveData(query: "Update tblLocation set Location=@Location where LocationId=@LocationId", new { model });
+        public async Task<int> Update(TblLocation model) => await _db.SaveData(query: "Update tblLocation set Location=@Location where LocationId=@LocationId", new { model.LocationId, model.Location });
     }
 }

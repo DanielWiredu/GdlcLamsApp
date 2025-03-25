@@ -13,8 +13,8 @@ namespace BusinessLogic.Mapper
     {
         public MappingProfile() 
         {
-            CreateMap<TblLocation, LocationModel>();
-            CreateMap<LocationModel, TblLocation>();
+            CreateMap<TblReportingPoint, ReportingPointModel>();
+            CreateMap<ReportingPointModel, TblReportingPoint>();
         }
     }
 }

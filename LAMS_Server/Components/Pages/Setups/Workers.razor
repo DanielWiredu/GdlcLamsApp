@@ -1,0 +1,126 @@
+﻿@page "/setups/workers"
+@rendermode InteractiveServer
+
+<style>
+    .mud-table-container {
+        overflow: auto;
+    }
+</style>
+
+<LamsAppTitle Title="Workers" Description="Manage Workers"></LamsAppTitle>
+
+@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTable Hover="true" Elevation="25" Items="_workerList" Dense="@_dense" Bordered="@_bordered" Striped="@_striped" Filter="new Func<TblWorker, bool>(Search)" @bind-worker="_worker" >
+        <ToolBarContent>
+            <div class="justify-center mud-text-align-center">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="(() => InvokeModal())" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">Create</MudButton>
+                <MudButton Variant="Variant.Filled" OnClick="GetWorkersAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary">Reload</MudButton>
+                <MudButton Variant="Variant.Filled" OnClick="ExportToExcel" StartIcon="@Icons.Custom.FileFormats.FileExcel" IconColor="Color.Secondary" Color="Color.Surface" Style="margin-left: 5px;">Export</MudButton>
+            </div>
+            @* <MudToolBarSpacer /> *@
+            <MudSpacer></MudSpacer>
+                <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Search for Workers" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+           
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<TblWorker, object>(x => x.WorkerId)">Id</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<TblWorker, object>(x => x.Sname)">Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<TblWorker, object>(x => x.Oname)">Description</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<TblWorker, object>(x => x.PhoneNo)">Tax</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:right">Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.WorkerId</MudTd>
+            <MudTd DataLabel="Name">
+                <MudHighlighter Text="@context.Sname" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Description">
+                <MudHighlighter Text="@context.Oname" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Tax">@context.PhoneNo</MudTd>
+            @* <MudTd DataLabel="Actions" Style="text-align:right">
+                    <MudMenu Label="Actions" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" IconColor="Color.Secondary" Direction="Direction.Left" OffsetX="true">
+                            <MudMenuItem @onclick="@(() => InvokeModal(@context.WorkerId))">Edit"</MudMenuItem>
+                            <MudMenuItem @onclick="@(() => Delete(@context.WorkerId))">Delete"</MudMenuItem>
+                    </MudMenu>
+            </MudTd> *@
+            <MudTd DataLabel="">
+                <MudFab Href="@($"/supplier/edit/{context.WorkerId}")" Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Edit" />
+                <MudFab Href="@($"/supplier/delete/{context.WorkerId}")" Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" />
+            </MudTd>
+        </RowTemplate>
+        @* <FooterContent>
+            
+        </FooterContent> *@
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+
+    <div class="d-flex flex-wrap mt-4">
+        <MudSwitch @bind-Value="@_dense" Color="Color.Secondary" Style="margin-left: 5px;">Dense</MudSwitch>
+        <MudSwitch @bind-Value="@_striped" Color="Color.Tertiary" Style="margin-left: 5px;">Striped</MudSwitch>
+        <MudSwitch @bind-Value="@_bordered" Color="Color.Warning" Style="margin-left: 5px;">Bordered</MudSwitch>
+    </div>
+}
+
+
+@code {
+
+    private List<TblWorker> _workerList = new();
+    private TblWorker _worker = new();
+    private string _searchString = "";
+    private bool _dense = true;
+    private bool _striped = true;
+    private bool _bordered = false;
+
+    private ClaimsPrincipal _currentUser;
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetWorkersAsync();
+        _loaded = true;
+    }
+
+    private async Task GetWorkersAsync()
+    {
+        var response = await _db.Workers.GetAll();
+        _workerList = response.ToList();
+    }
+    private async Task InvokeModal(string id = null)
+    {
+           
+    }
+    private async Task ExportToExcel()
+    {
+            
+    }
+    private async Task Delete(string id)
+    {
+        
+    }
+    private async Task Reset()
+    {
+        _worker = new TblWorker();
+        await GetWorkersAsync();
+    }
+    private bool Search(TblWorker worker)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+        if (worker.Sname?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+        {
+            return true;
+        }
+        if (worker.Oname?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true)
+        {
+            return true;
+        }
+        return false;
+    }
+}

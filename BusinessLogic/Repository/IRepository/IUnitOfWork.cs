@@ -8,6 +8,8 @@ namespace BusinessLogic.Repository.IRepository
 {
     public interface IUnitOfWork
     {
-        ILocationRepository Location { get; }
+        ILocationRepository Locations { get; }
+        IReportingPointRepository ReportingPoints { get; }
+        IWorkerRepository Workers { get; }
     }
 }

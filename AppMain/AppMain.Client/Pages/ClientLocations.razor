@@ -1,0 +1,20 @@
+﻿@page "/client-locations"
+@using AppModels
+@rendermode InteractiveAuto
+@inject HttpClient _httpClient
+@inject Microsoft.Extensions.Configuration.IConfiguration config
+
+<h1>Client Locations</h1>
+
+
+
+@code {
+    protected List<LocationModel> locations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // _httpClient.BaseAddress = new Uri(config["BaseAPIUrl"]);
+        _httpClient.BaseAddress = new Uri("http://localhost:5001/");
+        locations = await _httpClient.GetFromJsonAsync<List<LocationModel>>("api/ReportingPoint");
+    }
+}

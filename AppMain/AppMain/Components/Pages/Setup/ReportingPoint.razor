@@ -1,0 +1,372 @@
+﻿@page "/reportingPoints"
+@rendermode InteractiveServer
+
+@using DataAccess.Models
+@using AppModels
+@using BusinessLogic.Repository.IRepository
+@using Microsoft.AspNetCore.Authorization
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Spinner
+
+@inject IUnitOfWork _db
+@inject IJSRuntime JS
+
+<h3>Reporting Point</h3>
+
+<button type="button" class="btn btn-primary m-2 float-end" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="addClick">Add ReportingPoint</button>
+<div class="row col-md-4">
+    <button class="btn btn-success" @onclick="TestSwalSuccess">Test Swal Success </button> <hr />
+    <button class="btn btn-danger" @onclick="TestSwalFailure">Test Swal Failure </button>
+</div>
+
+<p>Log response from action : @logResponse</p>
+
+@* <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                <div class="d-flex flex-row">
+                    <input class="form-control m-2" @bind="ReportingPointIdFilter" />
+                    <button class="m-1" @onclick="FilterFn">Filter</button>
+                    <button class="btn btn-light" @onclick='()=>SortFn("ReportingPointId","asc")'><i class="bi bi-arrow-up"></i></button>
+                    <button class="btn btn-light" @onclick='()=>SortFn("ReportingPointId","desc")'><i class="bi bi-arrow-down"></i></button>
+                </div>
+                Department Id
+            </th>
+            <th>
+                <div class="d-flex flex-row">
+                    <input class="form-control m-2" @bind="ReportingPointFilter" />
+                    <button class="m-1" @onclick="FilterFn">Filter</button>
+                    <button class="btn btn-light" @onclick='()=>SortFn("ReportingPoint","asc")'><i class="bi bi-arrow-up"></i></button>
+                    <button class="btn btn-light" @onclick='()=>SortFn("ReportingPoint","desc")'><i class="bi bi-arrow-down"></i></button>
+                </div>
+                Department Name
+            </th>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rpt in reportingPoints)
+        {
+            <tr>
+                <td>@rpt.ReportingPointId</td>
+                <td>@rpt.ReportingPoint</td>
+                <td>
+                    <button type="button" class="btn btn-light mr-1" data-bs-toggle="modal" data-bs-target="#exampleModal" @onclick="(()=> editClick(rpt))">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button type="button" class="btn btn-light mr-1" @onclick="(()=> deleteClick(rpt.ReportingPointId))">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <div class="row">
+            <SfGrid @ref="gridReportingPoints" Toolbar="@toolbar" AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true" DataSource="@reportingPoints" AllowPaging="true" AllowGrouping="true" AllowSorting="true" Height="300px" RowHeight="40">
+                <GridEvents TValue="ReportingPointModel" CommandClicked="OnCommandClicked" OnToolbarClick="ToolbarButtonsClickHandler" OnActionBegin="ActionBeginHandler" OnActionComplete="ActionCompleteHandler"></GridEvents>
+                <GridPageSettings PageCount="5" PageSize="20"></GridPageSettings>
+                <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true" Mode="EditMode.Dialog"></GridEditSettings>
+                <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
+                <GridColumns>
+                    <GridColumn Field=@nameof(ReportingPointModel.ReportingPointId) HeaderText="ReportingPoint ID" TextAlign="TextAlign.Left" Width="120" AllowAdding="false" IsIdentity="true" IsPrimaryKey="true">
+                        <HeaderTemplate>
+                            <div>
+                                <i class="bi bi-arrow-up"></i> Reporting Point ID
+                            </div>
+                        </HeaderTemplate>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(ReportingPointModel.ReportingPoint) HeaderText="ReportingPoint Name" Width="150"></GridColumn>
+                    <GridColumn HeaderText="Temp Btn" Width="120">
+                        <Template>
+                            <tr>
+                                <td>
+                                    <button type="button" class="btn btn-light mr-1" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-light mr-1">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Custom Ops" Width="100">
+                        <GridCommandColumns>
+                            <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {Content="01", CssClass="e-outline" })"></GridCommandColumn>
+                            <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {Content="02", CssClass="e-outline" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                    <GridColumn HeaderText="Manage Records" Width="150">
+                        <GridCommandColumns>
+                            <GridCommandColumn Type="CommandButtonType.Edit" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-edit", CssClass="e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-delete", CssClass="e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Save" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-save", CssClass="e-flat" })"></GridCommandColumn>
+                            <GridCommandColumn Type="CommandButtonType.Cancel" ButtonOption="@(new CommandButtonOptions() {IconCss="e-icons e-cancel-icon", CssClass="e-flat" })"></GridCommandColumn>
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+                <SfSpinner @bind-Visible=@VisibleProp>
+
+                </SfSpinner>
+            </SfGrid>
+            <hr />
+            <SfMessage Severity="MessageSeverity.Success" Visible="@IsSuccessMgsVisible"> Operation Completed Successfully </SfMessage>
+            <SfMessage Severity="MessageSeverity.Error" Visible="@IsErrorMgsVisible"> Operation Failed </SfMessage>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="=exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@modalTitle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">ReportingPoint </span>
+                    <input type="text" class="form-control" @bind="ReportingPointName" />
+                </div>
+
+                @if (modalTitle == "Add Reporting Point")
+                {
+                    <button type="button" class="btn btn-primary" @onclick="createClick">Create</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-primary" @onclick="updateClick">Update</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private SfGrid<ReportingPointModel>? gridReportingPoints { get; set; }
+    private List<object> toolbar = new List<object> {"Add", "Edit", "Delete", "Update", "Cancel", "Search", "ExcelExport", "PdfExport",
+    new ItemModel(){Text="Log", TooltipText="Log all transactions", PrefixIcon="e-click", Id="logTrans" } };
+
+    private IEnumerable<ReportingPointModel> reportingPoints = Array.Empty<ReportingPointModel>();
+
+    private string ReportingPointIdFilter = "";
+    private string ReportingPointFilter = "";
+
+    private IEnumerable<ReportingPointModel> reportingPointsWithoutFilter = Array.Empty<ReportingPointModel>();
+
+    private string modalTitle;
+    private int ReportingPointId;
+    private string ReportingPointName;
+    private string logResponse;
+
+    private bool VisibleProp { get; set; } = false;
+
+    private bool IsSuccessMgsVisible { get; set; } = false;
+    private bool IsErrorMgsVisible { get; set; } = false;
+
+    private async Task refreshList()
+    {
+        reportingPointsWithoutFilter = reportingPoints = await _db.ReportingPoints.GetAll();
+    }
+
+    private void FilterFn()
+    {
+        reportingPoints = reportingPointsWithoutFilter.Where(c =>
+            c.ReportingPointId.ToString().Contains(ReportingPointIdFilter) && c.ReportingPoint.ToLower().Contains(ReportingPointFilter.ToLower())
+        );
+    }
+   
+    private void SortFn(string property, string asc_desc)
+    {
+        if (property == "ReportingPointId")
+        {
+            if (asc_desc == "asc")
+                reportingPoints = reportingPointsWithoutFilter.OrderBy(c => c.ReportingPointId);
+            else
+                reportingPoints = reportingPointsWithoutFilter.OrderByDescending(c => c.ReportingPointId);
+        }
+        else if (property == "ReportingPoint")
+        {
+            if (asc_desc == "asc")
+                reportingPoints = reportingPointsWithoutFilter.OrderBy(c => c.ReportingPoint);
+            else
+                reportingPoints = reportingPointsWithoutFilter.OrderByDescending(c => c.ReportingPoint);
+        }
+    }
+
+    private async Task createClick()
+    {
+        var repPointObj = new ReportingPointModel()
+            {
+                ReportingPoint = ReportingPointName
+            };
+        try
+        {
+            var createdResult = await _db.ReportingPoints.Add(repPointObj);
+            if (createdResult > 0)
+            {
+                // await JS.InvokeVoidAsync("alert", createdResult.ToString() + " Record(s) saved successfully");
+                await JS.InvokeVoidAsync("ShowToastr", "success", createdResult.ToString() + " Record(s) saved successfully");
+                await refreshList();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            // await JS.InvokeVoidAsync("alert", ex.Message.ToString());
+            await JS.InvokeVoidAsync("ShowToastr", "error", ex.Message.ToString());
+        }  
+    }
+    
+    private async Task LogTransaction()
+    {
+        logResponse = await _db.ReportingPoints.isLogged(DateTime.UtcNow, "DBWiredu", "Updated Reporting Point", "RecordID");
+    }
+
+    private async Task updateClick()
+    {
+        var repPointObj = new ReportingPointModel()
+            {
+                ReportingPointId = ReportingPointId,
+                ReportingPoint = ReportingPointName
+            };
+
+        try
+        {
+            var createdResult = await _db.ReportingPoints.Update(repPointObj);
+            if (createdResult > 0)
+            {
+                // await JS.InvokeVoidAsync("alert", createdResult.ToString() + " Record(s) updated successfully");
+                await JS.InvokeVoidAsync("ShowSwal", "success", createdResult.ToString() + " Record(s) updated successfully");
+                await refreshList();
+                await LogTransaction();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            // await JS.InvokeVoidAsync("alert", ex.Message.ToString());
+            await JS.InvokeVoidAsync("ShowSwal", "error", ex.Message.ToString());
+        }  
+    }
+
+    private async Task deleteClick(int id)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", "Are you sure?"))
+        {
+            return;
+
+        }
+        try
+        {
+            var createdResult = await _db.ReportingPoints.Remove(id.ToString());
+            if (createdResult > 0)
+            {
+                // await JS.InvokeVoidAsync("alert", createdResult.ToString() + " Record(s) deleted successfully");
+                await JS.InvokeVoidAsync("ShowSwal", "success", createdResult.ToString() + " Record(s) deleted successfully");
+                await refreshList();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.Message.ToString());
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        VisibleProp = true;
+        await refreshList();
+
+        // await Task.Delay(3000);
+        VisibleProp = false;
+    }
+
+    private void addClick()
+    {
+        modalTitle = "Add Reporting Point";
+        ReportingPointId = 0;
+        ReportingPointName = string.Empty;
+    }
+    private void editClick(ReportingPointModel reportingPoint)
+    {
+        modalTitle = "Edit Reporting Point";
+        ReportingPointId = reportingPoint.ReportingPointId;
+        ReportingPointName = reportingPoint.ReportingPoint;
+    }
+    private async Task TestSwalSuccess()
+    {
+        await JS.InvokeVoidAsync("ShowSwal", "success", "Task completed successfully");
+        IsSuccessMgsVisible = true;
+    }
+    private async Task TestSwalFailure()
+    {
+        await JS.InvokeVoidAsync("ShowSwal", "error", "Task failed!");
+        IsErrorMgsVisible = true;
+    }
+
+    public async void ToolbarButtonsClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        if (args.Item.Id.Contains("_excelexport"))
+        {
+            await gridReportingPoints.ExportToExcelAsync();
+        }
+        else if (args.Item.Id.Contains("_pdfexport"))
+        {
+            await gridReportingPoints.ExportToPdfAsync();
+        }
+        else if (args.Item.Id == "logTrans")
+        {
+            Console.Write("Transaction Logged successfully");
+        }
+    }
+    public async void OnCommandClicked(CommandClickEventArgs<ReportingPointModel> args)
+    {
+        if (args.CommandColumn.ButtonOption.Content == "01")
+        {
+            Console.Write("Custom Operation 1");
+        }
+        else if (args.CommandColumn.ButtonOption.Content == "02")
+        {
+            Console.Write("Custom Operation 2");
+        }
+    }
+    public async void ActionBeginHandler(ActionEventArgs<ReportingPointModel> args)
+    {
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            if (args.Action == "Add")
+            {
+                // save new record (args.Data) ;
+            }
+            else if (args.Action == "Edit")
+            {
+                // update record (args.Data) ;
+            }
+        }
+        else if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete))
+        {
+            //delete record (args.Data.Id);
+        }
+    }
+    public async void ActionCompleteHandler(ActionEventArgs<ReportingPointModel> args)
+    {
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save))
+        {
+            if (args.Action == "Add")
+            {
+                refreshList();
+                gridReportingPoints?.Refresh();
+            }
+          // no need to refresh for update and delete 
+        }
+    }
+}

@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Repository.IRepository;
+﻿using AutoMapper;
+using BusinessLogic.Repository.IRepository;
 using DataAccess.DbAccess;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,17 @@ namespace BusinessLogic.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ISqlDataAccess _db;
-        public UnitOfWork(ISqlDataAccess db) 
+        private readonly IMapper _mapper;
+        public UnitOfWork(ISqlDataAccess db, IMapper mapper) 
         {
             _db = db;
-            Location = new LocationRepository(_db);
+            _mapper = mapper;
+            Locations = new LocationRepository(_db);
+            ReportingPoints = new ReportingPointRepository(_db, _mapper);
+            Workers = new WorkerRepository(_db);
         }
-        public ILocationRepository Location { get; private set; }
+        public ILocationRepository Locations { get; private set; }
+        public IReportingPointRepository ReportingPoints { get; private set; }
+        public IWorkerRepository Workers { get; private set; }
     }
 }

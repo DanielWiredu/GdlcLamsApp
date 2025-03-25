@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35004.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppMain", "AppMain\AppMain\AppMain.csproj", "{466A9CE9-8394-41E2-8CD8-C2363B339DFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppMain", "AppMain\AppMain\AppMain.csproj", "{466A9CE9-8394-41E2-8CD8-C2363B339DFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppMain.Client", "AppMain\AppMain.Client\AppMain.Client.csproj", "{793339B6-BF80-49F0-AE9C-168569C6E837}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppMain.Client", "AppMain\AppMain.Client\AppMain.Client.csproj", "{793339B6-BF80-49F0-AE9C-168569C6E837}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{37A6F9D3-DA80-44F1-B471-34DE03B47599}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{37A6F9D3-DA80-44F1-B471-34DE03B47599}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{B755FDA9-13AB-4BFE-BFA5-1DC02748FCA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{B755FDA9-13AB-4BFE-BFA5-1DC02748FCA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppModels", "AppModels\AppModels.csproj", "{F74A95A8-EB51-47ED-B1E1-A490C97D139B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppModels", "AppModels\AppModels.csproj", "{F74A95A8-EB51-47ED-B1E1-A490C97D139B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LAMS_Server", "LAMS_Server\LAMS_Server.csproj", "{465A2E14-3BAE-4F2B-BBFC-3370627CCF24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F74A95A8-EB51-47ED-B1E1-A490C97D139B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F74A95A8-EB51-47ED-B1E1-A490C97D139B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F74A95A8-EB51-47ED-B1E1-A490C97D139B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{465A2E14-3BAE-4F2B-BBFC-3370627CCF24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{465A2E14-3BAE-4F2B-BBFC-3370627CCF24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{465A2E14-3BAE-4F2B-BBFC-3370627CCF24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{465A2E14-3BAE-4F2B-BBFC-3370627CCF24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
