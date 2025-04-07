@@ -179,7 +179,7 @@ namespace AppMain.Conrollers
                     }
 
                     gdlcRequest.GphaApproved = true;
-                    gdlcRequest.GdlcApprovedDate = DateTime.UtcNow;
+                    gdlcRequest.GphaApprovedDate = DateTime.UtcNow;
                     gdlcRequest.SyncDate = DateTime.UtcNow;
                 }
                 catch (Exception ex)
@@ -399,9 +399,9 @@ namespace AppMain.Conrollers
         {
             try
             {
-                _jobManager.AddOrUpdate<UtilitiesController>("GetGPHARequests", GdlcBranch, x => x.GetGPHALabourRequests(), "*/10 * * * *");
+                _jobManager.AddOrUpdate<UtilitiesController>($"GetGPHARequests_{GdlcBranch}", GdlcBranch, x => x.GetGPHALabourRequests(), "*/10 * * * *");
 
-                _jobManager.AddOrUpdate<UtilitiesController>("SyncGPHACostSheets", GdlcBranch, x => x.GetGPHACostSheets(), "*/5 * * * *");
+                _jobManager.AddOrUpdate<UtilitiesController>($"SyncGPHACostSheets_{GdlcBranch}", GdlcBranch, x => x.GetGPHACostSheets(), "*/5 * * * *");
 
                 var response = "Jobs Sent to Hangfire!";
                 return Results.Ok(response);
