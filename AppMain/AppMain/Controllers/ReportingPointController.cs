@@ -3,7 +3,7 @@ using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AppMain.Conrollers
+namespace AppMain.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

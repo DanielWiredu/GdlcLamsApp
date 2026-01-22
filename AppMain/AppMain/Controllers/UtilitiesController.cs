@@ -8,7 +8,7 @@ using System.ComponentModel.Design;
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace AppMain.Conrollers
+namespace AppMain.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -62,6 +62,11 @@ namespace AppMain.Conrollers
         [HttpGet("SyncGPHACostSheets")]
         public async Task<string> GetGPHACostSheets()
         {
+            var now = DateTime.UtcNow.TimeOfDay;
+            if (now >= new TimeSpan(6, 0, 0) && now < new TimeSpan(20, 0, 0))
+            {
+                return "GPHA API is not configured to run between 6 AM and 8 PM.";
+            }
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
             string workerId = "";
@@ -200,6 +205,11 @@ namespace AppMain.Conrollers
         [HttpGet("SyncGPHALabourRequests")]
         public async Task<string> GetGPHALabourRequests()
         {
+            var now = DateTime.UtcNow.TimeOfDay;
+            if (now >= new TimeSpan(6, 0, 0) && now < new TimeSpan(20, 0, 0))
+            {
+                return "GPHA API is not configured to run between 6 AM and 8 PM.";
+            }
             try
             {
                 int sync_mins = Math.Abs(Convert.ToInt32(sync_request_backmins));
@@ -269,9 +279,14 @@ namespace AppMain.Conrollers
         [HttpGet("SyncGPHARequestCostSheet/{LabourRequestID}")]
         public async Task<string> GetGPHARequestCostSheet(string LabourRequestID)
         {
+            var now = DateTime.UtcNow.TimeOfDay;
+            if (now >= new TimeSpan(6, 0, 0) && now < new TimeSpan(20, 0, 0))
+            {
+                return "GPHA API is not configured to run between 6 AM and 8 PM.";
+            }
+
             string workerId = "";
             int tradeGroupId = 0;
-
 
             #region approveCostSheets
             try
@@ -399,7 +414,7 @@ namespace AppMain.Conrollers
         {
             try
             {
-                _jobManager.AddOrUpdate<UtilitiesController>($"GetGPHARequests_{GdlcBranch}", GdlcBranch, x => x.GetGPHALabourRequests(), "*/10 * * * *");
+                _jobManager.AddOrUpdate<UtilitiesController>($"GetGPHARequests_{GdlcBranch}", GdlcBranch, x => x.GetGPHALabourRequests(), "0 */1 * * *");
 
                 _jobManager.AddOrUpdate<UtilitiesController>($"SyncGPHACostSheets_{GdlcBranch}", GdlcBranch, x => x.GetGPHACostSheets(), "*/5 * * * *");
 

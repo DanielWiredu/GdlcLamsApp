@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
 
-namespace AppMain.Conrollers
+namespace AppMain.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
