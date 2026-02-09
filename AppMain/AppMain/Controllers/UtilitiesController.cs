@@ -63,9 +63,11 @@ namespace AppMain.Controllers
         public async Task<string> GetGPHACostSheets()
         {
             var now = DateTime.UtcNow.TimeOfDay;
-            if (now >= new TimeSpan(6, 0, 0) && now < new TimeSpan(20, 0, 0))
+            var mainWindow = now >= new TimeSpan(6, 0, 0) && now < new TimeSpan(18, 0, 0);
+            var lunchWindow = now >= new TimeSpan(11, 30, 0) && now < new TimeSpan(13, 30, 0);
+            if (mainWindow && !lunchWindow /* && !otherWindow */)
             {
-                return "GPHA API is not configured to run between 6 AM and 8 PM.";
+                return "GPHA API is not configured to run at this time";
             }
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
@@ -206,9 +208,11 @@ namespace AppMain.Controllers
         public async Task<string> GetGPHALabourRequests()
         {
             var now = DateTime.UtcNow.TimeOfDay;
-            if (now >= new TimeSpan(6, 0, 0) && now < new TimeSpan(20, 0, 0))
+            var mainWindow = now >= new TimeSpan(6, 0, 0) && now < new TimeSpan(18, 0, 0);
+            var lunchWindow = now >= new TimeSpan(11, 30, 0) && now < new TimeSpan(13, 30, 0);
+            if (mainWindow && !lunchWindow /* && !otherWindow */)
             {
-                return "GPHA API is not configured to run between 6 AM and 8 PM.";
+                return "GPHA API is not configured to run at this time";
             }
             try
             {
@@ -414,11 +418,11 @@ namespace AppMain.Controllers
         {
             try
             {
-                _jobManager.AddOrUpdate<UtilitiesController>($"GetGPHARequests_{GdlcBranch}", GdlcBranch, x => x.GetGPHALabourRequests(), "0 */1 * * *");
+                _jobManager.AddOrUpdate<UtilitiesController>($"GetGPHARequests_{GdlcBranch}", GdlcBranch, x => x.GetGPHALabourRequests(), "*/55 * * * *");
 
-                _jobManager.AddOrUpdate<UtilitiesController>($"SyncGPHACostSheets_{GdlcBranch}", GdlcBranch, x => x.GetGPHACostSheets(), "*/5 * * * *");
+                _jobManager.AddOrUpdate<UtilitiesController>($"SyncGPHACostSheets_{GdlcBranch}", GdlcBranch, x => x.GetGPHACostSheets(), "*/7 * * * *");
 
-                var response = "Jobs Sent to Hangfire!";
+                var response = $"Jobs Sent to Hangfire! at {DateTime.UtcNow}";
                 return Results.Ok(response);
             }
             catch (Exception ex)

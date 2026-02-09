@@ -16,19 +16,22 @@ namespace BusinessLogic.Repository
     public class ReportingPointRepository : IReportingPointRepository
     {
         private readonly ISqlDataAccess _db;
-        private readonly IMapper _mapper;
-        public ReportingPointRepository(ISqlDataAccess db, IMapper mapper)
+        public ReportingPointRepository(ISqlDataAccess db)
         {
             _db = db;
-            _mapper = mapper;
         }
         public async Task<int> Add(ReportingPointModel model) => await _db.SaveData(query: "Insert into tblReportingPoint(ReportingPoint) values(@ReportingPoint)", new {model.ReportingPoint });
-       
+
 
         public async Task<ReportingPointModel> Find(string Id)
         {
             IEnumerable<TblReportingPoint> results = await _db.LoadData<TblReportingPoint, dynamic>(query: "Select * from tblReportingPoint where ReportingPointId=@ReportingPointId", new { ReportingPointId = int.Parse(Id) });
-            var finalResults = _mapper.Map<IEnumerable<TblReportingPoint>, IEnumerable<ReportingPointModel>>(results);
+            //var finalResults = _mapper.Map<IEnumerable<TblReportingPoint>, IEnumerable<ReportingPointModel>>(results);
+            var finalResults = results.Select(rp => new ReportingPointModel
+            {
+                ReportingPointId = rp.ReportingPointId,
+                ReportingPoint = rp.ReportingPoint
+            });
             return finalResults.FirstOrDefault();
         }
 

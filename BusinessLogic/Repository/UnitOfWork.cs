@@ -12,13 +12,11 @@ namespace BusinessLogic.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ISqlDataAccess _db;
-        private readonly IMapper _mapper;
-        public UnitOfWork(ISqlDataAccess db, IMapper mapper) 
+        public UnitOfWork(ISqlDataAccess db) 
         {
             _db = db;
-            _mapper = mapper;
             Locations = new LocationRepository(_db);
-            ReportingPoints = new ReportingPointRepository(_db, _mapper);
+            ReportingPoints = new ReportingPointRepository(_db);
             Workers = new WorkerRepository(_db);
         }
         public ILocationRepository Locations { get; private set; }

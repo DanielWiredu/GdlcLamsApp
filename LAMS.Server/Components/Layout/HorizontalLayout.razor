@@ -1,0 +1,37 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime;
+
+<div class="wrapper">
+
+    <Topbar/>
+    <HorizontalNav/>
+
+    <div class="content-page">
+
+        <div class="container-fluid">
+
+            @Body
+
+        </div>
+
+        <Footer/>
+
+    </div>
+
+</div>
+
+@* <Customizer/> *@
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("updateHtmlAttributes", "data-layout", "topnav");
+            await JsRuntime.InvokeVoidAsync("updateHtmlAttributes", "data-topbar-color", "dark");
+            await JsRuntime.InvokeVoidAsync("updateHtmlAttributes", "data-menu-color", "light");
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+}
