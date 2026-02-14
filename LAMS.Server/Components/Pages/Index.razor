@@ -1058,15 +1058,15 @@
 </div> <!-- end row-->
 
 @code {
-private IJSObjectReference? _module;
-protected override async Task OnAfterRenderAsync(bool firstRender)
-{
-    if (firstRender)
+    private IJSObjectReference? _module;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/dashboard.js");
-        await JsRuntime.InvokeVoidAsync("loadDashboard");
-        await JsRuntime.InvokeVoidAsync("loadConfig");
-        await JsRuntime.InvokeVoidAsync("loadApps");
+        if (firstRender)
+        {
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/dashboard.js");
+            await JsRuntime.InvokeVoidAsync("loadDashboard");
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
     }
-}
 }

@@ -1,0 +1,17 @@
+﻿@page "/workers-aged"
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime;
+
+
+<PageBreadcrumb Subtitle="Workers" Title="Aged" />
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+}

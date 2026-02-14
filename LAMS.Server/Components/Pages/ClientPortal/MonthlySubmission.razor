@@ -1,0 +1,17 @@
+﻿@page "/clientportal-monthlysubmission"
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime;
+
+
+<PageBreadcrumb Subtitle="Client Portal" Title="Monthly Submission" />
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+}

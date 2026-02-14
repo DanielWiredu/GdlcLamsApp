@@ -1,0 +1,17 @@
+﻿@page "/clms-approvedrequest"
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime;
+
+
+<PageBreadcrumb Subtitle="CLMS" Title="Approved Request" />
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+}

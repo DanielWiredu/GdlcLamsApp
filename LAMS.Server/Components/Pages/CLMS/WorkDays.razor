@@ -1,0 +1,17 @@
+﻿@page "/clms-workdays"
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime;
+
+
+<PageBreadcrumb Subtitle="CLMS" Title="Days Worked" />
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+}

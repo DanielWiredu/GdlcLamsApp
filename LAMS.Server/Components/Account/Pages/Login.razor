@@ -6,6 +6,8 @@
 @using Microsoft.AspNetCore.Identity
 @using LAMS.Server.Data
 
+@layout LAMS.Server.Components.Layout.BaseLayout
+
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
