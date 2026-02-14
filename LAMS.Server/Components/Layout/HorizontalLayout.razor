@@ -1,6 +1,11 @@
 @inherits LayoutComponentBase
 @inject IJSRuntime JsRuntime;
 
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <div class="wrapper">
 
     <Topbar/>
@@ -22,7 +27,7 @@
 
 @* <Customizer/> *@
 
-@code {
+@* @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -34,4 +39,4 @@
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
     }
-}
+} *@

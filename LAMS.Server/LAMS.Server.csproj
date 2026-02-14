@@ -22,4 +22,11 @@
     <ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="Components\Pages\ClientPortal\" />
+    <Folder Include="Components\Pages\CustomizePayroll\" />
+    <Folder Include="Components\Pages\Reports\" />
+  </ItemGroup>
+
 </Project>

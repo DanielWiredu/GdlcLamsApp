@@ -8,13 +8,13 @@
     <!-- Brand Logo -->
     <a href="/" class="logo">
         <span class="logo logo-light">
-            <span class="logo-lg"><img src="/images/logo.png" alt="logo"></span>
-            <span class="logo-sm"><img src="/images/logo-sm.png" alt="small logo"></span>
+            <span class="logo-lg"><img src="/images/GDLC_Logo.png" alt="logo" height="300"></span>
+            <span class="logo-sm">LAMS</span>
         </span>
 
         <span class="logo logo-dark">
-            <span class="logo-lg"><img src="/images/logo-black.png" alt="dark logo"></span>
-            <span class="logo-sm"><img src="/images/logo-sm.png" alt="small logo"></span>
+            <span class="logo-lg"><img src="/images/GDLC_Logo.png" alt="dark logo" ></span>
+            <span class="logo-sm">LAMS</span>
         </span>
     </a>
 
@@ -102,55 +102,10 @@
             <li class="side-nav-title mt-2" data-lang="menu-title">Navigation</li>
 
             <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarDashboards" aria-expanded="false"
-                   aria-controls="sidebarDashboards" class="side-nav-link">
+                <a href="/" class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="circle-gauge"></i></span>
-                    <span class="menu-text" data-lang="dashboards">Dashboards</span>
-                    <span class="badge bg-success">02</span>
-                </a>
-                <div class="collapse" id="sidebarDashboards">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/" class="side-nav-link">
-                                <span class="menu-text" data-lang="dashboard-one">Dashboard 1</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/dashboard-2" class="side-nav-link">
-                                <span class="menu-text" data-lang="dashboard-two">Dashboard 2</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a href="/landing" target="_blank" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="earth"></i></span>
-                    <span class="menu-text" data-lang="landing-page">Landing Page</span>
-                </a>
-            </li>
-
-            <li class="side-nav-title" data-lang="apps-title">Apps</li>
-
-            <li class="side-nav-item">
-                <a href="/chat" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="message-square-dot"></i></span>
-                    <span class="menu-text" data-lang="chat"> Chat </span>
-                </a>
-            </li>
-
-            <li class="side-nav-item">
-                <a href="/calendar" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="calendar"></i></span>
-                    <span class="menu-text" data-lang="calendar"> Calendar </span>
-                </a>
-            </li>
-
-            <li class="side-nav-item">
-                <a href="/file-manager" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="folder-open-dot"></i></span>
-                    <span class="menu-text" data-lang="file-manager"> File Manager </span>
+                    <span class="menu-text" data-lang=""> Dashboard </span>
+                    <span class="badge bg-success">01</span>
                 </a>
             </li>
 
@@ -158,63 +113,94 @@
                 <a data-bs-toggle="collapse" href="#sidebarEcommerce" aria-expanded="false"
                    aria-controls="sidebarEcommerce" class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="shopping-bag"></i></span>
-                    <span class="menu-text" data-lang="ecommerce">Ecommerce</span>
+                    <span class="menu-text" data-lang="">Workers</span>
                     <span class="menu-arrow"></span>
                 </a>
                 <div class="collapse" id="sidebarEcommerce">
                     <ul class="sub-menu">
+                        <li class="side-nav-item"> <a href="/workers-registration" class="side-nav-link"><span class="menu-text" data-lang="">Registration</span> </a> </li>
+                        @* <li class="side-nav-item">
+                            <a href="/counter" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Allocation</span>
+                            </a>
+                        </li> *@
+                        <li class="side-nav-item">
+                            <a href="/operations-dailystaffreq" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Daily Staff Requisition</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/operations-weeklystaffreq" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Weekly Staff Requisition</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/operations-monthlystaffreq" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Monthly Staff Requisition</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/operations-dailyhoursupdate" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Hours Update Daily Cost Sheet</span>
+                            </a>
+                        </li>
                         <li class="side-nav-item">
                             <a data-bs-toggle="collapse" href="#sidebarProducts" aria-expanded="false"
                                aria-controls="sidebarProducts" class="side-nav-link">
-                                <span class="menu-text" data-lang="eco-products">Products</span>
+                                <span class="menu-text" data-lang="">Client Portal</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <div class="collapse" id="sidebarProducts">
                                 <ul class="sub-menu">
                                     <li class="side-nav-item">
-                                        <a href="/ecommerce-products" class="side-nav-link">
-                                            <span class="menu-text" data-lang="eco-pro-listing">Listing</span>
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Labour Advice</span>
                                         </a>
                                     </li>
                                     <li class="side-nav-item">
-                                        <a href="/ecommerce-products-grid" class="side-nav-link">
-                                            <span class="menu-text" data-lang="eco-pro-grid">Products Grid</span>
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Daily Submissions</span>
                                         </a>
                                     </li>
                                     <li class="side-nav-item">
-                                        <a href="/ecommerce-product-details" class="side-nav-link">
-                                            <span class="menu-text" data-lang="eco-pro-details">Product Details</span>
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Weekly Submissions</span>
                                         </a>
                                     </li>
                                     <li class="side-nav-item">
-                                        <a href="/ecommerce-add-product" class="side-nav-link">
-                                            <span class="menu-text" data-lang="eco-pro-add">Add Product</span>
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Monthly Submissions</span>
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/ecommerce-categories" class="side-nav-link">
-                                <span class="menu-text" data-lang="eco-categories">Categories</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
                             <a data-bs-toggle="collapse" href="#sidebarOrders" aria-expanded="false"
                                aria-controls="sidebarOrders" class="side-nav-link">
-                                <span class="menu-text" data-lang="eco-orders">Orders</span>
+                                <span class="menu-text" data-lang="">GPHA CLMS</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <div class="collapse" id="sidebarOrders">
                                 <ul class="sub-menu">
                                     <li class="side-nav-item">
                                         <a href="/ecommerce-orders" class="side-nav-link">
-                                            <span class="menu-text" data-lang="eco-orders-list">Orders</span>
+                                            <span class="menu-text" data-lang="">Pending Requests</span>
                                         </a>
                                     </li>
                                     <li class="side-nav-item">
                                         <a href="/ecommerce-order-details" class="side-nav-link">
-                                            <span class="menu-text" data-lang="eco-order-details">Order Details</span>
+                                            <span class="menu-text" data-lang="">All Requests</span>
+                                        </a>
+                                    </li>
+                                    <li class="side-nav-item">
+                                        <a href="/ecommerce-order-details" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Approved Requests</span>
+                                        </a>
+                                    </li>
+                                    <li class="side-nav-item">
+                                        <a href="/ecommerce-order-details" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Days Worked</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -222,36 +208,7 @@
                         </li>
                         <li class="side-nav-item">
                             <a href="/ecommerce-customers" class="side-nav-link">
-                                <span class="menu-text" data-lang="eco-customers">Customers</span>
-                            </a>
-                        </li>
-
-                        <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarSellers" aria-expanded="false"
-                               aria-controls="sidebarSellers" class="side-nav-link">
-                                <span class="menu-text" data-lang="eco-sellers"> Sellers </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="sidebarSellers">
-                                <ul class="sub-menu">
-                                    <li class="side-nav-item">
-                                        <a href="/ecommerce-sellers" class="side-nav-link">
-                                            <span class="menu-text" data-lang="eco-sellers-list">Sellers</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/ecommerce-seller-details" class="side-nav-link">
-                                            <span class="menu-text"
-                                                  data-lang="eco-sellers-details">Sellers Details</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-                        <li class="side-nav-item">
-                            <a href="/ecommerce-reviews" class="side-nav-link">
-                                <span class="menu-text" data-lang="eco-reviews">Reviews</span>
+                                <span class="menu-text" data-lang="">ID Cards</span>
                             </a>
                         </li>
                     </ul>
@@ -259,96 +216,67 @@
             </li>
 
             <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarEmail" aria-expanded="false" aria-controls="sidebarEmail"
-                   class="side-nav-link">
+                <a href="#sidebarEmail" class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="inbox"></i></span>
-                    <span class="menu-text" data-lang="email">Email</span>
+                    <span class="menu-text" data-lang="">Aged Workers</span>
                     <span class="badge text-bg-danger">New</span>
                 </a>
-                <div class="collapse" id="sidebarEmail">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/email" class="side-nav-link">
-                                <span class="menu-text" data-lang="email-inbox">Inbox</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/email-details" class="side-nav-link">
-                                <span class="menu-text" data-lang="email-details">Details</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/email-compose" class="side-nav-link">
-                                <span class="menu-text" data-lang="email-compose">Compose</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/email-templates" class="side-nav-link">
-                                <span class="menu-text" data-lang="email-templates">Email Templates</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </li>
 
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarCRM" aria-expanded="false" aria-controls="sidebarCRM"
                    class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="handshake"></i></span>
-                    <span class="menu-text" data-lang="crm"> CRM </span>
+                    <span class="menu-text" data-lang=""> Audit </span>
                     <span class="menu-arrow"></span>
                 </a>
                 <div class="collapse" id="sidebarCRM">
                     <ul class="sub-menu">
                         <li class="side-nav-item">
-                            <a href="/crm-contacts" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-contacts">Contacts</span>
+                            <a href="/audit-dailyapproval" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Daily Requisition Approval</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/crm-opportunities" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-opportunities">Opportunities</span>
+                            <a href="/audit-weeklyapproval" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Weekly Requisition Approval</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/crm-deals" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-deals">Deals</span>
+                            <a href="/audit-monthlyapproval" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Monthly Requisition Approval</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/crm-leads" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-leads">Leads</span>
+                            <a data-bs-toggle="collapse" href="#sidebarProducts1" aria-expanded="false"
+                               aria-controls="sidebarProducts" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Client Portal</span>
+                                <span class="menu-arrow"></span>
                             </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/crm-pipeline" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-pipeline">Pipeline</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/crm-campaign" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-campaign">Campaign</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/crm-proposals" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-proposals">Proposals</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/crm-estimations" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-estimations">Estimations</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/crm-customers" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-customers">Customers</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/crm-activities" class="side-nav-link">
-                                <span class="menu-text" data-lang="crm-activities">Activities</span>
-                            </a>
+                            <div class="collapse" id="sidebarProducts1">
+                                <ul class="sub-menu">
+                                    <li class="side-nav-item">
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Labour Advice</span>
+                                        </a>
+                                    </li>
+                                    <li class="side-nav-item">
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Daily Submissions</span>
+                                        </a>
+                                    </li>
+                                    <li class="side-nav-item">
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Weekly Submissions</span>
+                                        </a>
+                                    </li>
+                                    <li class="side-nav-item">
+                                        <a href="#" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Monthly Submissions</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -358,34 +286,24 @@
                 <a data-bs-toggle="collapse" href="#sidebarUsers" aria-expanded="false" aria-controls="sidebarUsers"
                    class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="users"></i></span>
-                    <span class="menu-text" data-lang="users"> Users </span>
+                    <span class="menu-text" data-lang=""> Payroll </span>
                     <span class="menu-arrow"></span>
                 </a>
                 <div class="collapse" id="sidebarUsers">
                     <ul class="sub-menu">
                         <li class="side-nav-item">
-                            <a href="/users-contacts" class="side-nav-link">
-                                <span class="menu-text" data-lang="contacts">Contacts</span>
+                            <a href="/audit-dailypayroll" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Daily Payroll</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/users-profile" class="side-nav-link">
-                                <span class="menu-text" data-lang="profile">Profile</span>
+                            <a href="/audit-weeklypayroll" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Weekly Payroll</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/users-roles" class="side-nav-link">
-                                <span class="menu-text" data-lang="roles">Roles</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/users-role-details" class="side-nav-link">
-                                <span class="menu-text" data-lang="role-details">Role Details</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/users-permissions" class="side-nav-link">
-                                <span class="menu-text" data-lang="permissions">Permissions</span>
+                            <a href="/audit-monthlypayroll" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Monthly Payroll</span>
                             </a>
                         </li>
                     </ul>
@@ -396,1094 +314,186 @@
                 <a data-bs-toggle="collapse" href="#sidebarInvoice" aria-expanded="false" aria-controls="sidebarInvoice"
                    class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="receipt-text"></i></span>
-                    <span class="menu-text" data-lang="invoice"> Invoice</span>
+                    <span class="menu-text" data-lang=""> Setups</span>
                     <span class="menu-arrow"></span>
                 </a>
                 <div class="collapse" id="sidebarInvoice">
                     <ul class="sub-menu">
                         <li class="side-nav-item">
-                            <a href="/invoices" class="side-nav-link">
-                                <span class="menu-text" data-lang="invoices">Invoices</span>
+                            <a href="/setups-gang" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Gang</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/invoice-details" class="side-nav-link">
-                                <span class="menu-text" data-lang="invoice-details">Single Invoice</span>
+                            <a href="/setups-bank" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Bank</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/invoice-create" class="side-nav-link">
-                                <span class="menu-text" data-lang="invoice-create">New Invoice</span>
+                            <a href="/setups-bankbranch" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Bank Branch</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/setups-nationality" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Nationality</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/setups-reportingpoint" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Reporting Point</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/setups-cargo" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Cargo</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/setups-vessel" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Vessel</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="/setups-location" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Location</span>
                             </a>
                         </li>
                     </ul>
                 </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a href="/social-feed" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="rss"></i></span>
-                    <span class="menu-text" data-lang="social"> Social Feed </span>
-                </a>
             </li>
 
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarTickets" aria-expanded="false" aria-controls="sidebarTickets"
                    class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="life-buoy"></i></span>
-                    <span class="menu-text" data-lang="support"> Support Center</span>
+                    <span class="menu-text" data-lang=""> Loans</span>
                     <span class="menu-arrow"></span>
                 </a>
                 <div class="collapse" id="sidebarTickets">
                     <ul class="sub-menu">
                         <li class="side-nav-item">
-                            <a href="/ticket-list" class="side-nav-link">
-                                <span class="menu-text" data-lang="tickets">Tickets List</span>
+                            <a href="/loans-scheme" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Scheme Setup</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/ticket-details" class="side-nav-link">
-                                <span class="menu-text" data-lang="ticket-details">Ticket Details</span>
+                            <a href="/loans-management" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Loan Management</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/ticket-create" class="side-nav-link">
-                                <span class="menu-text" data-lang="ticket-create">New Ticket</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a href="/api-keys" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="key"></i></span>
-                    <span class="menu-text" data-lang="api-keys"> API Keys </span>
-                </a>
-            </li>
-
-            <li class="side-nav-title mt-2" data-lang="pages-title">Custom Pages</li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarPages" aria-expanded="false" aria-controls="sidebarPages"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="notebook-text"></i></span>
-                    <span class="menu-text" data-lang="pages"> Pages </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarPages">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/pages-faq" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-faq">FAQ</span>
+                            <a href="/loans-approval" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Loan Approval</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/pages-pricing" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-pricing">Pricing</span>
+                            <a href="/loans-repayment" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Loan Repayment</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/pages-empty" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-empty">Empty Page</span>
+                            <a href="/loans-lastrepayment" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Loan Last Repayment</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/pages-timeline" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-timeline">Timeline</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/pages-sitemap" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-sitemap">Sitemap</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/pages-search-results" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-search-results">Search Results</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/pages-coming-soon" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-coming-soon">Coming Soon</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/pages-terms-conditions" class="side-nav-link">
-                                <span class="menu-text" data-lang="pages-terms-conditions">Terms & Conditions</span>
+                            <a href="/loans-report" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Loan Reports</span>
                             </a>
                         </li>
                     </ul>
                 </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarPagesAuth" aria-expanded="false"
-                   aria-controls="sidebarPagesAuth" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="fingerprint"></i></span>
-                    <span class="menu-text" data-lang="authentication"> Authentication </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarPagesAuth">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarOneAuth" aria-expanded="false"
-                               aria-controls="sidebarOneAuth" class="side-nav-link">
-                                <span class="menu-text" data-lang="basic-auth"> Basic </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="sidebarOneAuth">
-                                <ul class="sub-menu">
-                                    <li class="side-nav-item">
-                                        <a href="/auth-sign-in" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-sign-in">Sign In</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-sign-up" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-sign-up">Sign Up</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-reset-pass" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-reset-pass">Reset Password</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-new-pass" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-new-pass">New Password</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-two-factor" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-two-factor">Two Factor</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-lock-screen" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-lock-screen">Lock Screen</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-success-mail" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-success-mail">Success Mail</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-login-pin" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-login-pin">Login with PIN</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-delete-account" class="side-nav-link">
-                                            <span class="menu-text"
-                                                  data-lang="auth-delete-account">Delete Account</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarTwoAuth" aria-expanded="false"
-                               aria-controls="sidebarTwoAuth" class="side-nav-link">
-                                <span class="menu-text" data-lang="cover-auth"> Cover </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="sidebarTwoAuth">
-                                <ul class="sub-menu">
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-sign-in" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-sign-in">Sign In</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-sign-up" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-sign-up">Sign Up</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-reset-pass" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-reset-pass">Reset Password</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-new-pass" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-new-pass">New Password</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-two-factor" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-two-factor">Two Factor</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-lock-screen" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-lock-screen">Lock Screen</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-success-mail" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-success-mail">Success Mail</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-login-pin" class="side-nav-link">
-                                            <span class="menu-text" data-lang="auth-2-login-pin">Login with PIN</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/auth-2-delete-account" class="side-nav-link">
-                                            <span class="menu-text"
-                                                  data-lang="auth-2-delete-account">Delete Account</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarPagesError" aria-expanded="false"
-                   aria-controls="sidebarPagesError" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="shield-alert"></i></span>
-                    <span class="menu-text" data-lang="error-pages"> Error Pages </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarPagesError">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/error-400" class="side-nav-link">
-                                <span class="menu-text" data-lang="error-400">400 Bad Request</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/error-401" class="side-nav-link">
-                                <span class="menu-text" data-lang="error-401">401 Unauthorized</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/error-403" class="side-nav-link">
-                                <span class="menu-text" data-lang="error-403">403 Forbidden</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/error-404" class="side-nav-link">
-                                <span class="menu-text" data-lang="error-404">404 Not Found</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/error-408" class="side-nav-link">
-                                <span class="menu-text" data-lang="error-408">408 Request Timeout</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/error-500" class="side-nav-link">
-                                <span class="menu-text" data-lang="error-500">500 Internal Server</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/maintenance" class="side-nav-link">
-                                <span class="menu-text" data-lang="maintenance">Maintenance</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-title mt-2" data-lang="layouts-title">Layouts</li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarLayouts" aria-expanded="false" aria-controls="sidebarLayouts"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="proportions"></i></span>
-                    <span class="menu-text" data-lang="layout-options"> Layout Options </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarLayouts">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/layouts-scrollable" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="layouts-scrollable">Scrollable</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/layouts-compact" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="layouts-compact">Compact</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/layouts-boxed" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="layouts-boxed">Boxed</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/layouts-horizontal" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="layouts-horizontal">Horizontal</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/layouts-preloader" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="layouts-preloader">Preloader</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarSidebars" aria-expanded="false"
-                   aria-controls="sidebarSidebars" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="panel-right-close"></i></span>
-                    <span class="menu-text" data-lang="sidebars"> Sidebars </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarSidebars">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/sidebar-dark" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-dark">Dark Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-gradient" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-gradient">Gradient Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-gray" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-gray">Gray Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-image" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-image">Image Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-compact" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-compact">Compact Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-icon-view" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-icon-view">Icon View Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-on-hover" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-on-hover">On Hover Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-on-hover-active" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-on-hover-active">On Hover Active</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-offcanvas" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-offcanvas">Offcanvas Menu</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-no-icons" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-no-icons">No Icons with Lines</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/sidebar-with-lines" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="sidebar-with-lines">Sidebar with Lines</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarTopbars" aria-expanded="false" aria-controls="sidebarTopbars"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="panel-top"></i></span>
-                    <span class="menu-text" data-lang="topbar"> Topbar </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarTopbars">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/topbar-light" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="topbar-light">Light Topbar</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/topbar-gray" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="topbar-gray">Gray Topbar</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/topbar-gradient" target="_blank" class="side-nav-link">
-                                <span class="menu-text" data-lang="topbar-gradient">Gradient Topbar</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-title mt-2" data-lang="components-title">Components</li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarBaseUI" aria-expanded="false" aria-controls="sidebarBaseUI"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="pencil-ruler"></i></span>
-                    <span class="menu-text" data-lang="base-ui"> Base UI </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarBaseUI">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/ui-buttons" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-buttons">Buttons</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-images" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-images">Images</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-accordions" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-accordions">Accordions</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-alerts" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-alerts">Alerts</span>
-                            </a>
-                        </li>
-
-                        <li class="side-nav-item">
-                            <a href="/ui-badges" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-badges">Badges</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-breadcrumb" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-breadcrumb">Breadcrumb</span>
-                            </a>
-                        </li>
-
-                        <li class="side-nav-item">
-                            <a href="/ui-cards" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-cards">Cards</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-carousel" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-carousel">Carousel</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-collapse" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-collapse">Collapse</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-colors" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-colors">Colors</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-dropdowns" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-dropdowns">Dropdowns</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-videos" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-videos">Videos</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-grid" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-grid">Grid Options</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-links" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-links">Links</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-list-group" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-list-group">List Group</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-modals" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-modals">Modals</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-notifications" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-notifications">Notifications</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-offcanvas" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-offcanvas">Offcanvas</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-placeholders" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-placeholders">Placeholders</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-pagination" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-pagination">Pagination</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-popovers" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-popovers">Popovers</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-progress" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-progress">Progress</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-spinners" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-spinners">Spinners</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-tabs" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-tabs">Tabs</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-tooltips" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-tooltips">Tooltips</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-typography" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-typography">Typography</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/ui-utilities" class="side-nav-link">
-                                <span class="menu-text" data-lang="ui-utilities">Utilities</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarMiscellaneous" aria-expanded="false"
-                   aria-controls="sidebarMiscellaneous" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="house-plug"></i></span>
-                    <span class="menu-text" data-lang="miscellaneous"> Miscellaneous </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarMiscellaneous">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/misc-sortable" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-sortable">Sortable List</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/misc-pdf-viewer" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-pdf-viewer">PDF Viewer</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/misc-i18" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-i18">i18 Support</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/misc-sweet-alerts" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-sweet-alerts">Sweet Alerts</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/misc-pass-meter" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-pass-meter">Password Meter</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/misc-clipboard" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-clipboard">Clipboard</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/misc-tree-view" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-tree-view">Tree View</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/misc-tour" class="side-nav-link">
-                                <span class="menu-text" data-lang="misc-tour">Tour</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a href="/widgets" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="dessert"></i></span>
-                    <span class="menu-text" data-lang="widgets"> Widgets </span>
-                </a>
             </li>
 
             <li class="side-nav-item">
                 <a data-bs-toggle="collapse" href="#sidebarCharts" aria-expanded="false" aria-controls="sidebarCharts"
                    class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="chart-no-axes-combined"></i></span>
-                    <span class="menu-text" data-lang="charts"> Charts </span>
+                    <span class="menu-text" data-lang=""> Tools </span>
                     <span class="menu-arrow"></span>
                 </a>
                 <div class="collapse" id="sidebarCharts">
                     <ul class="sub-menu">
                         <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarApexCharts" aria-expanded="false"
-                               aria-controls="sidebarApexCharts" class="side-nav-link">
-                                <span class="menu-text" data-lang="apex-charts"> Apex Charts </span>
-                                <span class="menu-arrow"></span>
+                            <a href="/tools-dlecompany" class="side-nav-link">
+                                <span class="menu-text" data-lang="">DLE Company</span>
                             </a>
-                            <div class="collapse" id="sidebarApexCharts">
-                                <ul class="sub-menu">
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-area" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-area">Area</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-bar" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-bar">Bar</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-bubble" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-bubble">Bubble</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-candlestick" class="side-nav-link">
-                                            <span class="menu-text"
-                                                  data-lang="charts-apex-candlestick">Candlestick</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-column" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-column">Column</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-heatmap" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-heatmap">Heatmap</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-line" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-line">Line</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-mixed" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-mixed">Mixed</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-timeline" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-timeline">Timeline</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-boxplot" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-boxplot">Boxplot</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-treemap" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-treemap">Treemap</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-pie" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-pie">Pie</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-radar" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-radar">Radar</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-radialbar" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-radialbar">RadialBar</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-scatter" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-scatter">Scatter</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-polar-area" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-polar-area">Polar Area</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-sparklines" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-sparklines">Sparklines</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-range" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-range">Range</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-funnel" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-funnel">Funnel</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/charts-apex-slope" class="side-nav-link">
-                                            <span class="menu-text" data-lang="charts-apex-slope">Slope</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                         </li>
                         <li class="side-nav-item">
                             <a data-bs-toggle="collapse" href="#sidebarChartJs" aria-expanded="false"
                                aria-controls="sidebarChartJs" class="side-nav-link">
-                                <span class="menu-text" data-lang="chartjs"> Chart Js </span>
+                                <span class="menu-text" data-lang=""> Trade Setup </span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <div class="collapse" id="sidebarChartJs">
                                 <ul class="sub-menu">
                                     <li class="side-nav-item">
-                                        <a href="/chartjs-area" class="side-nav-link">
-                                            <span class="menu-text" data-lang="chartjs-area">Area</span>
+                                        <a href="/tools-tradegroup" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Trade Group</span>
                                         </a>
                                     </li>
                                     <li class="side-nav-item">
-                                        <a href="/chartjs-bar" class="side-nav-link">
-                                            <span class="menu-text" data-lang="chartjs-bar">Bar</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/chartjs-line" class="side-nav-link">
-                                            <span class="menu-text" data-lang="chartjs-line">Line</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/chartjs-other" class="side-nav-link">
-                                            <span class="menu-text" data-lang="chartjs-other">Other</span>
+                                        <a href="/tools-tradetype" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Trade Type</span>
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/charts-apextree" class="side-nav-link">
-                                <span class="menu-text" data-lang="charts-apextree">Apex Tree</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarForms" aria-expanded="false" aria-controls="sidebarForms"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="file-input"></i></span>
-                    <span class="menu-text" data-lang="forms">Forms</span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarForms">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/form-elements" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-elements">Basic Elements</span>
+                            <a href="/tools-payrollsetup" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Payroll Setup</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/form-pickers" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-pickers">Pickers</span>
+                            <a href="/tools-taguntag" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Tag/Untag Workers</span>
                             </a>
                         </li>
                         <li class="side-nav-item">
-                            <a href="/form-select" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-select">Select</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/form-validation" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-validation">Validation</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/form-wizard" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-wizard">Wizard</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/form-fileuploads" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-fileuploads">File Uploads</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/form-text-editors" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-text-editors">Text Editors</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/form-range-slider" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-range-slider">Range Slider</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/form-layouts" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-layouts">Layouts</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/form-other-plugins" class="side-nav-link">
-                                <span class="menu-text" data-lang="form-other-plugins">Other Plugins</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarTables" aria-expanded="false" aria-controls="sidebarTables"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="table"></i></span>
-                    <span class="menu-text" data-lang="tables">Tables</span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarTables">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/tables-static" class="side-nav-link">
-                                <span class="menu-text" data-lang="tables-static">Static Tables</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/tables-custom" class="side-nav-link">
-                                <span class="menu-text" data-lang="tables-custom">Custom Tables</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarDataTables" aria-expanded="false"
-                               aria-controls="sidebarDataTables" class="side-nav-link">
-                                <span class="menu-text" data-lang="datatables">DataTables</span>
-                                <span class="badge bg-success">13</span>
-                            </a>
-                            <div class="collapse" id="sidebarDataTables">
-                                <ul class="sub-menu">
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-basic" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-basic">Basic</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-export-data" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-export-data">Export Data</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-select" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-select">Select</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-ajax" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-ajax">Ajax</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-javascript" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-javascript">Javascript Source</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-rendering" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-rendering">Data Rendering</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-scroll" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-scroll">Scroll</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-columns" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-columns">Show & Hide Column</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-child-rows" class="side-nav-link">
-                                            <span class="menu-text"
-                                                  data-lang="tables-datatables-child-rows">Child Rows</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-column-searching" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-column-searching">Column Searching</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-range-search" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-range-search">Range Search</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-fixed-header" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-fixed-header">Fixed Header</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-add-rows" class="side-nav-link">
-                                            <span class="menu-text"
-                                                  data-lang="tables-datatables-add-rows">Add Rows</span>
-                                        </a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a href="/tables-datatables-checkbox-select" class="side-nav-link">
-                                            <span class="menu-text" data-lang="tables-datatables-checkbox-select">Checkbox Select</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarIcons" aria-expanded="false" aria-controls="sidebarIcons"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="sparkles"></i></span>
-                    <span class="menu-text" data-lang="icons">Icons</span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarIcons">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/icons-tabler" class="side-nav-link">
-                                <span class="menu-text" data-lang="icons-tabler">Tabler</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/icons-lucide" class="side-nav-link">
-                                <span class="menu-text" data-lang="icons-lucide">Lucide</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/icons-flags" class="side-nav-link">
-                                <span class="menu-text" data-lang="icons-flags">Flags</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarMaps" aria-expanded="false" aria-controls="sidebarMaps"
-                   class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="map-pinned"></i></span>
-                    <span class="menu-text" data-lang="maps">Maps</span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarMaps">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a href="/maps-vector" class="side-nav-link">
-                                <span class="menu-text" data-lang="maps-vector">Vector Maps</span>
-                            </a>
-                        </li>
-                        <li class="side-nav-item">
-                            <a href="/maps-leaflet" class="side-nav-link">
-                                <span class="menu-text" data-lang="maps-leaflet">Leaflet Maps</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-
-            <li class="side-nav-title mt-2" data-lang="items-title">Menu Items</li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarMenuLevels" aria-expanded="false"
-                   aria-controls="sidebarMenuLevels" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="list-tree"></i></span>
-                    <span class="menu-text" data-lang="menu-levels"> Menu Levels </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarMenuLevels">
-                    <ul class="sub-menu">
-                        <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarSecondLevel" aria-expanded="false"
-                               aria-controls="sidebarSecondLevel" class="side-nav-link">
-                                <span class="menu-text" data-lang="second-level"> Second Level </span>
+                            <a data-bs-toggle="collapse" href="#sidebarChartJs1" aria-expanded="false"
+                               aria-controls="sidebarChartJs1" class="side-nav-link">
+                                <span class="menu-text" data-lang=""> Store Records </span>
                                 <span class="menu-arrow"></span>
                             </a>
-                            <div class="collapse" id="sidebarSecondLevel">
+                            <div class="collapse" id="sidebarChartJs1">
                                 <ul class="sub-menu">
                                     <li class="side-nav-item">
-                                        <a href="javascript: void(0);" class="side-nav-link">
-                                            <span class="menu-text">Item 2.1</span>
+                                        <a href="/tools-dailystore" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Daily Data Store</span>
                                         </a>
                                     </li>
                                     <li class="side-nav-item">
-                                        <a href="javascript: void(0);" class="side-nav-link">
-                                            <span class="menu-text">Item 2.2</span>
+                                        <a href="/tools-weeklystore" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Weekly Data Store</span>
+                                        </a>
+                                    </li>
+                                    <li class="side-nav-item">
+                                        <a href="/tools-monthlystore" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Monthly Data Store</span>
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                         </li>
                         <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarThirdLevel" aria-expanded="false"
-                               aria-controls="sidebarThirdLevel" class="side-nav-link">
-                                <span class="menu-text" data-lang="third-level"> Third Level </span>
+                            <a data-bs-toggle="collapse" href="#sidebarChartJs2" aria-expanded="false"
+                               aria-controls="sidebarChartJs2" class="side-nav-link">
+                                <span class="menu-text" data-lang=""> Security</span>
                                 <span class="menu-arrow"></span>
                             </a>
-                            <div class="collapse" id="sidebarThirdLevel">
+                            <div class="collapse" id="sidebarChartJs2">
                                 <ul class="sub-menu">
                                     <li class="side-nav-item">
-                                        <a href="javascript: void(0);" class="side-nav-link">Item 1</a>
+                                        <a href="/tools-users" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Users</span>
+                                        </a>
                                     </li>
                                     <li class="side-nav-item">
-                                        <a data-bs-toggle="collapse" href="#sidebarFourthLevel" aria-expanded="false"
-                                           aria-controls="sidebarFourthLevel" class="side-nav-link">
-                                            <span class="menu-text"> Item 2 </span>
-                                            <span class="menu-arrow"></span>
+                                        <a href="/tools-audittrail" class="side-nav-link">
+                                            <span class="menu-text" data-lang="">Audit Trail</span>
                                         </a>
-                                        <div class="collapse" id="sidebarFourthLevel">
-                                            <ul class="sub-menu">
-                                                <li class="side-nav-item">
-                                                    <a href="javascript: void(0);" class="side-nav-link">
-                                                        <span class="menu-text">Item 3.1</span>
-                                                    </a>
-                                                </li>
-                                                <li class="side-nav-item">
-                                                    <a href="javascript: void(0);" class="side-nav-link">
-                                                        <span class="menu-text">Item 3.2</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -1493,12 +503,11 @@
             </li>
 
             <li class="side-nav-item">
-                <a href="#!" class="side-nav-link disabled">
-                    <span class="menu-icon"><i data-lucide="eye-off"></i></span>
-                    <span class="menu-text" data-lang="disabled-menu"> Disabled Menu </span>
+                <a href="/landing" target="_blank" class="side-nav-link">
+                    <span class="menu-icon"><i data-lucide="earth"></i></span>
+                    <span class="menu-text" data-lang="">Customize Payroll</span>
                 </a>
             </li>
-
         </ul>
     </div>
 </div>

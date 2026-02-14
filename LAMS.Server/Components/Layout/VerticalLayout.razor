@@ -1,4 +1,10 @@
 @inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime;
+
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
 <div class="wrapper">
 
@@ -19,4 +25,16 @@
 
 </div>
 
-<Customizer/>
+@* <Customizer/> *@
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("updateHtmlAttributes", "class", "sidebar-with-line");
+            // await JsRuntime.InvokeVoidAsync("loadConfig");
+            // await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+}

@@ -13,7 +13,7 @@
 
 <PageTitle>Log in</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Log in</MudText>
+@* <MudText Typo="Typo.h3" GutterBottom="true">Log in</MudText> *@
 
 <div class="auth-box overflow-hidden align-items-center d-flex">
     <div class="container">
@@ -85,14 +85,13 @@
                     </div>
                     <div class="auth-brand text-center mb-4">
                         <a class="logo-dark" href="/">
-                            <img alt="dark logo" height="28" src="/images/logo-black.png" />
+                            <img alt="dark logo" height="60" width="300" src="/images/GDLC_Logo.png" />
                         </a>
-                        <a class="logo-light" href="/">
-                            <img alt="logo" height="28" src="/images/logo.png" />
-                        </a>
+                       @*  <a class="logo-light" href="/">
+                            <img alt="logo" height="28" src="" />
+                        </a> *@
                         <p class="text-muted w-lg-75 mt-3 mx-auto">
-                            Let’s get you signed in. Enter your email and
-                            password to continue.
+                            Enter your email and password to continue.
                         </p>
                     </div>
                     <MudGrid>
@@ -101,7 +100,7 @@
                             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                                 <DataAnnotationsValidator />
 
-                                <MudText GutterBottom="true" Typo="Typo.body1">Use a local account to log in.</MudText>
+                                @* <MudText GutterBottom="true" Typo="Typo.body1">Use a local account to log in.</MudText> *@
 
                                 <MudGrid>
                                     <MudItem md="12">
@@ -179,7 +178,7 @@
                     </p> *@
                 </div>
                 <p class="text-center text-muted mt-4 mb-0">
-                    © @DateTime.Now.Year UBold — by <span class="fw-semibold">Coderthemes</span>
+                    © @DateTime.Now.Year Developed — by <span class="fw-semibold">Eupac Web Solutions Limited</span>
                 </p>
             </div>
         </div>

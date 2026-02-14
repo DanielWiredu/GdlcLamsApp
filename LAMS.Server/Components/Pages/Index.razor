@@ -1065,8 +1065,8 @@ protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         _module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/pages/dashboard.js");
         await JsRuntime.InvokeVoidAsync("loadDashboard");
-        // await JsRuntime.InvokeVoidAsync("loadConfig");
-        // await JsRuntime.InvokeVoidAsync("loadApps");
+        await JsRuntime.InvokeVoidAsync("loadConfig");
+        await JsRuntime.InvokeVoidAsync("loadApps");
     }
 }
 }

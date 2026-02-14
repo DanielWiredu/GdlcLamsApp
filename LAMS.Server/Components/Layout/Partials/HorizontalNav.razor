@@ -1,11 +1,6 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
 
-<MudThemeProvider />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
-
 <!-- Horizontal Menu Start -->
 <header class="topnav">
     <nav class="navbar navbar-expand-lg">
@@ -26,12 +21,12 @@
                             <div class="menu-arrow"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-drop">
-                            <a href="counter" class="dropdown-item">Counter</a>
-                            <a href="weather" class="dropdown-item">Weather</a>
-                            <a href="home" class="dropdown-item">Home</a>
-                            <a href="auth" class="dropdown-item">Auth</a>
-                            <a href="pages-empty" class="dropdown-item">Empty </a>
-                            <a href="layouts-horizontal" class="dropdown-item"> Starter</a>
+                            <a href="/counter" class="dropdown-item">Counter</a>
+                            <a href="/weather" class="dropdown-item">Weather</a>
+                            <a href="/home" class="dropdown-item">Home</a>
+                            <a href="/auth" class="dropdown-item">Auth</a>
+                            <a href="/pages-empty" class="dropdown-item">Empty </a>
+                            <a href="/layouts-horizontal" class="dropdown-item"> Starter</a>
                             <a href="#!" class="dropdown-item disabled">Drop Item Disabled <span class="badge text-bg-light opacity-50">soon</span></a>
                         </div>
                     </li>
@@ -115,16 +110,3 @@
     </nav>
 </header>
 <!-- Horizontal Menu End -->
-@code {
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JsRuntime.InvokeVoidAsync("updateHtmlAttributes", "data-layout", "topnav");
-            await JsRuntime.InvokeVoidAsync("updateHtmlAttributes", "data-topbar-color", "dark");
-            await JsRuntime.InvokeVoidAsync("updateHtmlAttributes", "data-menu-color", "light");
-        }
-    }
-
-}
