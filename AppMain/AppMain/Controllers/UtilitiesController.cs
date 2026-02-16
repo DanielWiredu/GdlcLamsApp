@@ -431,5 +431,53 @@ namespace AppMain.Controllers
                 return Results.Problem();
             }
         }
+
+        [HttpPost("CreateRequest")]
+        public async Task<IActionResult> CreateRequest([FromBody] LabourRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            try
+            {
+                // Ensure ID is generated if not provided
+                if (request.Id == Guid.Empty)
+                    request.Id = Guid.NewGuid();
+
+                // Default request date if not supplied
+                if (request.RequestDate == default)
+                    request.RequestDate = DateTime.UtcNow;
+
+                await _context.LabourRequests.AddAsync(request);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(
+                    nameof(GetRequestById),
+                    new { id = request.Id },
+                    request);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, SD.LogErrorMsg, null, User.Identity?.Name);
+                return BadRequest(ex.Message.Replace("'", "").Replace("\r\n", ""));
+            } 
+        }
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetRequestById(Guid id)
+        {
+            try
+            {
+                var labourRequest = await _context.LabourRequests.FindAsync(id);
+
+                if (labourRequest == null)
+                    return NotFound();
+
+                return Ok(labourRequest);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, SD.LogErrorMsg, null, User.Identity?.Name);
+                return BadRequest(ex.Message.Replace("'", "").Replace("\r\n", ""));
+            }  
+        }
     } 
 }

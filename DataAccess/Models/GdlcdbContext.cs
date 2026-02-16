@@ -15,6 +15,7 @@ public partial class GdlcdbContext : DbContext
     {
     }
 
+    public DbSet<LabourRequest> LabourRequests { get; set; }
     public virtual DbSet<TblAction> TblActions { get; set; }
 
     public virtual DbSet<TblAllocationBatch> TblAllocationBatches { get; set; }
