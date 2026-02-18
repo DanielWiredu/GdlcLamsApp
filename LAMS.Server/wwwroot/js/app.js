@@ -1442,3 +1442,19 @@ window.toggleSidebar = function () {
 window.toggleOnHoverSidebar = function () {
     new LayoutCustomizer()._toggleOnHoverSidebar();
 }
+window.ShowSwal = (type, message) => {
+    if (type === "success") {
+        Swal.fire({
+            title: "Success Notification",
+            text: message,
+            icon: "success"
+        });
+    }
+    if (type === "error") {
+        Swal.fire({
+            title: "Error Notification",
+            text: message,
+            icon: "error"
+        });
+    }
+}

@@ -35,7 +35,7 @@ namespace BusinessLogic.Repository
             return finalResults.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<ReportingPointModel>> GetAll() => await _db.LoadData<ReportingPointModel, dynamic>(query: "Select * from tblReportingPoint where ReportingPointId < @ReportingPointId", new { ReportingPointId = 3000});
+        public async Task<IEnumerable<ReportingPointModel>> GetAll() => await _db.LoadData<ReportingPointModel, dynamic>(query: "Select * from tblReportingPoint", new { });
 
         public async Task<int> Remove(string Id) => await _db.SaveData(query: "Delete from tblReportingPoint where ReportingPointId=@ReportingPointId", new { ReportingPointId = int.Parse(Id) });
 

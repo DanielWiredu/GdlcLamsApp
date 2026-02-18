@@ -1,18 +1,16 @@
 ﻿@page "/setups-location"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-@inject IUnitOfWork unitOfWork
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Setups" Title="Locations" />
 
 <MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="500px" RowsPerPage="20" Filter="new Func<TblLocation, bool>(FilterFunc1)">
     <ToolBarContent>
         @* <MudText Typo="Typo.h6">Locations</MudText> *@
-        <div class="d-flex gap-2">
-            <a class="btn btn-sm btn-primary" href="#">
-                <i class="ti ti-plus me-1"></i> Add New
-            </a>
-        </div>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord"> Add New </MudButton>
         <MudSpacer />
         <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -21,6 +19,11 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Location">@context.Location</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="(() => EditRecord(context))"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(()=>ConfirmRecordDelete(context.LocationId))"></MudIconButton>
+        </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
@@ -30,6 +33,7 @@
 @code {
     private string searchString1 = "";
     private IEnumerable<TblLocation> Elements = new List<TblLocation>();
+    private TblLocation? location = new TblLocation();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -42,7 +46,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Elements = await unitOfWork.Locations.GetAll();
+        Elements = await _unitOfWork.Locations.GetAll();
     }
 
     private bool FilterFunc1(TblLocation element) => FilterFunc(element, searchString1);
@@ -54,5 +58,73 @@
         if (element.Location.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+    private async Task AddRecord()
+    {
+        var parameters = new DialogParameters<LocationDialog> { { x => x.Model, new TblLocation() }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true,  MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<LocationDialog>("Add Location", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Locations.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditRecord(TblLocation editLocation)
+    {
+        var parameters = new DialogParameters<LocationDialog> { { x => x.Model,
+            new TblLocation { LocationId = editLocation.LocationId,  Location = editLocation.Location } },
+            { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<LocationDialog>("Edit Location", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Locations.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmRecordDelete(int locationId)
+    {
+        location.LocationId = locationId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            location.LocationId = 0;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && location.LocationId != 0)
+        {
+            try
+            {
+                var response = await _unitOfWork.Locations.Remove(location.LocationId.ToString());
+                if (response == 1)
+                {
+                    _snackbar.Add("Location Deleted Successfully!", Severity.Success);
+                    Elements = await _unitOfWork.Locations.GetAll();
+                    StateHasChanged();
+                    location.LocationId = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting location: {ex.Message}", Severity.Error);
+                location.LocationId = 0;
+            }
+        }
     }
 }
