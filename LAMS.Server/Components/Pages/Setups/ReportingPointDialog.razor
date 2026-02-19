@@ -3,8 +3,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField Label="Gang Name"  @bind-Value="Model.GangName"  Required="true" RequiredError="Gang Name is required" />
-        <MudTextField Label="Notes" @bind-Value="Model.Notes" Lines="3" TextArea="true" />
+        <MudTextField Label="Reporting Point"  @bind-Value="Model.ReportingPoint"  Required="true" RequiredError="Reporting Point is required" />
     </DialogContent>
 
     <DialogActions>
@@ -18,7 +17,7 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    [Parameter] public TblGang Model { get; set; } = new();
+    [Parameter] public ReportingPointModel Model { get; set; } = new();
     [Parameter] public bool IsEdit { get; set; }
 
     private bool _isEdit;
@@ -32,33 +31,32 @@
 
     private async Task Save()
     {
-        if (string.IsNullOrWhiteSpace(Model.GangName))
+        if (string.IsNullOrWhiteSpace(Model.ReportingPoint))
             return;
 
         if (_isEdit)
         {
             try
             {
-                await _unitOfWork.Setups.UpdateGang(Model);
-                _snackbar.Add("Gang updated successfully", Severity.Success);
+                await _unitOfWork.ReportingPoints.Update(Model);
+                _snackbar.Add("Reporting Point updated successfully", Severity.Success);
             }
             catch (Exception ex)
             {
-                _snackbar.Add($"Error updating gang: {ex.Message}", Severity.Error);
+                _snackbar.Add($"Error updating reporting point: {ex.Message}", Severity.Error);
                 return;
-            }  
-      
+            }     
         }
         else
         {
             try
             {
-                await _unitOfWork.Setups.AddGang(Model);
-                _snackbar.Add("Gang added successfully", Severity.Success);
+                await _unitOfWork.ReportingPoints.Add(Model);
+                _snackbar.Add("Reporting Point added successfully", Severity.Success);
             }
             catch (Exception ex)
             {
-                _snackbar.Add($"Error adding gang: {ex.Message}", Severity.Error);
+                _snackbar.Add($"Error adding reporting point: {ex.Message}", Severity.Error);
                 return;
             }
         }

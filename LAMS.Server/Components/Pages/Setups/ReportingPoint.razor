@@ -1,11 +1,39 @@
 ﻿@page "/setups-reportingpoint"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Setups" Title="Reporting Point" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="500px" RowsPerPage="20" Filter="new Func<ReportingPointModel, bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Reporting Point</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Location">@context.ReportingPoint</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="(() => EditRecord(context))"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.ReportingPointId))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<ReportingPointModel> Elements = new List<ReportingPointModel>();
+    private ReportingPointModel? reportingPoint = new ReportingPointModel();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -14,4 +42,89 @@
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.ReportingPoints.GetAll();
+    }
+
+    private bool FilterFunc1(ReportingPointModel element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(ReportingPointModel element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ReportingPoint.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task AddRecord()
+    {
+        var parameters = new DialogParameters<ReportingPointDialog> { { x => x.Model, new ReportingPointModel() }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<ReportingPointDialog>("Add Reporting Point", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.ReportingPoints.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditRecord(ReportingPointModel editReportingPoint)
+    {
+        var parameters = new DialogParameters<ReportingPointDialog> { { x => x.Model,
+            new ReportingPointModel { ReportingPointId = editReportingPoint.ReportingPointId,  ReportingPoint = editReportingPoint.ReportingPoint } },
+            { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<ReportingPointDialog>("Edit Reporting Point", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.ReportingPoints.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmRecordDelete(int reportingPointId)
+    {
+        reportingPoint.ReportingPointId = reportingPointId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            reportingPoint.ReportingPointId = 0;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && reportingPoint.ReportingPointId != 0)
+        {
+            try
+            {
+                var response = await _unitOfWork.ReportingPoints.Remove(reportingPoint.ReportingPointId.ToString());
+                if (response == 1)
+                {
+                    _snackbar.Add("Reporting Point Deleted Successfully!", Severity.Success);
+                    Elements = await _unitOfWork.ReportingPoints.GetAll();
+                    StateHasChanged();
+                    reportingPoint.ReportingPointId = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting reporting point: {ex.Message}", Severity.Error);
+                reportingPoint.ReportingPointId = 0;
+            }
+        }
+    }
 }
+

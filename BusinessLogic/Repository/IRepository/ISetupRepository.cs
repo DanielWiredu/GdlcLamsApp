@@ -13,5 +13,9 @@ namespace BusinessLogic.Repository.IRepository
         Task<IEnumerable<TblGang>> GetAllGangs();
         Task<int> RemoveGang(int Id);
         Task<int> UpdateGang(TblGang model);
+        Task<int> AddVessel(TblVessel model);
+        Task<IEnumerable<TblVessel>> GetAllVessels();
+        Task<int> RemoveVessel(int Id);
+        Task<int> UpdateVessel(TblVessel model);
     }
 }
