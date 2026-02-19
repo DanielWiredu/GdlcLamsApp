@@ -25,5 +25,13 @@ namespace BusinessLogic.Repository.IRepository
         Task<IEnumerable<TblNationality>> GetAllNationality();
         Task<int> RemoveNationality(int Id);
         Task<int> UpdateNationality(TblNationality model);
+        Task<int> AddBank(TblBank model);
+        Task<IEnumerable<TblBank>> GetAllBank();
+        Task<int> RemoveBank(int Id);
+        Task<int> UpdateBank(TblBank model);
+        Task<int> AddBankBranch(TblBankBranch model);
+        Task<IEnumerable<VwBankBranch>> GetAllBankBranch();
+        Task<int> RemoveBankBranch(int Id);
+        Task<int> UpdateBankBranch(TblBankBranch model);
     }
 }

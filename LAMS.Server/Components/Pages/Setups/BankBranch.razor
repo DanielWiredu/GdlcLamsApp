@@ -1,17 +1,136 @@
 ﻿@page "/setups-bankbranch"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Setups" Title="Bank Branch" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<VwBankBranch, bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Bank</MudTh>
+        <MudTh>Branch Name</MudTh>
+        <MudTh>Sort Code</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.BankName</MudTd>
+        <MudTd>@context.BranchName</MudTd>
+        <MudTd>@context.SortCode</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="(() => EditRecord(context))"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.BranchId))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<VwBankBranch> Elements = new List<VwBankBranch>();
+    private TblBankBranch? bankBranch = new TblBankBranch();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Setups.GetAllBankBranch();
+    }
+
+    private bool FilterFunc1(VwBankBranch element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(VwBankBranch element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.BranchName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.BankName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task AddRecord()
+    {
+        var parameters = new DialogParameters<BankBranchDialog> { { x => x.Model, new TblBankBranch() }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<BankBranchDialog>("Add Bank Branch", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllBankBranch();
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditRecord(VwBankBranch editBankBranch)
+    {
+        var parameters = new DialogParameters<BankBranchDialog> { { x => x.Model,
+            new TblBankBranch { BranchId = editBankBranch.BranchId, BranchName = editBankBranch.BranchName, BankId = editBankBranch.BankId, SortCode = editBankBranch.SortCode } },
+            { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<BankBranchDialog>("Edit Bank Branch", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllBankBranch();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmRecordDelete(int branchId)
+    {
+        bankBranch.BranchId = branchId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            bankBranch.BranchId = 0;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && bankBranch.BranchId != 0)
+        {
+            try
+            {
+                var response = await _unitOfWork.Setups.RemoveBankBranch(bankBranch.BranchId);
+                if (response == 1)
+                {
+                    _snackbar.Add("Bank Branch Deleted Successfully!", Severity.Success);
+                    Elements = await _unitOfWork.Setups.GetAllBankBranch();
+                    StateHasChanged();
+                    bankBranch.BranchId = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting bank branch: {ex.Message}", Severity.Error);
+                bankBranch.BranchId = 0;
+            }
         }
     }
 }

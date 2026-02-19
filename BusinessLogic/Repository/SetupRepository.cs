@@ -32,5 +32,13 @@ namespace BusinessLogic.Repository
         public async Task<IEnumerable<TblNationality>> GetAllNationality() => await _db.LoadData<TblNationality, dynamic>(query: "Select * from tblNationality", new { });
         public async Task<int> RemoveNationality(int Id) => await _db.SaveData(query: "Delete from tblNationality where Id=@Id", new { NationalityId = Id });
         public async Task<int> UpdateNationality(TblNationality model) => await _db.SaveData(query: "Update tblNationality set Nationality=@Nationality where Id=@Id", new { model.Id, model.Nationality });
+        public async Task<int> AddBank(TblBank model) => await _db.SaveData(query: "Insert into tblBanks(BankName) values(@BankName)", new { model.BankName });
+        public async Task<IEnumerable<TblBank>> GetAllBank() => await _db.LoadData<TblBank, dynamic>(query: "Select * from tblBanks", new { });
+        public async Task<int> RemoveBank(int Id) => await _db.SaveData(query: "Delete from tblBanks where BankId=@BankId", new { BankId = Id });
+        public async Task<int> UpdateBank(TblBank model) => await _db.SaveData(query: "Update tblBanks set BankName=@BankName where BankId=@BankId", new { model.BankId, model.BankName });
+        public async Task<int> AddBankBranch(TblBankBranch model) => await _db.SaveData(query: "Insert into tblBankBranches(BranchName,BankId,SortCode) values(@BranchName, @BankId, @SortCode)", new { model.BranchName, model.BankId, model.SortCode });
+        public async Task<IEnumerable<VwBankBranch>> GetAllBankBranch() => await _db.LoadData<VwBankBranch, dynamic>(query: "Select * from VwBankBranches", new { });
+        public async Task<int> RemoveBankBranch(int Id) => await _db.SaveData(query: "Delete from tblBankBranches where BranchId=@BranchId", new { BranchId = Id });
+        public async Task<int> UpdateBankBranch(TblBankBranch model) => await _db.SaveData(query: "Update tblBankBranches set BranchName=@BranchName,BankId=@BankId,SortCode=@SortCode where BranchId=@BranchId", new { model.BranchId, model.BranchName, model.BankId, model.SortCode });
     }
 }
