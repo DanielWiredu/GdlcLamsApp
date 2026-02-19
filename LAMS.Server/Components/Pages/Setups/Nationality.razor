@@ -1,17 +1,129 @@
 ﻿@page "/setups-nationality"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Setups" Title="Nationality" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="500px" RowsPerPage="20" Filter="new Func<TblNationality, bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Nationality</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nationality">@context.Nationality</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="(() => EditRecord(context))"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.Id))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<TblNationality> Elements = new List<TblNationality>();
+    private TblNationality? nationality = new TblNationality();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Setups.GetAllNationality();
+    }
+
+    private bool FilterFunc1(TblNationality element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblNationality element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Nationality.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task AddRecord()
+    {
+        var parameters = new DialogParameters<NationalityDialog> { { x => x.Model, new TblNationality() }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<NationalityDialog>("Add Nationality", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllNationality();
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditRecord(TblNationality editNationality)
+    {
+        var parameters = new DialogParameters<NationalityDialog> { { x => x.Model,
+            new TblNationality { Id = editNationality.Id,  Nationality = editNationality.Nationality } },
+            { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<NationalityDialog>("Edit Nationality", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllNationality();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmRecordDelete(int nationalityId)
+    {
+        nationality.Id = nationalityId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            nationality.Id = 0;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && nationality.Id != 0)
+        {
+            try
+            {
+                var response = await _unitOfWork.Setups.RemoveNationality(nationality.Id);
+                if (response == 1)
+                {
+                    _snackbar.Add("Nationality Deleted Successfully!", Severity.Success);
+                    Elements = await _unitOfWork.Setups.GetAllNationality();
+                    StateHasChanged();
+                    nationality.Id = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting nationality: {ex.Message}", Severity.Error);
+                nationality.Id = 0;
+            }
         }
     }
 }

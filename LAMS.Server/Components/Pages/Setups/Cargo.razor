@@ -1,11 +1,39 @@
 ﻿@page "/setups-cargo"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Setups" Title="Cargo" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="500px" RowsPerPage="20" Filter="new Func<TblCargo, bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Cargo Name</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Cargo Name">@context.CargoName</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="(() => EditRecord(context))"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.CargoId))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<TblCargo> Elements = new List<TblCargo>();
+    private TblCargo? cargo = new TblCargo();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -14,4 +42,89 @@
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Setups.GetAllCargo();
+    }
+
+    private bool FilterFunc1(TblCargo element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblCargo element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.CargoName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task AddRecord()
+    {
+        var parameters = new DialogParameters<CargoDialog> { { x => x.Model, new TblCargo() }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<CargoDialog>("Add Cargo", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllCargo();
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditRecord(TblCargo editCargo)
+    {
+        var parameters = new DialogParameters<CargoDialog> { { x => x.Model,
+            new TblCargo { CargoId = editCargo.CargoId,  CargoName = editCargo.CargoName } },
+            { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<CargoDialog>("Edit Cargo", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllCargo();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmRecordDelete(int cargoId)
+    {
+        cargo.CargoId = cargoId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            cargo.CargoId = 0;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && cargo.CargoId != 0)
+        {
+            try
+            {
+                var response = await _unitOfWork.Setups.RemoveCargo(cargo.CargoId);
+                if (response == 1)
+                {
+                    _snackbar.Add("Cargo Deleted Successfully!", Severity.Success);
+                    Elements = await _unitOfWork.Setups.GetAllCargo();
+                    StateHasChanged();
+                    cargo.CargoId = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting cargo: {ex.Message}", Severity.Error);
+                cargo.CargoId = 0;
+            }
+        }
+    }
 }
+

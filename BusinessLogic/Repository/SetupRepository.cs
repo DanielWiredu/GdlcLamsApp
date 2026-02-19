@@ -24,5 +24,13 @@ namespace BusinessLogic.Repository
         public async Task<IEnumerable<TblVessel>> GetAllVessels() => await _db.LoadData<TblVessel, dynamic>(query: "Select * from tblVessel", new { });
         public async Task<int> RemoveVessel(int Id) => await _db.SaveData(query: "Delete from tblVessel where VesselId=@VesselId", new { VesselId = Id });
         public async Task<int> UpdateVessel(TblVessel model) => await _db.SaveData(query: "Update tblVessel set VesselName=@VesselName where VesselId=@VesselId", new { model.VesselId, model.VesselName });
+        public async Task<int> AddCargo(TblCargo model) => await _db.SaveData(query: "Insert into tblCargo(CargoName) values(@CargoName)", new { model.CargoName });
+        public async Task<IEnumerable<TblCargo>> GetAllCargo() => await _db.LoadData<TblCargo, dynamic>(query: "Select * from tblCargo", new { });
+        public async Task<int> RemoveCargo(int Id) => await _db.SaveData(query: "Delete from tblCargo where CargoId=@CargoId", new { CargoId = Id });
+        public async Task<int> UpdateCargo(TblCargo model) => await _db.SaveData(query: "Update tblCargo set CargoName=@CargoName where CargoId=@CargoId", new { model.CargoId, model.CargoName });
+        public async Task<int> AddNationality(TblNationality model) => await _db.SaveData(query: "Insert into tblNationality(Nationality) values(@Nationality)", new { model.Nationality });
+        public async Task<IEnumerable<TblNationality>> GetAllNationality() => await _db.LoadData<TblNationality, dynamic>(query: "Select * from tblNationality", new { });
+        public async Task<int> RemoveNationality(int Id) => await _db.SaveData(query: "Delete from tblNationality where Id=@Id", new { NationalityId = Id });
+        public async Task<int> UpdateNationality(TblNationality model) => await _db.SaveData(query: "Update tblNationality set Nationality=@Nationality where Id=@Id", new { model.Id, model.Nationality });
     }
 }

@@ -17,5 +17,13 @@ namespace BusinessLogic.Repository.IRepository
         Task<IEnumerable<TblVessel>> GetAllVessels();
         Task<int> RemoveVessel(int Id);
         Task<int> UpdateVessel(TblVessel model);
+        Task<int> AddCargo(TblCargo model);
+        Task<IEnumerable<TblCargo>> GetAllCargo();
+        Task<int> RemoveCargo(int Id);
+        Task<int> UpdateCargo(TblCargo model);
+        Task<int> AddNationality(TblNationality model);
+        Task<IEnumerable<TblNationality>> GetAllNationality();
+        Task<int> RemoveNationality(int Id);
+        Task<int> UpdateNationality(TblNationality model);
     }
 }

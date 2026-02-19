@@ -1,0 +1,67 @@
+﻿@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField Label="Nationality"  @bind-Value="Model.Nationality"  Required="true" RequiredError="Nationality is required" />
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Default">Cancel</MudButton>
+        <MudButton OnClick="Save" Color="Color.Success" Variant="Variant.Filled">
+            @(_isEdit ? "Update" : "Save")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public TblNationality Model { get; set; } = new();
+    [Parameter] public bool IsEdit { get; set; }
+
+    private bool _isEdit;
+
+    protected override void OnInitialized()
+    {
+        _isEdit = IsEdit;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Save()
+    {
+        if (string.IsNullOrWhiteSpace(Model.Nationality))
+            return;
+
+        if (_isEdit)
+        {
+            try
+            {
+                await _unitOfWork.Setups.UpdateNationality(Model);
+                _snackbar.Add("Nationality updated successfully", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error updating nationality: {ex.Message}", Severity.Error);
+                return;
+            }  
+      
+        }
+        else
+        {
+            try
+            {
+                await _unitOfWork.Setups.AddNationality(Model);
+                _snackbar.Add("Nationality added successfully", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error adding nationality: {ex.Message}", Severity.Error);
+                return;
+            }
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}
