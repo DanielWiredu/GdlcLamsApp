@@ -10,7 +10,7 @@
                 <MudSelectItem Value="@bank.BankId"> @bank.BankName </MudSelectItem>
             }
         </MudSelect>
-        <MudTextField Label="Branch Name"  @bind-Value="Model.BranchName"  Required="true" RequiredError="Branch Name is required" />
+        <MudTextField Label="Branch Name"  @bind-Value="Model.BranchName" Required="true" RequiredError="Branch Name is required" />
         <MudTextField Label="Sort Code" @bind-Value="Model.SortCode" Required="true" RequiredError="Sort Code is required" MaxLength="6" />
     </DialogContent>
 
@@ -41,7 +41,7 @@
 
     private async Task Save()
     {
-        if (string.IsNullOrWhiteSpace(Model.BranchName))
+        if (string.IsNullOrWhiteSpace(Model.BranchName) || Model.BankId == 0)
             return;
 
         if (_isEdit)

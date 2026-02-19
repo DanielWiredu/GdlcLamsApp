@@ -40,5 +40,29 @@ namespace BusinessLogic.Repository
         public async Task<IEnumerable<VwBankBranch>> GetAllBankBranch() => await _db.LoadData<VwBankBranch, dynamic>(query: "Select * from VwBankBranches", new { });
         public async Task<int> RemoveBankBranch(int Id) => await _db.SaveData(query: "Delete from tblBankBranches where BranchId=@BranchId", new { BranchId = Id });
         public async Task<int> UpdateBankBranch(TblBankBranch model) => await _db.SaveData(query: "Update tblBankBranches set BranchName=@BranchName,BankId=@BankId,SortCode=@SortCode where BranchId=@BranchId", new { model.BranchId, model.BranchName, model.BankId, model.SortCode });
+        public async Task<int> AddDLECompany(TblDlecompany model)
+        {
+            string query = @"INSERT INTO tblDLECompany(DLEcodeCompanyName, DLEaddr, DLEtel, Email, FContp, Ftel, FEmail, Pattern, OContp, Otel, OEmail, AContp, Atel, AEmail, SharePerc)
+                                    VALUES(@DLEcodeCompanyName, @DLEaddr, @DLEtel, @Email, @FContp, @Ftel, @FEmail, @Pattern, @OContp, @Otel, @OEmail, @AContp, @Atel, @AEmail, @SharePerc)";
+            return await _db.SaveData<TblDlecompany>(query, model);
+        }
+        public async Task<IEnumerable<TblDlecompany>> GetAllDLECompany()
+        {
+            string query = @"SELECT * FROM tblDLECompany ORDER BY DlecodeCompanyName";
+            return await _db.LoadData<TblDlecompany, dynamic>(query, new { });
+        }
+        public async Task<int> RemoveDLECompany(int id)
+        {
+            string query = @"DELETE FROM tblDLECompany WHERE DlecodeCompanyId = @Id";
+            return await _db.SaveData(query, new { Id = id });
+        }
+        public async Task<int> UpdateDLECompany(TblDlecompany model)
+        {
+            string query = @"Update tblDLECompany set DLEcodeCompanyName=@DLEcodeCompanyName, DLEaddr=@DLEaddr, DLEtel=@DLEtel, Email=@Email, FContp=@FContp, Ftel=@Ftel, FEmail=@FEmail,
+            Pattern=@Pattern, OContp=@OContp, Otel=@Otel, OEmail=@OEmail, AContp=@AContp, Atel=@Atel, AEmail=@AEmail, SharePerc=@SharePerc where DLEcodeCompanyID=@DLEcodeCompanyID";
+            return await _db.SaveData<TblDlecompany>(query, model);
+        }
+        
+
     }
 }

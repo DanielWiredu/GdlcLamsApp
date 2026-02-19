@@ -1,11 +1,50 @@
 ﻿@page "/tools-dlecompany"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Tools" Title="DLE Company" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblDlecompany, bool>(FilterFunc1)">
+    <ToolBarContent>
+        @* <MudText Typo="Typo.h6">Locations</MudText> *@
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>DLE CompanyName</MudTh>
+        <MudTh>Pattern</MudTh>
+        <MudTh>Share %</MudTh>
+        <MudTh>Active</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="DLE CompanyName">@context.DlecodeCompanyName</MudTd>
+        <MudTd DataLabel="Pattern">@context.Pattern</MudTd>
+        <MudTd DataLabel="Share %">@context.SharePerc</MudTd>
+        @* <MudTd DataLabel="Active">@context.Active</MudTd> *@
+        <MudTd DataLabel="Active">
+            <MudCheckBox T="bool" Value="@context.Active" Disabled="true" Color="Color.Success" />
+        </MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="(() => EditRecord(context))"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.DlecodeCompanyId))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<TblDlecompany> Elements = new List<TblDlecompany>();
+    private TblDlecompany? company = new TblDlecompany();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -14,4 +53,87 @@
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Setups.GetAllDLECompany();
+    }
+
+    private bool FilterFunc1(TblDlecompany element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblDlecompany element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.DlecodeCompanyName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task AddRecord()
+    {
+        var parameters = new DialogParameters<DLECompanyDialog> { { x => x.Model, new TblDlecompany { SharePerc = 0, Active = true } }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = _dialogService.Show<DLECompanyDialog>("Add DLE Company", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllDLECompany();
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditRecord(TblDlecompany editCompany)
+    {
+        var parameters = new DialogParameters<DLECompanyDialog> { { x => x.Model, editCompany }, { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = _dialogService.Show<DLECompanyDialog>("Edit DLE Company", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Setups.GetAllDLECompany();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmRecordDelete(int companyId)
+    {
+        company.DlecodeCompanyId = companyId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            company.DlecodeCompanyId = 0;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && company.DlecodeCompanyId != 0)
+        {
+            try
+            {
+                var response = await _unitOfWork.Setups.RemoveDLECompany(company.DlecodeCompanyId);
+                if (response == 1)
+                {
+                    _snackbar.Add("DLE Company Deleted Successfully!", Severity.Success);
+                    Elements = await _unitOfWork.Setups.GetAllDLECompany();
+                    StateHasChanged();
+                    company.DlecodeCompanyId = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting DLE Company: {ex.Message}", Severity.Error);
+                company.DlecodeCompanyId = 0;
+            }
+        }
+    }
 }
+

@@ -33,5 +33,9 @@ namespace BusinessLogic.Repository.IRepository
         Task<IEnumerable<VwBankBranch>> GetAllBankBranch();
         Task<int> RemoveBankBranch(int Id);
         Task<int> UpdateBankBranch(TblBankBranch model);
+        Task<int> AddDLECompany(TblDlecompany model);
+        Task<IEnumerable<TblDlecompany>> GetAllDLECompany();
+        Task<int> RemoveDLECompany(int Id);
+        Task<int> UpdateDLECompany(TblDlecompany model);
     }
 }
