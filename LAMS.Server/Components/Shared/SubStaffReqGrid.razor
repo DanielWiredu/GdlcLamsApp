@@ -1,0 +1,114 @@
+﻿@inject IUnitOfWork _unitOfWork
+@inject IJSRuntime JsRuntime
+@inject IDialogService _dialogService
+
+<MudPaper Class="pa-4">
+
+   <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudButton Disabled="_readOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="OpenAddWorkerDialog"> Add Worker </MudButton>
+            </MudItem>
+        <MudItem xs="12" md="6" Class="d-flex justify-end">
+            <MudText Typo="Typo.subtitle1" Class="mb-2">
+        Total Members : @_items.Count
+    </MudText>
+        </MudItem>
+    </MudGrid>
+   
+    <MudTable Items="_items" ReadOnly="@_readOnly" Dense="true" Hover="true" Bordered="true" Striped="true" FixedHeader="true" Height="350px">
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh>Worker ID</MudTh>
+            <MudTh>Surname</MudTh>
+            <MudTh>Other Names</MudTh>
+            <MudTh>Normal</MudTh>
+            <MudTh>Overtime</MudTh>
+            <MudTh>Category</MudTh>
+            <MudTh>Group</MudTh>
+            <MudTh>Ezwich No</MudTh>
+            <MudTh>*</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudIconButton Disabled="_readOnly" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => DeleteItem(context.AutoId))" />
+            </MudTd>
+            <MudTd>@context.WorkerId</MudTd>
+            <MudTd>@context.Sname</MudTd>
+            <MudTd>@context.Oname</MudTd>
+            <MudTd>@context.Normal</MudTd>
+            <MudTd>@context.Overtime</MudTd>
+            <MudTd>@context.TradetypeName</MudTd>
+            <MudTd>@context.TradegroupName</MudTd>
+            <MudTd>@context.Ezwichid</MudTd>
+            <MudTd>@context.Transport</MudTd>
+            <MudTd>
+                <MudIconButton Disabled="_readOnly" Icon="@Icons.Material.Filled.TravelExplore" Color="Color.Success" Size="Size.Small" OnClick="@(() => Transport(context))"> </MudIconButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+
+    [Parameter] public string ReqNo { get; set; }
+    [Parameter] public bool _readOnly { get; set; }
+
+    private List<VwSubStaffReq> _items = new ();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(ReqNo))
+            await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            _items = (await _unitOfWork.DailyReq.GetSubStaffReq(ReqNo)).ToList();
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+        }
+    }
+
+    private async Task DeleteItem(int id)
+    {
+        bool confirm = await JsRuntime.InvokeAsync<bool>(
+            "confirm", "Delete Record?");
+
+        if (!confirm)
+            return;
+
+        // await _unitOfWork.SubStaffReq.Delete(id);
+        await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Deleted successfully");
+        await LoadData();
+    }
+
+    private async Task Transport(VwSubStaffReq item)
+    {
+        // await _unitOfWork.SubStaffReq.MarkTransport(item.AutoId);
+        await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Transport updated");
+        await LoadData();
+    }
+    private async Task OpenAddWorkerDialog()
+    {
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = _dialogService.Show<FindWorkerDialog>("Workers", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is VwWorker worker)
+        {
+            // TODO: Add worker to requisition
+            
+        }
+    }
+}

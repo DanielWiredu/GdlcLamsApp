@@ -1,0 +1,45 @@
+﻿@page "/operations-newdailystaffreq"
+@using AppModels.DailyReq
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime
+
+
+<PageBreadcrumb Subtitle="Operations" Title="Daily Requisition Details" />
+
+<DailyReqDetails Model="@Model"></DailyReqDetails>
+
+<SubStaffReqGrid ReqNo="@Model.RequestNo" _readOnly="false" />
+
+<MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
+
+    <!-- Hidden Buttons -->
+    <MudButton Variant="Variant.Outlined" Color="Color.Default" Size="Size.Small" Style="display:none;">  Find Request </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" Disabled="true"  Style="display:none;"> Generate Cost Sheet </MudButton>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Disabled="true"> Submit Online </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small"  Disabled="true"> Print Copy </MudButton>
+
+    <MudCheckBox T="bool" Label="Approved"  Disabled="true"  Class="ml-4"  Style="color:red;font-size:medium" />
+    <MudText Class="mx-2" Style="color:green"> Approval Date </MudText>
+    <MudDatePicker @bind-Date="Model.RequisitionDate"  ReadOnly="true"  Disabled="true"  Dense="true" Style="max-width:150px;" />
+    <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small"> Add </MudButton>
+    <MudButton Variant="Variant.Filled"  Color="Color.Warning" Size="Size.Small">  Return </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="true"> Print </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="true">  Save </MudButton>
+
+</MudPaper>
+
+@code {
+    private RequisitionModel Model = new RequisitionModel
+    {
+        RequestNo = "DAP59291"
+    };
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+}

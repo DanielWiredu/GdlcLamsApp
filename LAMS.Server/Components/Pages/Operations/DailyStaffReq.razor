@@ -1,17 +1,99 @@
 ﻿@page "/operations-dailystaffreq"
 @rendermode InteractiveServer
-@inject IJSRuntime JsRuntime;
-
+@inject IJSRuntime JsRuntime
+@inject IUnitOfWork _unitOfWork
 
 <PageBreadcrumb Subtitle="Operations" Title="Daily Staff Requisition" />
 
+<MudTable ServerData="ServerReload" Dense="true" Hover="true" Striped="true" @ref="table" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="50" @bind-SelectedItem="_selectedBatch">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Href="/operations-newdailystaffreq"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="autono" T="VwDailyReq">AutoNo</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="ReqNo" T="VwDailyReq">ReqNo</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Date" T="VwDailyReq">Date</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="DlecodeCompanyName" T="VwDailyReq">DlecodeCompanyName</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="VesselName" T="VwDailyReq">VesselName</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="ReportingPoint" T="VwDailyReq">ReportingPoint</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="gphaRequestId" T="VwDailyReq">GphaRequestId</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="approved" T="VwDailyReq">Approved</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="submitted" T="VwDailyReq">Submitted</MudTableSortLabel></MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="AutoNo">@context.AutoNo</MudTd>
+        <MudTd DataLabel="ReqNo">@context.ReqNo</MudTd>
+        <MudTd DataLabel="Date">@context.Date.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="DlecodeCompanyName">@context.DlecodeCompanyName</MudTd>
+        <MudTd DataLabel="VesselName">@context.VesselName</MudTd>
+        <MudTd DataLabel="ReportingPoint">@context.ReportingPoint</MudTd>
+        <MudTd DataLabel="GphaRequestId">@context.GphaRequestId</MudTd>
+        <MudTd DataLabel="Approved"> <MudCheckBox T="bool" Value="@context.Approved" Disabled="true" Color="Color.Success" /> </MudTd>
+        <MudTd DataLabel="Submitted"> <MudCheckBox T="bool?" Value="@context.Submitted" Disabled="true" Color="Color.Success" /> </MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" ></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" ></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private MudTable<VwDailyReq> table;
+    private VwDailyReq _selectedBatch;
+    private string searchString = "";
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender) return;
+
+        await JsRuntime.InvokeVoidAsync("loadConfig");
+        await JsRuntime.InvokeVoidAsync("loadApps");
+    }
+
+    private async Task<TableData<VwDailyReq>> ServerReload(TableState state, CancellationToken token)
+    {
+        try
         {
-            await JsRuntime.InvokeVoidAsync("loadConfig");
-            await JsRuntime.InvokeVoidAsync("loadApps");
+            var data = await _unitOfWork.DailyReq.ViewDailyReq(searchString);
+            var totalItems = data.Count();
+
+            data = state.SortLabel switch
+            {
+                "ReqNo" => data.OrderByDirection(state.SortDirection, o => o.ReqNo),
+                "Date" => data.OrderByDirection(state.SortDirection, o => o.Date),
+                "DlecodeCompanyName" => data.OrderByDirection(state.SortDirection, o => o.DlecodeCompanyName),
+                "VesselName" => data.OrderByDirection(state.SortDirection, o => o.VesselName),
+                "ReportingPoint" => data.OrderByDirection(state.SortDirection, o => o.ReportingPoint),
+                _ => data
+            };
+
+            var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
+            return new TableData<VwDailyReq>{ TotalItems = totalItems,  Items = items };
         }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return new TableData<VwDailyReq> { TotalItems = 0, Items = Array.Empty<VwDailyReq>() };
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        searchString = text;
+        await table.ReloadServerData();
     }
 }

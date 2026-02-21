@@ -1,4 +1,4 @@
-﻿using DataAccess.Models;
+﻿using DataAccess.DbAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace BusinessLogic.Repository.IRepository
 {
-    public interface IWorkerRepository : IRepository<TblWorker>
+    public interface IWeeklyReqRepository
     {
-        Task<IEnumerable<VwWorker>> Search(string _searchType, string _searchValue);
+       
     }
 }

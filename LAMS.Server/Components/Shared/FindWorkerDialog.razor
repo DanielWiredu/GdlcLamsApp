@@ -1,0 +1,98 @@
+﻿@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+
+<MudDialog>
+
+    <DialogContent>
+
+        <!-- Search Type -->
+        <MudRadioGroup T="string" @bind-Value="_searchType" Row="true">
+            @foreach (var type in _searchTypes)
+            {
+                <MudRadio Value="@type">@type</MudRadio>
+            }
+        </MudRadioGroup>
+@* 
+        <MudTextField @bind-Value="_searchValue" Label="Enter value" Required="true" Immediate="true" Class="mt-3" />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  Class="mt-2"  OnClick="SearchWorkers"> Find </MudButton> *@
+
+        <form @onsubmit=SearchWorkers>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="app-search">
+                        <input class="form-control" id="SearchInput" placeholder="Search here..." @bind="_searchValue"
+                               type="search" />
+                        <i class="app-search-icon text-muted" data-lucide="search"></i>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Workers Table -->
+        <MudTable Items="_workers" Dense="true" Hover="true" Bordered="true"  FixedHeader="true" Height="380px" Class="mt-4">
+            <HeaderContent>
+                <MudTh>Worker ID</MudTh>
+                <MudTh>Surname</MudTh>
+                <MudTh>Other Names</MudTh>
+                <MudTh>Gang</MudTh>
+                <MudTh>SSF No</MudTh>
+                <MudTh>Trade Group</MudTh>
+                <MudTh>Trade Category</MudTh>
+                <MudTh>NHIS No</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudLink OnClick="@(() => SelectWorker(context))">
+                        @context.WorkerId
+                    </MudLink>
+                </MudTd>
+                <MudTd>@context.Sname</MudTd>
+                <MudTd>@context.Oname</MudTd>
+                <MudTd>@context.GangName</MudTd>
+                <MudTd>@context.Ssfno</MudTd>
+                <MudTd>@context.TradegroupName</MudTd>
+                <MudTd>@context.TradetypeName</MudTd>
+                <MudTd>@context.Nhis</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Warning" OnClick="Cancel">
+            Close
+        </MudButton>
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private string _searchType = "WorkerID";
+    private string _searchValue;
+    private List<VwWorker> _workers = new();
+    private List<string> _searchTypes = new() { "WorkerID", "SSFNo", "NHISNo", "Gang", "Surname", "Othernames" };
+
+    private async Task SearchWorkers()
+    {
+        if (string.IsNullOrWhiteSpace(_searchValue))
+        {
+            _snackbar.Add("Search value required", Severity.Warning);
+            return;
+        }
+
+        _workers = (await _unitOfWork.Workers
+            .Search(_searchType, _searchValue))
+            .ToList();
+    }
+
+    private void SelectWorker(VwWorker worker)
+    {
+        MudDialog.Close(DialogResult.Ok(worker));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

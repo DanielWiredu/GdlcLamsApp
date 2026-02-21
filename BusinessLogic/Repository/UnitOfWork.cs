@@ -19,10 +19,12 @@ namespace BusinessLogic.Repository
             ReportingPoints = new ReportingPointRepository(_db);
             Workers = new WorkerRepository(_db);
             Setups = new SetupRepository(_db);
+            DailyReq = new DailyReqRepository(_db);
         }
         public ILocationRepository Locations { get; private set; }
         public IReportingPointRepository ReportingPoints { get; private set; }
         public IWorkerRepository Workers { get; private set; }
         public ISetupRepository Setups { get; private set; }
+        public IDailyReqRepository DailyReq { get; private set; }
     }
 }

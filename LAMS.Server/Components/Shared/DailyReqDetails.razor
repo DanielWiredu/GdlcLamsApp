@@ -1,0 +1,240 @@
+﻿@using AppModels.DailyReq
+@inject IUnitOfWork _unitOfWork
+@inject IJSRuntime JsRuntime
+
+<MudPaper Class="pa-4">
+
+    <MudGrid>
+        <!-- LEFT COLUMN -->
+        <MudItem xs="12" md="5">
+            <MudTextField Label="Request No" @bind-Value="Model.RequestNo" ReadOnly="true" />
+            <MudAutocomplete MaxItems="50" T="TblDlecompany" Label="DLE Company"   @bind-Value="SelectedCompany" ToStringFunc="@(c => c?.DlecodeCompanyName)" CoerceText="true"
+              Clearable="true" Dense="true"  SearchFunc="SearchCompanies" Required="true"  RequiredError="Required"></MudAutocomplete>
+            <MudAutocomplete MaxItems="50" T="TblVessel" Label="Vessel" @bind-Value="SelectedVessel" ToStringFunc="@(v => v?.VesselName)" CoerceText="true"
+                             Clearable="true" Dense="true" SearchFunc="SearchVessels" Required="true" RequiredError="Required"></MudAutocomplete>
+            <MudAutocomplete MaxItems="50" T="ReportingPointModel" Label="Reporting Point" @bind-Value="SelectedReportingPoint" ToStringFunc="@(r => r?.ReportingPoint)" CoerceText="true"
+                             Clearable="true" Dense="true" SearchFunc="SearchReportingPoints" Required="true" RequiredError="Required"></MudAutocomplete>
+            <MudAutocomplete MaxItems="50" T="TblLocation" Label="Location" @bind-Value="SelectedLocation" ToStringFunc="@(l => l?.Location)" CoerceText="true"
+                             Clearable="true" Dense="true" SearchFunc="SearchLocations" Required="true" RequiredError="Required"></MudAutocomplete>
+            
+
+        </MudItem>
+
+        <!-- MIDDLE COLUMN -->
+        <MudItem xs="12" md="5">
+            <MudDatePicker Label="Requisition Date" @bind-Date="Model.RequisitionDate" Required="true" />
+            <MudAutocomplete MaxItems="50" T="TblCargo" Label="Cargo" @bind-Value="SelectedCargo" ToStringFunc="@(c => c?.CargoName)" CoerceText="true"
+                             Clearable="true" Dense="true" SearchFunc="SearchCargos" Required="true" RequiredError="Required"></MudAutocomplete>
+            <MudAutocomplete MaxItems="50" T="TblGang" Label="Gang" @bind-Value="SelectedGang" ToStringFunc="@(g => g?.GangName)" CoerceText="true"
+                             Clearable="true" Dense="true" SearchFunc="SearchGangs" Required="true" RequiredError="Required"></MudAutocomplete>
+
+            <MudTextField Label="Job Description" @bind-Value="Model.JobDescription" />
+            <MudTextField Label="GPHA RequestID" @bind-Value="Model.GphaRequestId" />
+            <MudRadioGroup T="string" @bind-Value="Model.ShiftType">
+                @foreach (var shift in ShiftTypes)
+                {
+                    <MudRadio T="string" Value="@shift">@shift</MudRadio>
+                }
+            </MudRadioGroup>
+        </MudItem>
+        <!-- RIGHT COLUMN -->
+        <MudItem xs="12" md="2">
+            <MudCheckBox @bind-Value="Model.ShipSide" Label="Ship Side" />
+            <MudCheckBox @bind-Value="Model.Weekend" Label="Weekend / Holiday" />
+            
+            <MudCheckBox @bind-Value="Model.Night" Label="Night" />
+            <MudNumericField T="double" Label="Normal Hrs" @bind-Value="Model.NormalHours" ReadOnly="false" Min="0" HideSpinButtons="true" />
+            <MudNumericField T="double" Label="Overtime Hrs" @bind-Value="Model.OvertimeHours" ReadOnly="false" Min="0" HideSpinButtons="true" />
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    [Parameter] public RequisitionModel Model { get; set; }
+    private List<string> ShiftTypes = new()
+    {
+        "Non-Shift",
+        "Shift 80%",
+        "Shift 100%",
+    };
+
+    private TblDlecompany SelectedCompany
+    {
+        get => Companies.FirstOrDefault(c => c.DlecodeCompanyId == Model.CompanyId);
+        set => Model.CompanyId = value?.DlecodeCompanyId;
+    }
+    private TblVessel SelectedVessel
+    {
+        get => Vessels.FirstOrDefault(v => v.VesselId == Model.VesselId);
+        set => Model.VesselId = value?.VesselId;
+    }
+    private ReportingPointModel SelectedReportingPoint
+    {
+        get => ReportingPoints.FirstOrDefault(r => r.ReportingPointId == Model.ReportingPointId);
+        set => Model.ReportingPointId = value?.ReportingPointId;
+    }
+    private TblLocation SelectedLocation
+    {
+        get => Locations.FirstOrDefault(l => l.LocationId == Model.LocationId);
+        set => Model.LocationId = value?.LocationId;
+    }
+
+    private TblCargo SelectedCargo
+    {
+        get => CargoList.FirstOrDefault(c => c.CargoId == Model.CargoId);
+        set => Model.CargoId = value?.CargoId;
+    }
+
+    private TblGang SelectedGang
+    {
+        get => Gangs.FirstOrDefault(g => g.GangId == Model.GangId);
+        set => Model.GangId = value?.GangId;
+    }
+    private async Task<IEnumerable<TblDlecompany>> SearchCompanies(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Companies;
+        }
+        // filter locally first
+        var localResults = Companies.Where(c => c.DlecodeCompanyName.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.Setups.GetAllDLECompany();
+        // add new results to cache, avoid duplicates
+        foreach (var company in serverResults)
+        {
+            if (!Companies.Any(c => c.DlecodeCompanyId == company.DlecodeCompanyId))
+                Companies.Add(company);
+        }
+        return serverResults;
+    }
+    private async Task<IEnumerable<TblVessel>> SearchVessels(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Vessels;
+        }
+        // filter locally first
+        var localResults = Vessels.Where(v => v.VesselName.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.Setups.GetAllVessels();
+        // add new results to cache, avoid duplicates
+        foreach (var vessel in serverResults)
+        {
+            if (!Vessels.Any(v => v.VesselId == vessel.VesselId))
+                Vessels.Add(vessel);
+        }
+        return serverResults;
+    }
+    private async Task<IEnumerable<ReportingPointModel>> SearchReportingPoints(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return ReportingPoints;
+        }
+        // filter locally first
+        var localResults = ReportingPoints.Where(r => r.ReportingPoint.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.ReportingPoints.GetAll();
+        // add new results to cache, avoid duplicates
+        foreach (var reportingPoint in serverResults)
+        {
+            if (!ReportingPoints.Any(r => r.ReportingPointId == reportingPoint.ReportingPointId))
+                ReportingPoints.Add(reportingPoint);
+        }
+        return serverResults;
+    }
+    private async Task<IEnumerable<TblLocation>> SearchLocations(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Locations;
+        }
+        // filter locally first
+        var localResults = Locations.Where(l => l.Location.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.Locations.GetAll();
+        // add new results to cache, avoid duplicates
+        foreach (var location in serverResults)
+        {
+            if (!Locations.Any(l => l.LocationId == location.LocationId))
+                Locations.Add(location);
+        }
+        return serverResults;
+    }
+    private async Task<IEnumerable<TblCargo>> SearchCargos(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return CargoList;
+        }
+        // filter locally first
+        var localResults = CargoList.Where(c => c.CargoName.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.Setups.GetAllCargo();
+        // add new results to cache, avoid duplicates
+        foreach (var cargo in serverResults)
+        {
+            if (!CargoList.Any(c => c.CargoId == cargo.CargoId))
+                CargoList.Add(cargo);
+        }
+        return serverResults;
+    }
+    private async Task<IEnumerable<TblGang>> SearchGangs(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Gangs;
+        }
+        // filter locally first
+        var localResults = Gangs.Where(g => g.GangName.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.Setups.GetAllGangs();
+        // add new results to cache, avoid duplicates
+        foreach (var gang in serverResults)
+        {
+            if (!Gangs.Any(g => g.GangId == gang.GangId))
+                Gangs.Add(gang);
+        }
+        return serverResults;
+    }
+
+    private List<TblDlecompany> Companies = new();
+    private List<TblVessel> Vessels = new();
+    private List<ReportingPointModel> ReportingPoints = new();
+    private List<TblLocation> Locations = new();
+    private List<TblCargo> CargoList = new();
+    private List<TblGang> Gangs = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Companies = (await _unitOfWork.Setups.GetAllDLECompany()).ToList();
+            Vessels = (await _unitOfWork.Setups.GetAllVessels()).ToList();
+            ReportingPoints = (await _unitOfWork.ReportingPoints.GetAll()).ToList();
+            Locations = (await _unitOfWork.Locations.GetAll()).ToList();
+            CargoList = (await _unitOfWork.Setups.GetAllCargo()).ToList();
+            Gangs = (await _unitOfWork.Setups.GetAllGangs()).ToList();
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+    
+    }
+
+}
