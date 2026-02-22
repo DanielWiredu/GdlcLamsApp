@@ -1,13 +1,16 @@
 ﻿@page "/operations-dailystaffreq"
+@using AppModels.DailyReq
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime
 @inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Operations" Title="Daily Staff Requisition" />
 
-<MudTable ServerData="ServerReload" Dense="true" Hover="true" Striped="true" @ref="table" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="50" @bind-SelectedItem="_selectedBatch">
+<MudTable ServerData="ServerReload" Dense="true" Hover="true" Striped="true" @ref="table" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="50" @bind-SelectedItem="_selectedReq">
     <ToolBarContent>
-        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Href="/operations-newdailystaffreq"> Add New </MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Href="/operations-dailystaffreqdetails"> Add New </MudButton>
         <MudSpacer />
         <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -34,9 +37,9 @@
         <MudTd DataLabel="Approved"> <MudCheckBox T="bool" Value="@context.Approved" Disabled="true" Color="Color.Success" /> </MudTd>
         <MudTd DataLabel="Submitted"> <MudCheckBox T="bool?" Value="@context.Submitted" Disabled="true" Color="Color.Success" /> </MudTd>
         <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" ></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" Href="@($"/operations-dailystaffreqdetails/{context.ReqNo}")"></MudIconButton>
             <MudDivider Vertical="true" FlexItem="true" />
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" ></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.ReqNo))"></MudIconButton>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
@@ -52,7 +55,7 @@
 
 @code {
     private MudTable<VwDailyReq> table;
-    private VwDailyReq _selectedBatch;
+    private VwDailyReq _selectedReq;
     private string searchString = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -95,5 +98,43 @@
     {
         searchString = text;
         await table.ReloadServerData();
+    }
+    private async Task ConfirmRecordDelete(string ReqNo)
+    {
+        _selectedReq.ReqNo = ReqNo;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            _selectedReq.ReqNo = string.Empty;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && !string.IsNullOrEmpty(_selectedReq.ReqNo))
+        {
+            try
+            {
+                var request = new DeleteReqRequest { ReqNo = _selectedReq.ReqNo, DeleteBy = "UserID" };
+                var response = await _unitOfWork.DailyReq.DeleteDailyReq(request);
+                if (response == 1)
+                {
+                    _snackbar.Add("DLE Company Deleted Successfully!", Severity.Success);
+                    await table.ReloadServerData();
+                    _selectedReq.ReqNo = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting DLE Company: {ex.Message}", Severity.Error);
+                _selectedReq.ReqNo = string.Empty;
+            }
+        }
     }
 }

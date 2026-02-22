@@ -1,6 +1,8 @@
-﻿@inject IUnitOfWork _unitOfWork
+﻿@using AppModels.DailyReq
+@inject IUnitOfWork _unitOfWork
 @inject IJSRuntime JsRuntime
 @inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <MudPaper Class="pa-4">
 
@@ -82,14 +84,22 @@
         if (!confirm)
             return;
 
-        // await _unitOfWork.SubStaffReq.Delete(id);
-        await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Deleted successfully");
-        await LoadData();
+        var response = await _unitOfWork.DailyReq.RemoveSubStaffReq(id);
+        if (response == 1)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Deleted successfully");
+            await LoadData();
+        }
     }
 
     private async Task Transport(VwSubStaffReq item)
     {
-        // await _unitOfWork.SubStaffReq.MarkTransport(item.AutoId);
+        var request = new ToogleWorkerTransport
+        {
+            AutoId = item.AutoId,
+            transport = item.Transport
+        };
+        await _unitOfWork.DailyReq.ToogleWorkerTransport(request);
         await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Transport updated");
         await LoadData();
     }
@@ -108,7 +118,42 @@
         if (!result.Canceled && result.Data is VwWorker worker)
         {
             // TODO: Add worker to requisition
-            
+            if (worker.Flags != "ACT")
+            {
+                await JsRuntime.InvokeVoidAsync("ShowSwal", "error", $"This Worker {worker.WorkerId} is tagged. Please contact the Administrator");
+                return;
+            }
+            var addRequest = new AddSubStaffRequest
+            {
+                ReqNo = ReqNo,
+                WorkerId = worker.WorkerId,
+                TradegroupID = worker.TradegroupId,
+                transport = "*",
+                TradetypeID = worker.TradetypeId
+            };
+            try
+            {
+                int response = await _unitOfWork.DailyReq.AddSubStaff(addRequest);
+                if (response == 0)
+                {
+                    _snackbar.Add("Worker added successfully", Severity.Success);
+                    await LoadData();
+                }
+                else if (response == -73)
+                {
+                    _snackbar.Add("Only one Headman is permitted to work on a requisition", Severity.Error);
+                }
+                else
+                {
+                    _snackbar.Add("An error occurred while adding the worker", Severity.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add(ex.Message.Replace("'", "").Replace("\r\n", ""), Severity.Error);
+                return;
+            }
+        
         }
     }
 }

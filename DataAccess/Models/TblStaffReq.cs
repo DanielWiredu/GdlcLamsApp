@@ -61,13 +61,13 @@ public partial class TblStaffReq
 
     public DateTime? HourDate { get; set; }
 
-    public TimeOnly? NormalHrsFrom { get; set; }
+    public TimeSpan? NormalHrsFrom { get; set; }
 
-    public TimeOnly? NormalHrsTo { get; set; }
+    public TimeSpan? NormalHrsTo { get; set; }
 
-    public TimeOnly? OvertimeHrsFrom { get; set; }
+    public TimeSpan? OvertimeHrsFrom { get; set; }
 
-    public TimeOnly? OvertimeHrsTo { get; set; }
+    public TimeSpan? OvertimeHrsTo { get; set; }
 
     public bool? Submitted { get; set; }
 
@@ -84,6 +84,7 @@ public partial class TblStaffReq
     public string? GphaRequestId { get; set; }
 
     public DateTime? CreatedDate { get; set; }
+    public string ShiftType { get; set; } = string.Empty;
 
     public virtual ICollection<TblSubStaffReq> TblSubStaffReqs { get; set; } = new List<TblSubStaffReq>();
 }

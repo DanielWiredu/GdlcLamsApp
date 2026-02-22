@@ -22,7 +22,7 @@
 
         <!-- MIDDLE COLUMN -->
         <MudItem xs="12" md="5">
-            <MudDatePicker Label="Requisition Date" @bind-Date="Model.RequisitionDate" Required="true" />
+            <MudDatePicker Label="Requisition Date" @bind-Date="Model.RequisitionDate" Required="true" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
             <MudAutocomplete MaxItems="50" T="TblCargo" Label="Cargo" @bind-Value="SelectedCargo" ToStringFunc="@(c => c?.CargoName)" CoerceText="true"
                              Clearable="true" Dense="true" SearchFunc="SearchCargos" Required="true" RequiredError="Required"></MudAutocomplete>
             <MudAutocomplete MaxItems="50" T="TblGang" Label="Gang" @bind-Value="SelectedGang" ToStringFunc="@(g => g?.GangName)" CoerceText="true"
@@ -43,8 +43,8 @@
             <MudCheckBox @bind-Value="Model.Weekend" Label="Weekend / Holiday" />
             
             <MudCheckBox @bind-Value="Model.Night" Label="Night" />
-            <MudNumericField T="double" Label="Normal Hrs" @bind-Value="Model.NormalHours" ReadOnly="false" Min="0" HideSpinButtons="true" />
-            <MudNumericField T="double" Label="Overtime Hrs" @bind-Value="Model.OvertimeHours" ReadOnly="false" Min="0" HideSpinButtons="true" />
+            <MudNumericField T="double" Label="Normal Hrs" @bind-Value="Model.NormalHours" ReadOnly="true" Min="0" HideSpinButtons="true" />
+            <MudNumericField T="double" Label="Overtime Hrs" @bind-Value="Model.OvertimeHours" ReadOnly="true" Min="0" HideSpinButtons="true" />
         </MudItem>
     </MudGrid>
 </MudPaper>
@@ -61,34 +61,34 @@
     private TblDlecompany SelectedCompany
     {
         get => Companies.FirstOrDefault(c => c.DlecodeCompanyId == Model.CompanyId);
-        set => Model.CompanyId = value?.DlecodeCompanyId;
+        set => Model.CompanyId = value.DlecodeCompanyId;
     }
     private TblVessel SelectedVessel
     {
         get => Vessels.FirstOrDefault(v => v.VesselId == Model.VesselId);
-        set => Model.VesselId = value?.VesselId;
+        set => Model.VesselId = value.VesselId;
     }
     private ReportingPointModel SelectedReportingPoint
     {
         get => ReportingPoints.FirstOrDefault(r => r.ReportingPointId == Model.ReportingPointId);
-        set => Model.ReportingPointId = value?.ReportingPointId;
+        set => Model.ReportingPointId = value.ReportingPointId;
     }
     private TblLocation SelectedLocation
     {
         get => Locations.FirstOrDefault(l => l.LocationId == Model.LocationId);
-        set => Model.LocationId = value?.LocationId;
+        set => Model.LocationId = value.LocationId;
     }
 
     private TblCargo SelectedCargo
     {
         get => CargoList.FirstOrDefault(c => c.CargoId == Model.CargoId);
-        set => Model.CargoId = value?.CargoId;
+        set => Model.CargoId = value.CargoId;
     }
 
     private TblGang SelectedGang
     {
         get => Gangs.FirstOrDefault(g => g.GangId == Model.GangId);
-        set => Model.GangId = value?.GangId;
+        set => Model.GangId = value.GangId;
     }
     private async Task<IEnumerable<TblDlecompany>> SearchCompanies(string value, CancellationToken token)
     {
@@ -234,7 +234,5 @@
             await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
             return;
         }
-    
     }
-
 }
