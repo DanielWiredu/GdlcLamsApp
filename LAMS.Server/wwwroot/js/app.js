@@ -1458,3 +1458,34 @@ window.ShowSwal = (type, message) => {
         });
     }
 }
+window.makeDialogDraggable = (selector) => {
+    const dialog = document.querySelector(selector);
+    if (!dialog) return;
+
+    const header = dialog.querySelector('.mud-dialog-title');
+    if (!header) return;
+
+    header.style.cursor = "move";
+
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = dialog.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        dialog.style.position = "fixed";
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        dialog.style.left = (e.clientX - offsetX) + "px";
+        dialog.style.top = (e.clientY - offsetY) + "px";
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+};

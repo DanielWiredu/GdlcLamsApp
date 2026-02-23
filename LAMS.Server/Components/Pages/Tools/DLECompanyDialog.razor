@@ -1,7 +1,8 @@
 ﻿@inject IUnitOfWork _unitOfWork
 @inject ISnackbar _snackbar
+@inject IJSRuntime JsRuntime;
 
-<MudDialog MaxWidth="MaxWidth.ExtraLarge" FullWidth="true">
+<MudDialog MaxWidth="MaxWidth.ExtraLarge" FullWidth="true" Class="draggable-dialog">
     <DialogContent>
         <MudGrid>
             <!-- LEFT COLUMN -->
@@ -60,6 +61,14 @@
     protected override void OnInitialized()
     {
         _isEdit = IsEdit;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("makeDialogDraggable", ".draggable-dialog");
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();

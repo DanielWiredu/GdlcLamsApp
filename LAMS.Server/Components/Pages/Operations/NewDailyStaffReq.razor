@@ -32,8 +32,8 @@
     }
     <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Href="/operations-dailystaffreq"> Return </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)"
-               Href="@($"http://172.29.255.101/Reports/Daily/General/vwDailyCostSheet.aspx?reqno={Model.RequestNo}&st={Model.RequisitionDate:yyyy-MM-dd}&ed={Model.RequisitionDate:yyyy-MM-dd}")"
-     Target="_blank"> Print </MudButton>
+    Href="@($"http://172.29.255.101/Reports/Daily/General/vwDailyCostSheet.aspx?reqno={Model.RequestNo}&st={Model.RequisitionDate:yyyy-MM-dd}&ed={Model.RequisitionDate:yyyy-MM-dd}")"
+    Target="_blank"> Print </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? false : true)" OnClick="AddDailyReq"> @(IsEdit ? "Save Changes" : "Save")</MudButton>
 
 </MudPaper>
@@ -64,6 +64,11 @@
             {
                 // EDIT MODE
                 var dailyReq = await _unitOfWork.DailyReq.GetDailyReq(RequestNo);
+                if (dailyReq == null)
+                {
+                    _snackbar.Add("This requisition number was not found", Severity.Error);
+                    return;
+                }
                 Model = new RequisitionModel
                 {
                     AutoNo = dailyReq.AutoNo,
