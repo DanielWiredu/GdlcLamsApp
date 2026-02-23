@@ -1,0 +1,22 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField Label="Enter Requisition No" @bind-Value="ReqNo" Required="true" RequiredError="Requisition No is required" />
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Default">Cancel</MudButton>
+        <MudButton OnClick="FindReqNo" Color="Color.Success" Variant="Variant.Filled"> Find </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    public string ReqNo { get; set; }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void FindReqNo()
+    {
+        MudDialog.Close(DialogResult.Ok(ReqNo));
+    }
+}

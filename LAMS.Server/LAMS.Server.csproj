@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <Folder Include="Components\Pages\CustomizePayroll\" />
-    <Folder Include="Components\Pages\Reports\" />
   </ItemGroup>
 
 </Project>

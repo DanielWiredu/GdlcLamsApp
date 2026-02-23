@@ -5,6 +5,7 @@
 @inject IJSRuntime JsRuntime
 @inject IUnitOfWork _unitOfWork
 @inject ISnackbar _snackbar
+@inject IDialogService _dialogService
 
 <PageBreadcrumb Subtitle="Operations" Title="@($"{(IsEdit ? "Edit" : "New")} Daily Requisition Details")" />
 
@@ -18,9 +19,6 @@
     <MudButton Variant="Variant.Outlined" Color="Color.Default" Size="Size.Small" Style="display:none;">  Find Request </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" Disabled="true"  Style="display:none;"> Generate Cost Sheet </MudButton>
 
-   @*  <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Disabled="true"> Submit Online </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small"  Disabled="true"> Print Copy </MudButton> *@
-
     <MudCheckBox T="bool" Label="Approved" @bind-Value="Model.Approved" Disabled="true"  Class="ml-4"  Style="color:red;font-size:medium" />
     <MudText Class="mx-2" Style="color:green"> Approval Date </MudText>
     <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="true" Disabled="true" DateFormat="yyyy-MM-dd" Dense="true" Style="max-width:150px;" />
@@ -30,10 +28,12 @@
     }
     @if (IsEdit)
     {
-        <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small"> Find </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
     }
-    <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Href="/operations-dailystaffreq">  Return </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)"> Print </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Href="/operations-dailystaffreq"> Return </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)"
+               Href="@($"http://172.29.255.101/Reports/Daily/General/vwDailyCostSheet.aspx?reqno={Model.RequestNo}&st={Model.RequisitionDate:yyyy-MM-dd}&ed={Model.RequisitionDate:yyyy-MM-dd}")"
+     Target="_blank"> Print </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? false : true)" OnClick="AddDailyReq"> @(IsEdit ? "Save Changes" : "Save")</MudButton>
 
 </MudPaper>
@@ -43,14 +43,7 @@
     public string? RequestNo { get; set; }
     private RequisitionModel Model = new();
     private bool IsEdit => !string.IsNullOrEmpty(RequestNo);
-    // private static string newReqNo;
-    // private RequisitionModel Model = new RequisitionModel
-    // {
-    //     // RequestNo = "DAP59291"
-    //     RequestNo = newReqNo,
-    //     Approved = false,
-    //     ApprovedDate = null
-    // };
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -60,6 +53,10 @@
         }
     }
     protected override async Task OnParametersSetAsync()
+    {
+        await LoadDataAsync();
+    }
+    private async Task LoadDataAsync()
     {
         try
         {
@@ -89,6 +86,10 @@
                     NormalHours = dailyReq.Normal,
                     OvertimeHours = dailyReq.Overtime,
                 };
+                if (Model.Approved)
+                {
+                    _snackbar.Add("This requisition has been approved", Severity.Warning);
+                }
             }
             else
             {
@@ -100,7 +101,6 @@
             await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
             return;
         }
-
     }
     private async Task ResetState()
     {
@@ -154,12 +154,24 @@
                     _snackbar.Add("Saved successfully", Severity.Success);
                     Model.AutoNo = result.AutoNo;
                 }
-                
             }
         }
         catch (Exception ex)
         {
             _snackbar.Add($"Error saving record: {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task FindReqNo()
+    {
+        var parameters = new DialogParameters<FindCostSheetDialog> { };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<FindCostSheetDialog>("Find Cost Sheet", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            RequestNo = result.Data.ToString();
+            await LoadDataAsync(); 
         }
     }
 }
