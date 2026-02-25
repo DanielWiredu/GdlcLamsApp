@@ -38,6 +38,7 @@ namespace BusinessLogic.Repository
         public async Task<int> UpdateBank(TblBank model) => await _db.SaveData(query: "Update tblBanks set BankName=@BankName where BankId=@BankId", new { model.BankId, model.BankName });
         public async Task<int> AddBankBranch(TblBankBranch model) => await _db.SaveData(query: "Insert into tblBankBranches(BranchName,BankId,SortCode) values(@BranchName, @BankId, @SortCode)", new { model.BranchName, model.BankId, model.SortCode });
         public async Task<IEnumerable<VwBankBranch>> GetAllBankBranch() => await _db.LoadData<VwBankBranch, dynamic>(query: "Select * from VwBankBranches", new { });
+        public async Task<IEnumerable<TblBankBranch>> GetBankBranchByBankId(int bankId) => await _db.LoadData<TblBankBranch, dynamic>(query: "Select * from tblBankBranches Where BankId=@BankId", new { BankId = bankId });
         public async Task<int> RemoveBankBranch(int Id) => await _db.SaveData(query: "Delete from tblBankBranches where BranchId=@BranchId", new { BranchId = Id });
         public async Task<int> UpdateBankBranch(TblBankBranch model) => await _db.SaveData(query: "Update tblBankBranches set BranchName=@BranchName,BankId=@BankId,SortCode=@SortCode where BranchId=@BranchId", new { model.BranchId, model.BranchName, model.BankId, model.SortCode });
         public async Task<int> AddDLECompany(TblDlecompany model)

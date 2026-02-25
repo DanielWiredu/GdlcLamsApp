@@ -100,4 +100,5 @@ public partial class TblWorker
     public bool? OnlinePush { get; set; }
 
     public bool? UpdateStatus { get; set; }
+    public string MedicalIdNo { get; set; }
 }

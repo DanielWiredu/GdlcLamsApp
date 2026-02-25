@@ -102,4 +102,5 @@ public partial class VwTblWorker
     public string? GphaGroupId { get; set; }
 
     public string? GphaJobId { get; set; }
+    public string MedicalIdNo { get; set; }
 }

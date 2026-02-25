@@ -10,60 +10,66 @@
 <PageBreadcrumb Subtitle="Workers" Title="Registration" />
 
 <MudPaper Class="pa-6">
-    <MudForm @ref="_form" Model="_model" OnValidSubmit="Save">
+    <MudForm @ref="_form" Model="@_model">
         <MudGrid>
             <!-- LEFT COLUMN -->
             <MudItem xs="12" md="5">
-                <MudDatePicker Label="Registration Date" @bind-Date="_model.RegistrationDate" Required="true" DateFormat="dd/MM/yyyy" />
-                <MudTextField Label="Auto Number" @bind-Value="_model.AutoNumber" Disabled="true" />
-                <MudTextField Label="Worker ID" @bind-Value="_model.WorkerId" Required="true" />
+                <MudDatePicker Label="Registration Date" @bind-Date="_model.RegistrationDate" DateFormat="yyyy-MM-dd" For="@(() => _model.RegistrationDate)" />
+                <MudTextField Label="Auto Number" @bind-Value="_model.AutoNumber" Disabled="true" Immediate="true" For="@(() => _model.AutoNumber)" />
+                <MudTextField Label="Worker ID" @bind-Value="_model.WorkerId" Disabled="@(_model.AutoNumber != 0)" Immediate="true" For="@(() => _model.WorkerId)" />
+                @* <MudChip T="string" Color="Color.Secondary">Status: @_model.WorkerStatus</MudChip> *@
+                @if (_model.AutoNumber != 0)
+                {
+                    <MudChip T="string" Color="Color.Secondary"> Status: @GetStatusLabel(_model.WorkerStatus) </MudChip>
+                }
             </MudItem>
 
             <!-- RIGHT COLUMN -->
             <MudItem xs="12" md="5">
-                <MudSelect T="string" Label="Gender" @bind-Value="_model.Gender">
+                <MudSelect T="string" Label="Gender" @bind-Value="_model.Gender" Immediate="true" For="@(() => _model.Gender)">
                     <MudSelectItem Value=@("M")>Male</MudSelectItem>
                     <MudSelectItem Value=@("F")>Female</MudSelectItem>
                 </MudSelect>
-                <MudSelect T="string" Label="Worker Type"
-                           @bind-Value="_model.WorkerType">
+                <MudSelect T="string" Label="Worker Type" @bind-Value="_model.WorkerType" Immediate="true" For="@(() => _model.WorkerType)">
                     <MudSelectItem Value=@("D")>Daily</MudSelectItem>
                     <MudSelectItem Value=@("W")>Weekly</MudSelectItem>
                     <MudSelectItem Value=@("M")>Monthly</MudSelectItem>
                 </MudSelect>
-                <MudTextField Label="Full Name" Value="_model.FullName" ReadOnly="true" />
+                <MudTextField Label="Full Name" Value="_model.FullName" ReadOnly="true" For="@(() => _model.FullName)" />
+                @if (_model.AutoNumber != 0)
+                {
+                    <MudChip T="string" Color="Color.Secondary">Age: @_model.Age</MudChip>
+                }
             </MudItem>
 
             <!-- IMAGE COLUMN -->
             <MudItem xs="12" md="2">
-                <MudAvatar Size="Size.Large" Image="@_model.PhotoUrl" />
-                <MudImage Src="@_model.PhotoUrl" Width="200" Height="150" Alt="Swedish Farm House" Elevation="25" Class="rounded-lg ma-4" FallbackSrc="images/users/user-7.jpg" />
+                <MudImage Src="@_model.PhotoUrl" Width="200" Height="150" Alt="" Elevation="25" Class="rounded-lg ma-4" FallbackSrc="images/users/user-7.jpg" For="@(() => _model.PhotoUrl)" />
                 <MudFileUpload T="IBrowserFile" OnFilesChanged="UploadImage" Accept="image/*" />
             </MudItem>
         </MudGrid>
 
-        <MudDivider Class="my-6"/>
         <!-- TABS -->
-        <MudTabs>
+        <MudTabs KeepPanelsAlive="true">
             <!-- PERSONAL TAB -->
             <MudTabPanel Text="Personal">
                 <MudGrid>
                     <MudItem xs="12" md="6">
-                        <MudDatePicker Label="Date of Birth" @bind-Date="_model.DateOfBirth" Required="true" />
-                        <MudSelect T="int" Label="Nationality" @bind-Value="_model.NationalityId" Required="true">
+                        <MudDatePicker Label="Date of Birth" @bind-Date="_model.DateOfBirth" DateFormat="yyyy-MM-dd" For="@(() => _model.DateOfBirth)" />
+                        <MudSelect T="int" Label="Nationality" @bind-Value="_model.NationalityId" Immediate="true" For="@(() => _model.NationalityId)">
                             <MudSelectItem Value="0" Disabled="true"> -- Select Nationality -- </MudSelectItem>
                             @foreach (var n in Nationalities)
                             {
                                 <MudSelectItem Value="@n.Id">@n.Nationality</MudSelectItem>
                             }
                         </MudSelect>
-                        <MudTextField Label="Surname" @bind-Value="_model.Surname" Required="true" />
-                        <MudTextField Label="Other Names" @bind-Value="_model.OtherNames" />
-                        <MudTextField Label="Previous Name" @bind-Value="_model.PreviousName" />
-                        <MudTextField Label="Address 1" @bind-Value="_model.Address1" />
-                        <MudTextField Label="Address 2" @bind-Value="_model.Address2" />
-                        <MudTextField Label="Phone Number" @bind-Value="_model.PhoneNumber" Immediate="true" Pattern="^[0-9]{10}$" HelperText="10 digits only" />
-                        <MudTextField Label="Education" @bind-Value="_model.Education" />
+                        <MudTextField Label="Surname" @bind-Value="_model.Surname" Immediate="true" For="@(() => _model.Surname)" />
+                        <MudTextField Label="Other Names" @bind-Value="_model.OtherNames" For="@(() => _model.OtherNames)" />
+                        <MudTextField Label="Previous Name" @bind-Value="_model.PreviousName" For="@(() => _model.PreviousName)" />
+                        <MudTextField Label="Address 1" @bind-Value="_model.Address1" For="@(() => _model.Address1)" />
+                        <MudTextField Label="Address 2" @bind-Value="_model.Address2" For="@(() => _model.Address2)" />
+                        <MudTextField Label="Phone Number" @bind-Value="_model.PhoneNumber" Immediate="true" Pattern="^[0-9]{10}$" For="@(() => _model.PhoneNumber)" />
+                        <MudTextField Label="Education" @bind-Value="_model.Education" For="@(() => _model.Education)" />
                     </MudItem>
                     <MudItem xs="12" md="6">
                         <MudTextField Label="Next of Kin" @bind-Value="_model.NextOfKin" />
@@ -72,7 +78,7 @@
                         <MudTextField Label="Phone No" @bind-Value="_model.NOKPhoneNo" />
                         <MudTextField Label="Contact Person" @bind-Value="_model.ContactPerson" />
                         <MudTextField Label="Contact Address" @bind-Value="_model.ContactAddress" />
-                        <MudTextField Label="Contact Phone" @bind-Value="_model.ContactPhone" Pattern="^[0-9]{10}$" />
+                        <MudTextField Label="Contact Phone" @bind-Value="_model.ContactPhone" Pattern="^[0-9]{10}$" Immediate="true" For="@(() => _model.ContactPhone)" />
                         <MudTextField Label="Medical ID No" @bind-Value="_model.MedicalIdNo" />
                     </MudItem>
                 </MudGrid>
@@ -83,20 +89,20 @@
                     <MudItem xs="12" md="6">
                         <MudCheckBox Label="Tax" @bind-Value="_model.Tax" />
                         <MudCheckBox Label="Charge Premium" @bind-Value="_model.ChargePremium" />
-                        <MudTextField Label="SSF No" @bind-Value="_model.SSFNo" Required="true" Pattern="^[a-zA-Z0-9-\s]{8,15}$" />
+                        <MudTextField Label="SSF No" @bind-Value="_model.SSFNo" Pattern="^[a-zA-Z0-9\s-]{8,15}$" Immediate="true" For="@(() => _model.SSFNo)" />
                         <MudTextField Label="NHIS Reg No" @bind-Value="_model.NHISRegNo" />
                         <MudTextField Label="New ID No" @bind-Value="_model.NewIDNo"  />
                         <MudTextField Label="Shoe Size" @bind-Value="_model.ShoeSize"  />
                         <MudTextField Label="Height" @bind-Value="_model.Height" />
 
-                        <MudSelect T="int" Label="Trade Group" @bind-Value="_model.TradeGroupId" Required="true" RequiredError="Trade Group is required">
+                        <MudSelect T="int" Label="Trade Group" Value="_model.TradeGroupId" ValueChanged="OnTradeGroupChanged" Immediate="true" For="@(() => _model.TradeGroupId)">
                             <MudSelectItem Value="0" Disabled="true"> -- Select Trade Group -- </MudSelectItem>
                             @foreach (var g in TradeGroups)
                             {
                                 <MudSelectItem Value="@g.TradegroupId">@g.TradegroupName</MudSelectItem>
                             }
                         </MudSelect>
-                        <MudSelect T="int" Label="Trade Type" @bind-Value="_model.TradeTypeId" Required="true" RequiredError="Trade Type is required">
+                        <MudSelect T="int" Label="Trade Type" @bind-Value="_model.TradeTypeId" Disabled="_model.TradeGroupId == 0" Immediate="true" For="@(() => _model.TradeTypeId)">
                             <MudSelectItem Value="0" Disabled="true"> -- Select Trade Type -- </MudSelectItem>
                             @foreach (var g in TradeTypes)
                             {
@@ -104,52 +110,64 @@
                             }
                         </MudSelect>
                         <MudAutocomplete MaxItems="50" T="ReportingPointModel" Label="Department" @bind-Value="SelectedReportingPoint" ToStringFunc="@(r => r?.ReportingPoint)" CoerceText="true"
-                                         Clearable="true" Dense="true" SearchFunc="SearchReportingPoints" Required="true" RequiredError="Required"></MudAutocomplete>
+                        Clearable="true" Dense="true" SearchFunc="SearchReportingPoints"></MudAutocomplete>
                     </MudItem>
                     <MudItem xs="12" md="6">
-                        <MudTextField Label="E-zwich Number" @bind-Value="_model.EzwichNo" Pattern="^[\s\S]{6,15}$" />
                         <MudTextField Label="TIN" @bind-Value="_model.TIN" />
-                        <MudTextField Label="National ID No" @bind-Value="_model.NationalIdNo" Pattern="^(GHA)[-](\d{9})[-](\d{1})$" />
-                        @* <MudSelect T="int" Label="Gang" @bind-Value="_model.GangId" Required="true" RequiredError="Gang is required">
+                        <MudTextField Label="National ID No" @bind-Value="_model.NationalIdNo" Pattern="^GHA-\d{9}-\d{1}$" Immediate="true" For="@(() => _model.NationalIdNo)" />
+                        <MudSelect T="int" Label="Gang" @bind-Value="_model.GangId" Immediate="true" For="@(() => _model.GangId)">
                             <MudSelectItem Value="0" Disabled="true"> -- Select Gang -- </MudSelectItem>
                             @foreach (var g in Gangs)
                             {
                                 <MudSelectItem Value="@g.GangId">@g.GangName</MudSelectItem>
                             }
                         </MudSelect>
-                        <MudSelect T="int" Label="Bank" @bind-Value="_model.BankId" Required="true" RequiredError="Bank is required">
+                        <MudSelect T="string" Label="Payment Option" @bind-Value="_model.PaymentOption" Immediate="true" For="@(() => _model.PaymentOption)">
+                            <MudSelectItem Value=@("Ezwich")>Ezwich</MudSelectItem>
+                            <MudSelectItem Value=@("Bank")>Bank</MudSelectItem>
+                        </MudSelect>
+                        <MudTextField Label="E-zwich Number" @bind-Value="_model.EzwichNo" Pattern="^[\s\S]{6,15}$" Immediate="true" For="@(() => _model.EzwichNo)" Disabled="@(_model.PaymentOption != "Ezwich")" />
+                        <MudSelect T="int" Label="Bank" Value="_model.BankId" ValueChanged="OnBankChanged" Disabled="@(_model.PaymentOption != "Bank")">
                             <MudSelectItem Value="0" Disabled="true"> -- Select Bank -- </MudSelectItem>
                             @foreach (var b in Banks)
                             {
                                 <MudSelectItem Value="@b.BankId">@b.BankName</MudSelectItem>
                             }
-                        </MudSelect> *@
-
-                        <MudTextField Label="Account Number" @bind-Value="_model.BankAccountNumber" />
-                        <MudSelect T="string" Label="Payment Option" @bind-Value="_model.PaymentOption">
-                            <MudSelectItem Value=@("Ezwich")>Ezwich</MudSelectItem>
-                            <MudSelectItem Value=@("Bank")>Bank</MudSelectItem>
                         </MudSelect>
-                        <MudTextField Label="Notes & Comments" @bind-Value="_model.Notes" Lines="4"  />
+                        <MudSelect T="int" Label="Bank Branch" @bind-Value="_model.BankBranchId" Disabled="_model.BankId == 0" Searchable="true" Clearable="true">
+                            <MudSelectItem Value="0" Disabled="true"> -- Select Branch -- </MudSelectItem>
+                            @foreach (var b in BankBranches)
+                            {
+                                <MudSelectItem Value="@b.BranchId">@b.BranchName</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudTextField Label="Account Number" @bind-Value="_model.BankAccountNumber" Disabled="@(_model.PaymentOption != "Bank")" />
+                        <MudTextField Label="Notes & Comments" @bind-Value="_model.Notes" Lines="3"  />
                     </MudItem>
                 </MudGrid>
             </MudTabPanel>
         </MudTabs>
+        @* <MudDivider Class="my-6" /> *@
+        <MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end" Elevation="0">
+            @if (!IsEdit)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="ResetState"> Clear </MudButton>
+            }
+            <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="@(() => Nav.NavigateTo("/workers-registration"))"> Return </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Info" Disabled="@(_model.AutoNumber == 0)"> Print </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save"> @(IsEdit ? "Update" : "Save") </MudButton>
+        </MudPaper>
     </MudForm>
 </MudPaper>
-<MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
-    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="Clear"> Clear </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="@(() => Nav.NavigateTo("/workers"))"> Return </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Info" Disabled="true"> Print </MudButton>
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"> Save </MudButton>
-</MudPaper>
+
 
 @code {
     [Parameter]
     public string? WorkerId { get; set; }
-    private MudForm _form;
 
+    private MudForm _form;
     private WorkerModel _model = new();
+    private bool IsEdit => !string.IsNullOrEmpty(WorkerId);
 
     private IEnumerable<TblNationality> Nationalities = new List<TblNationality>();
     private IEnumerable<TblTradeGroup> TradeGroups = new List<TblTradeGroup>();
@@ -163,7 +181,25 @@
 
     private IEnumerable<TblGang> Gangs = new List<TblGang>();
     private IEnumerable<TblBank> Banks = new List<TblBank>();
+    private IEnumerable<TblBankBranch> BankBranches = new List<TblBankBranch>();
 
+    private readonly Dictionary<string, string> _statusMap = new()
+{
+    { "ACT", "Active" },
+    { "INA", "Inactive" },
+    { "NAY", "Not Approved Yet" },
+    { "INC", "Incapacitated" },
+    { "SUS", "Suspended" },
+    { "DTH", "Death" }
+};
+    private string GetStatusLabel(string statusCode)
+    {
+        if (string.IsNullOrEmpty(statusCode))
+            statusCode = "NAY";
+        return _statusMap.TryGetValue(statusCode, out var label)
+            ? label
+            : "Unknown";
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -172,13 +208,110 @@
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
     }
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadDataAsync();
+    }
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            if (IsEdit)
+            {
+                // EDIT MODE
+                var worker = await _unitOfWork.Workers.Find(WorkerId);
+                if (worker == null)
+                {
+                    _snackbar.Add("This worker was not found", Severity.Error);
+                    return;
+                }
+                TradeTypes = await _unitOfWork.Workers.GetTradeTypeByGroup(worker.TradegroupId ?? 0);
+                BankBranches = await _unitOfWork.Setups.GetBankBranchByBankId(worker.BankId ?? 0);
+                _model = new WorkerModel
+                    {
+                        AutoNumber = worker.AutoId,
+                        WorkerId = worker.WorkerId,
+                        WorkerType = worker.WorkerType,
+                        Surname = worker.Sname,
+                        OtherNames = worker.Oname,
+                        PreviousName = worker.Pname,
+                        Address1 = worker.Addr1,
+                        Address2 = worker.Addr2,
+                        PhoneNumber = worker.PhoneNo,
+                        DateOfBirth = worker.DateBirth,
+                        RegistrationDate = worker.RegDate,
+                        NationalityId = worker.NationalityId ?? 0,
+                        Education = worker.Education,
+                        NextOfKin = worker.Kin,
+                        NOKRelation = worker.Relation,
+                        NOKAddress = worker.KinAddr,
+                        NOKPhoneNo = worker.KinAddrPhone,
+                        ContactPerson = worker.ContPer,
+                        ContactAddress = worker.Contaddr,
+                        ContactPhone = worker.ContPhone,
+                        SSFNo = worker.Ssfno,
+                        NHISRegNo = worker.Nhis,
+                        NewIDNo = worker.Nat,
+                        ShoeSize = worker.ShoeSize,
+                        Height = worker.Height,
+                        TradeGroupId = worker.TradegroupId ?? 0,
+                        TradeTypeId = worker.TradetypeId ?? 0,
+                        GangId = worker.GangId ?? 0,
+                        BankId = worker.BankId ?? 0,
+                        BankBranchId = worker.BankBranchId ?? 0,
+                        BankAccountNumber = worker.BankNumber,
+                        DepartmentId = worker.DepartmentId,
+                        PaymentOption = worker.PaymentOption,
+                        Notes = worker.OfficialComm,
+                        Gender = worker.Sex,
+                        Tax = worker.Tax,
+                        ChargePremium = worker.ChargePremium,
+                        EzwichNo = worker.Ezwichid,
+                        TIN = worker.Tin,
+                        NationalIdNo = worker.NationalId,
+                        Age = worker.Age ?? 0,
+                    // WorkerStatus = worker.Flags switch
+                    // {
+                    //     "ACT" => "Active",
+                    //     "INA" => "Inactive",
+                    //     "NAY" => "Not Approved Yet",
+                    //     "INC" => "Incapacitated",
+                    //     "SUS" => "Suspended",
+                    //     "DTH" => "Death",
+                    //     _ => "Unknown"
+                    // },
+                        WorkerStatus = worker.Flags,
+                    };
+            }
+            else
+            {
+                await ResetState();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+    }
+    private async Task ResetState()
+    {
+        // Reset your state variables here
+        // NEW MODE
+        _model = new WorkerModel
+            {
+                RegistrationDate = DateTime.UtcNow,
+                DateOfBirth = DateTime.UtcNow,
+                WorkerStatus = "NAY",
+                DepartmentId = 0
+            };
+    }
     protected override async Task OnInitializedAsync()
     {
         try
         {
             Nationalities = await _unitOfWork.Setups.GetAllNationality();
             TradeGroups = await _unitOfWork.Workers.GetTradeGroups();
-            TradeTypes = await _unitOfWork.Workers.GetTradeTypeByGroup(_model.TradeGroupId);
             ReportingPoints = (await _unitOfWork.ReportingPoints.GetAll()).ToList();
             Gangs = await _unitOfWork.Setups.GetAllGangs();
             Banks = await _unitOfWork.Setups.GetAllBank();
@@ -188,6 +321,20 @@
             await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
             return;
         }
+    }
+    private async Task OnTradeGroupChanged(int value)
+    {
+        _model.TradeGroupId = value;
+        _model.TradeTypeId = 0;
+        TradeTypes = await _unitOfWork.Workers.GetTradeTypeByGroup(value);
+        StateHasChanged();
+    }
+    private async Task OnBankChanged(int value)
+    {
+        _model.BankId = value;
+        _model.BankBranchId = 0;
+        BankBranches = await _unitOfWork.Setups.GetBankBranchByBankId(value);
+        StateHasChanged();
     }
     private async Task<IEnumerable<ReportingPointModel>> SearchReportingPoints(string value, CancellationToken token)
     {
@@ -211,16 +358,86 @@
     }
     private async Task Save()
     {
-        await _form.Validate();
-        if (!_form.IsValid)
-            return;
+        if (_form != null)
+        {
+            await _form.Validate();
+            if (!_form.IsValid)
+            {
+                _snackbar.Add("Form is invalid. Please correct the errors.", Severity.Warning);
+                return;
+            }
+        }
 
         // Save to DB
-    }
-
-    private void Clear()
-    {
-        _model = new WorkerModel();
+        try
+        {
+            var worker = new TblWorker
+                {
+                    AutoId = _model.AutoNumber,
+                    WorkerId = _model.WorkerId,
+                    WorkerType = _model.WorkerType,
+                    Sname = _model.Surname,
+                    Oname = _model.OtherNames,
+                    Pname = _model.PreviousName,
+                    Addr1 = _model.Address1,
+                    Addr2 = _model.Address2,
+                    PhoneNo = _model.PhoneNumber,
+                    DateBirth = _model.DateOfBirth,
+                    RegDate = _model.RegistrationDate,
+                    NationalityId = _model.NationalityId,
+                    Education = _model.Education,
+                    Kin = _model.NextOfKin,
+                    Relation = _model.NOKRelation,
+                    KinAddr = _model.NOKAddress,
+                    KinAddrPhone = _model.NOKPhoneNo,
+                    ContPer = _model.ContactPerson,
+                    Contaddr = _model.ContactAddress,
+                    ContPhone = _model.ContactPhone,
+                    Ssfno = _model.SSFNo,
+                    Nhis = _model.NHISRegNo,
+                    Nat = _model.NewIDNo,
+                    ShoeSize = _model.ShoeSize,
+                    Height = _model.Height,
+                    TradegroupId = _model.TradeGroupId,
+                    TradetypeId = _model.TradeTypeId,
+                    GangId = _model.GangId,
+                    BankId = _model.BankId,
+                    BankBranchId = _model.BankBranchId,
+                    BankNumber = _model.BankAccountNumber,
+                    DepartmentId = _model.DepartmentId,
+                    PaymentOption = _model.PaymentOption,
+                    MedicalIdNo = _model.MedicalIdNo,
+                    OfficialComm = _model.Notes,
+                    Sex = _model.Gender,
+                    Tax = _model.Tax,
+                    ChargePremium = _model.ChargePremium,
+                    Ezwichid = _model.EzwichNo,
+                    Tin = _model.TIN,
+                    NationalId = _model.NationalIdNo,
+                    Who = "system",                // Set from logged-in user
+                    Whotime = DateTime.Now
+                };
+            if (IsEdit)
+            {
+                var response = await _unitOfWork.Workers.UpdateWorker(worker);
+                if (response == 0)
+                    _snackbar.Add("Details Updated Successfully", Severity.Success);
+            }
+            else
+            {
+                var result = await _unitOfWork.Workers.AddWorker(worker);
+                int returnValue = result.ReturnValue;
+                if (returnValue == 0)
+                {
+                    _snackbar.Add("Saved successfully", Severity.Success);
+                    _model.AutoNumber = result.AutoNo;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error saving record: {ex.Message}", Severity.Error);
+        }
     }
 
     private async Task UploadImage(InputFileChangeEventArgs e)
@@ -230,23 +447,30 @@
 
     public class WorkerModel
     {
-        [Required]
+        [Required(ErrorMessage = "Registration Date is required")]
         public DateTime? RegistrationDate { get; set; }
-
-        public string AutoNumber { get; set; }
-        [Required] public string WorkerId { get; set; }
+        [Required]
+        public int AutoNumber { get; set; }
+        [Required(ErrorMessage = "Worker ID is required")]
+        public string WorkerId { get; set; }
+        [Required(ErrorMessage = "Gender is required")]
         public string Gender { get; set; }
+        [Required(ErrorMessage = "Worker Type is required")]
         public string WorkerType { get; set; }
         public string FullName => $"{Surname} {OtherNames}";
 
-        [Required]
+        [Required(ErrorMessage = "Date of Birth is required")]
         public DateTime? DateOfBirth { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Nationality is required")]
         public int NationalityId { get; set; }
+        [Required(ErrorMessage = "Surname is required")]
         public string Surname { get; set; }
         public string OtherNames { get; set; }
         public string? PreviousName { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
+        [Required(ErrorMessage = "Phone Number is required")]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Phone Number must be exactly 10 digits")]
         public string PhoneNumber { get; set; }
         public string Education { get; set; }
 
@@ -256,30 +480,44 @@
         public string NOKPhoneNo { get; set; }
         public string ContactPerson { get; set; }
         public string ContactAddress { get; set; }
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Contact Phone must be exactly 10 digits")]
         public string ContactPhone { get; set; }
         public string MedicalIdNo { get; set; }
 
         public bool Tax { get; set; }
         public bool ChargePremium { get; set; }
+        [Required(ErrorMessage = "SSF Number is required")]
+        [RegularExpression(@"^[a-zA-Z0-9-\s]{8,15}$", ErrorMessage = "SSF Number must be 8 to 15 characters and can include letters, numbers, hyphens, and spaces")]
         public string SSFNo { get; set; }
         public string? NHISRegNo { get; set; }
         public string? NewIDNo { get; set; }
         public string? ShoeSize { get; set; }
         public string? Height { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Trade Group is required")]
         public int TradeGroupId { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Trade Type is required")]
         public int TradeTypeId { get; set; }
         public int? DepartmentId { get; set; }
 
+        [StringLength(15, MinimumLength = 6, ErrorMessage = "E-zwich Number must be between 6 and 15 characters")]
         public string? EzwichNo { get; set; }
         public string? TIN { get; set; }
+        [Required(ErrorMessage = "National ID is required")]
+        [RegularExpression(@"^(GHA)-(\d{9})-(\d{1})$", ErrorMessage = "Format must be GHA-123456789-1")]
         public string NationalIdNo { get; set; }
         public int GangId { get; set; }
         public int BankId { get; set; }
         public int BankBranchId { get; set; }
         public string? BankAccountNumber { get; set; }
+        [Required(ErrorMessage = "Payment option is required")]
         public string PaymentOption { get; set; }
         public string? Notes { get; set; }
 
         public string PhotoUrl { get; set; }
+        public int Age { get; set; }
+        public string WorkerStatus { get; set; }
+
+        public string? GphaGroupId { get; set; }
+        public string? GphaJobId { get; set; }
     }
 }
