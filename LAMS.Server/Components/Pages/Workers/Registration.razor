@@ -1,17 +1,152 @@
 ﻿@page "/workers-registration"
 @rendermode InteractiveServer
-@inject IJSRuntime JsRuntime;
+@inject IJSRuntime JsRuntime
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 
 <PageBreadcrumb Subtitle="Workers" Title="Registration" />
 
+<MudTable ServerData="ServerReload" Dense="true" Hover="true" Striped="true" @ref="table" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="50" @bind-SelectedItem="_selectedWorker">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Href="/workers-details"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="WorkerId" T="VwWorker">WorkerId</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="NationalID" T="VwWorker">NationalID</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Sname" T="VwWorker">Sname</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Oname" T="VwWorker">Oname</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="DateBirth" T="VwWorker">DateBirth</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="PhoneNo" T="VwWorker">PhoneNo</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="GangName" T="VwWorker">GangName</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Ssfno" T="VwWorker">Ssfno</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="TradegroupName" T="VwWorker">TradegroupName</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="TradetypeName" T="VwWorker">TradetypeName</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Ezwichid" T="VwWorker">Ezwichid</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Nhis" T="VwWorker">Nhis</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="BankNumber" T="VwWorker">BankNumber</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="WorkerStatus" T="VwWorker">WorkerStatus</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="RegDate" T="VwWorker">RegDate</MudTableSortLabel></MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="WorkerId">@context.WorkerId</MudTd>
+        <MudTd DataLabel="NationalID">@context.NationalID</MudTd>
+        <MudTd DataLabel="Sname">@context.Sname</MudTd>
+        <MudTd DataLabel="Oname">@context.Oname</MudTd>
+        <MudTd DataLabel="DateBirth">@context.DateBirth?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="PhoneNo">@context.PhoneNo</MudTd>
+        <MudTd DataLabel="GangName">@context.GangName</MudTd>
+        <MudTd DataLabel="Ssfno">@context.Ssfno</MudTd>
+        <MudTd DataLabel="TradegroupName">@context.TradegroupName</MudTd>
+        <MudTd DataLabel="TradetypeName">@context.TradetypeName</MudTd>
+        <MudTd DataLabel="Ezwichid">@context.Ezwichid</MudTd>
+        <MudTd DataLabel="Nhis">@context.Nhis</MudTd>
+        <MudTd DataLabel="BankNumber">@context.BankNumber</MudTd>
+        <MudTd DataLabel="WorkerStatus">@context.WorkerStatus</MudTd>
+        <MudTd DataLabel="RegDate">@context.RegDate?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" Href="@($"/workers-details/{context.WorkerId}")"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.WorkerId))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private MudTable<VwWorker> table;
+    private VwWorker _selectedWorker;
+    private string searchString = "";
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender) return;
+
+        await JsRuntime.InvokeVoidAsync("loadConfig");
+        await JsRuntime.InvokeVoidAsync("loadApps");
+    }
+
+    private async Task<TableData<VwWorker>> ServerReload(TableState state, CancellationToken token)
+    {
+        try
         {
-            await JsRuntime.InvokeVoidAsync("loadConfig");
-            await JsRuntime.InvokeVoidAsync("loadApps");
+            var data = await _unitOfWork.Workers.GetAll(searchString);
+            var totalItems = data.Count();
+
+            data = state.SortLabel switch
+            {
+                "WorkerId" => data.OrderByDirection(state.SortDirection, o => o.WorkerId),
+                "Sname" => data.OrderByDirection(state.SortDirection, o => o.Sname),
+                "Oname" => data.OrderByDirection(state.SortDirection, o => o.Oname),
+                "NationalID" => data.OrderByDirection(state.SortDirection, o => o.NationalID),
+                "Ezwichid" => data.OrderByDirection(state.SortDirection, o => o.Ezwichid),
+                _ => data
+            };
+
+            var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
+            return new TableData<VwWorker> { TotalItems = totalItems, Items = items };
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return new TableData<VwWorker> { TotalItems = 0, Items = Array.Empty<VwWorker>() };
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        searchString = text;
+        await table.ReloadServerData();
+    }
+    private async Task ConfirmRecordDelete(string workerId)
+    {
+        _selectedWorker.WorkerId = workerId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            _selectedWorker.WorkerId = string.Empty;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && !string.IsNullOrEmpty(_selectedWorker.WorkerId))
+        {
+            try
+            {
+                // var response = await _unitOfWork.DailyReq.DeleteDailyReq(_selectedWorker.WorkerId);
+                var response = 1; // Simulate successful deletion for demonstration purposes
+                if (response == 1)
+                {
+                    _snackbar.Add("Worker Deleted Successfully!", Severity.Success);
+                    await table.ReloadServerData();
+                    _selectedWorker.WorkerId = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting Worker: {ex.Message}", Severity.Error);
+                _selectedWorker.WorkerId = string.Empty;
+            }
         }
     }
 }

@@ -52,4 +52,5 @@ public partial class VwWorker
     public string? BankName { get; set; }
 
     public string? BranchName { get; set; }
+    public string? NationalID { get; set; }
 }

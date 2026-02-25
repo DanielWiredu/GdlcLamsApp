@@ -26,7 +26,9 @@ namespace BusinessLogic.Repository
             return results.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<TblWorker>> GetAll() => await _db.LoadData<TblWorker, dynamic>(query: "Select top(12000) * from vwWorkers", new { });
+        public async Task<IEnumerable<VwWorker>> GetAll(string _searchValue) => await _db.LoadData<VwWorker, dynamic>(
+            query: @"SELECT TOP(200) [WorkerID], [NationalID], [SName], [OName], [Date_Birth] AS DateBirth, [GangName], [SSFNo], [TradegroupNAME], [TradetypeNAME], [NHIS], [ezwichid], [RegDate], [PhoneNo], [Kin], BankNumber, [WorkerStatus] FROM [vwWorkers] 
+                     WHERE WorkerID LIKE '%' + @SearchValue + '%' OR NationalID LIKE '%' + @SearchValue + '%' OR SName LIKE '%' + @SearchValue + '%' OR OName LIKE '%' + @SearchValue + '%' OR ezwichid LIKE '%' + @SearchValue + '%'", new { SearchValue = _searchValue });
 
         public async Task<int> Remove(string Id) => await _db.SaveData(query: "Delete from tblLocation where LocationId=@LocationId", new { LocationId = int.Parse(Id) });
 
@@ -49,6 +51,16 @@ namespace BusinessLogic.Repository
             else if (_searchType == "Othernames")
                 query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE OName LIKE '%' + @SearchValue + '%' ORDER BY [SName]";
             return await _db.LoadData<VwWorker, dynamic>(query: query, new { SearchValue = _searchValue });
+        }
+        public async Task<IEnumerable<TblTradeGroup>> GetTradeGroups()
+        {
+            string query = $"SELECT * FROM tblTradeGroup";
+            return await _db.LoadData<TblTradeGroup, dynamic>(query: query, new { });
+        }
+        public async Task<IEnumerable<TblTradeType>> GetTradeTypeByGroup(int tradeGroupId)
+        {
+            string query = $"SELECT TradetypeID,TradetypeNAME FROM [tblTradeType] WHERE TradegroupID=@TradeGroupID";
+            return await _db.LoadData<TblTradeType, dynamic>(query: query, new { TradeGroupID = tradeGroupId });
         }
     }
 }

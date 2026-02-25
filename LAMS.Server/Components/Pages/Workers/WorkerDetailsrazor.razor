@@ -1,0 +1,285 @@
+﻿@page "/workers-details"
+@page "/workers-details/{WorkerId}"
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime
+@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+
+<PageBreadcrumb Subtitle="Workers" Title="Registration" />
+
+<MudPaper Class="pa-6">
+    <MudForm @ref="_form" Model="_model" OnValidSubmit="Save">
+        <MudGrid>
+            <!-- LEFT COLUMN -->
+            <MudItem xs="12" md="5">
+                <MudDatePicker Label="Registration Date" @bind-Date="_model.RegistrationDate" Required="true" DateFormat="dd/MM/yyyy" />
+                <MudTextField Label="Auto Number" @bind-Value="_model.AutoNumber" Disabled="true" />
+                <MudTextField Label="Worker ID" @bind-Value="_model.WorkerId" Required="true" />
+            </MudItem>
+
+            <!-- RIGHT COLUMN -->
+            <MudItem xs="12" md="5">
+                <MudSelect T="string" Label="Gender" @bind-Value="_model.Gender">
+                    <MudSelectItem Value=@("M")>Male</MudSelectItem>
+                    <MudSelectItem Value=@("F")>Female</MudSelectItem>
+                </MudSelect>
+                <MudSelect T="string" Label="Worker Type"
+                           @bind-Value="_model.WorkerType">
+                    <MudSelectItem Value=@("D")>Daily</MudSelectItem>
+                    <MudSelectItem Value=@("W")>Weekly</MudSelectItem>
+                    <MudSelectItem Value=@("M")>Monthly</MudSelectItem>
+                </MudSelect>
+                <MudTextField Label="Full Name" Value="_model.FullName" ReadOnly="true" />
+            </MudItem>
+
+            <!-- IMAGE COLUMN -->
+            <MudItem xs="12" md="2">
+                <MudAvatar Size="Size.Large" Image="@_model.PhotoUrl" />
+                <MudImage Src="@_model.PhotoUrl" Width="200" Height="150" Alt="Swedish Farm House" Elevation="25" Class="rounded-lg ma-4" FallbackSrc="images/users/user-7.jpg" />
+                <MudFileUpload T="IBrowserFile" OnFilesChanged="UploadImage" Accept="image/*" />
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-6"/>
+        <!-- TABS -->
+        <MudTabs>
+            <!-- PERSONAL TAB -->
+            <MudTabPanel Text="Personal">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudDatePicker Label="Date of Birth" @bind-Date="_model.DateOfBirth" Required="true" />
+                        <MudSelect T="int" Label="Nationality" @bind-Value="_model.NationalityId" Required="true">
+                            <MudSelectItem Value="0" Disabled="true"> -- Select Nationality -- </MudSelectItem>
+                            @foreach (var n in Nationalities)
+                            {
+                                <MudSelectItem Value="@n.Id">@n.Nationality</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudTextField Label="Surname" @bind-Value="_model.Surname" Required="true" />
+                        <MudTextField Label="Other Names" @bind-Value="_model.OtherNames" />
+                        <MudTextField Label="Previous Name" @bind-Value="_model.PreviousName" />
+                        <MudTextField Label="Address 1" @bind-Value="_model.Address1" />
+                        <MudTextField Label="Address 2" @bind-Value="_model.Address2" />
+                        <MudTextField Label="Phone Number" @bind-Value="_model.PhoneNumber" Immediate="true" Pattern="^[0-9]{10}$" HelperText="10 digits only" />
+                        <MudTextField Label="Education" @bind-Value="_model.Education" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField Label="Next of Kin" @bind-Value="_model.NextOfKin" />
+                        <MudTextField Label="Relation" @bind-Value="_model.NOKRelation" />
+                        <MudTextField Label="Address" @bind-Value="_model.NOKAddress" />
+                        <MudTextField Label="Phone No" @bind-Value="_model.NOKPhoneNo" />
+                        <MudTextField Label="Contact Person" @bind-Value="_model.ContactPerson" />
+                        <MudTextField Label="Contact Address" @bind-Value="_model.ContactAddress" />
+                        <MudTextField Label="Contact Phone" @bind-Value="_model.ContactPhone" Pattern="^[0-9]{10}$" />
+                        <MudTextField Label="Medical ID No" @bind-Value="_model.MedicalIdNo" />
+                    </MudItem>
+                </MudGrid>
+            </MudTabPanel>
+            <!-- OFFICIAL TAB -->
+            <MudTabPanel Text="Official">
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudCheckBox Label="Tax" @bind-Value="_model.Tax" />
+                        <MudCheckBox Label="Charge Premium" @bind-Value="_model.ChargePremium" />
+                        <MudTextField Label="SSF No" @bind-Value="_model.SSFNo" Required="true" Pattern="^[a-zA-Z0-9-\s]{8,15}$" />
+                        <MudTextField Label="NHIS Reg No" @bind-Value="_model.NHISRegNo" />
+                        <MudTextField Label="New ID No" @bind-Value="_model.NewIDNo"  />
+                        <MudTextField Label="Shoe Size" @bind-Value="_model.ShoeSize"  />
+                        <MudTextField Label="Height" @bind-Value="_model.Height" />
+
+                        <MudSelect T="int" Label="Trade Group" @bind-Value="_model.TradeGroupId" Required="true" RequiredError="Trade Group is required">
+                            <MudSelectItem Value="0" Disabled="true"> -- Select Trade Group -- </MudSelectItem>
+                            @foreach (var g in TradeGroups)
+                            {
+                                <MudSelectItem Value="@g.TradegroupId">@g.TradegroupName</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect T="int" Label="Trade Type" @bind-Value="_model.TradeTypeId" Required="true" RequiredError="Trade Type is required">
+                            <MudSelectItem Value="0" Disabled="true"> -- Select Trade Type -- </MudSelectItem>
+                            @foreach (var g in TradeTypes)
+                            {
+                                <MudSelectItem Value="@g.TradetypeId">@g.TradetypeName</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudAutocomplete MaxItems="50" T="ReportingPointModel" Label="Department" @bind-Value="SelectedReportingPoint" ToStringFunc="@(r => r?.ReportingPoint)" CoerceText="true"
+                                         Clearable="true" Dense="true" SearchFunc="SearchReportingPoints" Required="true" RequiredError="Required"></MudAutocomplete>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField Label="E-zwich Number" @bind-Value="_model.EzwichNo" Pattern="^[\s\S]{6,15}$" />
+                        <MudTextField Label="TIN" @bind-Value="_model.TIN" />
+                        <MudTextField Label="National ID No" @bind-Value="_model.NationalIdNo" Pattern="^(GHA)[-](\d{9})[-](\d{1})$" />
+                        @* <MudSelect T="int" Label="Gang" @bind-Value="_model.GangId" Required="true" RequiredError="Gang is required">
+                            <MudSelectItem Value="0" Disabled="true"> -- Select Gang -- </MudSelectItem>
+                            @foreach (var g in Gangs)
+                            {
+                                <MudSelectItem Value="@g.GangId">@g.GangName</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect T="int" Label="Bank" @bind-Value="_model.BankId" Required="true" RequiredError="Bank is required">
+                            <MudSelectItem Value="0" Disabled="true"> -- Select Bank -- </MudSelectItem>
+                            @foreach (var b in Banks)
+                            {
+                                <MudSelectItem Value="@b.BankId">@b.BankName</MudSelectItem>
+                            }
+                        </MudSelect> *@
+
+                        <MudTextField Label="Account Number" @bind-Value="_model.BankAccountNumber" />
+                        <MudSelect T="string" Label="Payment Option" @bind-Value="_model.PaymentOption">
+                            <MudSelectItem Value=@("Ezwich")>Ezwich</MudSelectItem>
+                            <MudSelectItem Value=@("Bank")>Bank</MudSelectItem>
+                        </MudSelect>
+                        <MudTextField Label="Notes & Comments" @bind-Value="_model.Notes" Lines="4"  />
+                    </MudItem>
+                </MudGrid>
+            </MudTabPanel>
+        </MudTabs>
+    </MudForm>
+</MudPaper>
+<MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
+    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="Clear"> Clear </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="@(() => Nav.NavigateTo("/workers"))"> Return </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info" Disabled="true"> Print </MudButton>
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary"> Save </MudButton>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? WorkerId { get; set; }
+    private MudForm _form;
+
+    private WorkerModel _model = new();
+
+    private IEnumerable<TblNationality> Nationalities = new List<TblNationality>();
+    private IEnumerable<TblTradeGroup> TradeGroups = new List<TblTradeGroup>();
+    private IEnumerable<TblTradeType> TradeTypes = new List<TblTradeType>();
+    private ReportingPointModel SelectedReportingPoint
+    {
+        get => ReportingPoints.FirstOrDefault(r => r.ReportingPointId == _model.DepartmentId);
+        set => _model.DepartmentId = value.ReportingPointId;
+    }
+    private List<ReportingPointModel> ReportingPoints = new();
+
+    private IEnumerable<TblGang> Gangs = new List<TblGang>();
+    private IEnumerable<TblBank> Banks = new List<TblBank>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Nationalities = await _unitOfWork.Setups.GetAllNationality();
+            TradeGroups = await _unitOfWork.Workers.GetTradeGroups();
+            TradeTypes = await _unitOfWork.Workers.GetTradeTypeByGroup(_model.TradeGroupId);
+            ReportingPoints = (await _unitOfWork.ReportingPoints.GetAll()).ToList();
+            Gangs = await _unitOfWork.Setups.GetAllGangs();
+            Banks = await _unitOfWork.Setups.GetAllBank();
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+    }
+    private async Task<IEnumerable<ReportingPointModel>> SearchReportingPoints(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return ReportingPoints;
+        }
+        // filter locally first
+        var localResults = ReportingPoints.Where(r => r.ReportingPoint.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.ReportingPoints.GetAll();
+        // add new results to cache, avoid duplicates
+        foreach (var reportingPoint in serverResults)
+        {
+            if (!ReportingPoints.Any(r => r.ReportingPointId == reportingPoint.ReportingPointId))
+                ReportingPoints.Add(reportingPoint);
+        }
+        return serverResults;
+    }
+    private async Task Save()
+    {
+        await _form.Validate();
+        if (!_form.IsValid)
+            return;
+
+        // Save to DB
+    }
+
+    private void Clear()
+    {
+        _model = new WorkerModel();
+    }
+
+    private async Task UploadImage(InputFileChangeEventArgs e)
+    {
+        // Save file logic
+    }
+
+    public class WorkerModel
+    {
+        [Required]
+        public DateTime? RegistrationDate { get; set; }
+
+        public string AutoNumber { get; set; }
+        [Required] public string WorkerId { get; set; }
+        public string Gender { get; set; }
+        public string WorkerType { get; set; }
+        public string FullName => $"{Surname} {OtherNames}";
+
+        [Required]
+        public DateTime? DateOfBirth { get; set; }
+        public int NationalityId { get; set; }
+        public string Surname { get; set; }
+        public string OtherNames { get; set; }
+        public string? PreviousName { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Education { get; set; }
+
+        public string NextOfKin { get; set; }
+        public string NOKRelation { get; set; }
+        public string NOKAddress { get; set; }
+        public string NOKPhoneNo { get; set; }
+        public string ContactPerson { get; set; }
+        public string ContactAddress { get; set; }
+        public string ContactPhone { get; set; }
+        public string MedicalIdNo { get; set; }
+
+        public bool Tax { get; set; }
+        public bool ChargePremium { get; set; }
+        public string SSFNo { get; set; }
+        public string? NHISRegNo { get; set; }
+        public string? NewIDNo { get; set; }
+        public string? ShoeSize { get; set; }
+        public string? Height { get; set; }
+        public int TradeGroupId { get; set; }
+        public int TradeTypeId { get; set; }
+        public int? DepartmentId { get; set; }
+
+        public string? EzwichNo { get; set; }
+        public string? TIN { get; set; }
+        public string NationalIdNo { get; set; }
+        public int GangId { get; set; }
+        public int BankId { get; set; }
+        public int BankBranchId { get; set; }
+        public string? BankAccountNumber { get; set; }
+        public string PaymentOption { get; set; }
+        public string? Notes { get; set; }
+
+        public string PhotoUrl { get; set; }
+    }
+}

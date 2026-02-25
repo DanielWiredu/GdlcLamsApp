@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace BusinessLogic.Repository.IRepository
 {
-    public interface IWorkerRepository : IRepository<TblWorker>
+    public interface IWorkerRepository
     {
+        Task<IEnumerable<VwWorker>> GetAll(string _searchValue);
         Task<IEnumerable<VwWorker>> Search(string _searchType, string _searchValue);
+        Task<IEnumerable<TblTradeGroup>> GetTradeGroups();
+        Task<IEnumerable<TblTradeType>> GetTradeTypeByGroup(int tradeGroupId);
     }
 }

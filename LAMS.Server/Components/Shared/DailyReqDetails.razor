@@ -27,7 +27,6 @@
                              Clearable="true" Dense="true" SearchFunc="SearchCargos" Required="true" RequiredError="Required"></MudAutocomplete>
             <MudAutocomplete MaxItems="50" T="TblGang" Label="Gang" @bind-Value="SelectedGang" ToStringFunc="@(g => g?.GangName)" CoerceText="true"
                              Clearable="true" Dense="true" SearchFunc="SearchGangs" Required="true" RequiredError="Required"></MudAutocomplete>
-
             <MudTextField Label="Job Description" @bind-Value="Model.JobDescription" />
             <MudTextField Label="GPHA RequestID" @bind-Value="Model.GphaRequestId" />
             <MudRadioGroup T="string" @bind-Value="Model.ShiftType">
@@ -41,7 +40,6 @@
         <MudItem xs="12" md="2">
             <MudCheckBox @bind-Value="Model.ShipSide" Label="Ship Side" />
             <MudCheckBox @bind-Value="Model.Weekend" Label="Weekend / Holiday" />
-            
             <MudCheckBox @bind-Value="Model.Night" Label="Night" />
             <MudNumericField T="double" Label="Normal Hrs" @bind-Value="Model.NormalHours" ReadOnly="true" Min="0" HideSpinButtons="true" />
             <MudNumericField T="double" Label="Overtime Hrs" @bind-Value="Model.OvertimeHours" ReadOnly="true" Min="0" HideSpinButtons="true" />
