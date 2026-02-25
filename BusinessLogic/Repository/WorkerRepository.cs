@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Repository.IRepository;
+﻿using AppModels.Workers;
+using BusinessLogic.Repository.IRepository;
 using Dapper;
 using DataAccess.DbAccess;
 using DataAccess.Models;
@@ -19,8 +20,8 @@ namespace BusinessLogic.Repository
         {
             _db = db;
         }
-        public async Task<int> Add(TblWorker model) => await _db.SaveData(query: "Insert into tblLocation(Location) values(@Location)", new {model.Sname });
-       
+        public async Task<int> Add(TblWorker model) => await _db.SaveData(query: "Insert into tblLocation(Location) values(@Location)", new { model.Sname });
+
 
         public async Task<VwTblWorker> Find(string WorkerID)
         {
@@ -39,19 +40,19 @@ namespace BusinessLogic.Repository
         public async Task<IEnumerable<VwWorker>> Search(string _searchType, string _searchValue)
         {
             int searchLimit = 100;
-            string query = $"SELECT top({searchLimit}) [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE WorkerID LIKE '% ' @SearchValue + '%'";
+            string query = $"SELECT top({searchLimit}) [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE WorkerID LIKE '% ' @SearchValue + '%'";
             if (_searchType == "WorkerID")
-                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE WorkerID LIKE '%' + @SearchValue + '%'";
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE WorkerID LIKE '%' + @SearchValue + '%'";
             else if (_searchType == "SSFNo")
-                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE SSFNo LIKE '%' + @SearchValue + '%'";
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE SSFNo LIKE '%' + @SearchValue + '%'";
             else if (_searchType == "NHISNo")
-                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE NHIS LIKE '%' + @SearchValue + '%'";
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE NHIS LIKE '%' + @SearchValue + '%'";
             else if (_searchType == "Gang")
-                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE GangName LIKE '%' + @SearchValue + '%'";
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE GangName LIKE '%' + @SearchValue + '%'";
             else if (_searchType == "Surname")
-                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE SName LIKE '%' + @SearchValue + '%' ORDER BY [OName]";
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE SName LIKE '%' + @SearchValue + '%' ORDER BY [OName]";
             else if (_searchType == "Othernames")
-                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID] FROM [vwWorkers] WHERE OName LIKE '%' + @SearchValue + '%' ORDER BY [SName]";
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE OName LIKE '%' + @SearchValue + '%' ORDER BY [SName]";
             return await _db.LoadData<VwWorker, dynamic>(query: query, new { SearchValue = _searchValue });
         }
         public async Task<IEnumerable<TblTradeGroup>> GetTradeGroups()
@@ -164,8 +165,8 @@ namespace BusinessLogic.Repository
             parameters.Add("@PaymentOption", worker.PaymentOption, DbType.String);
             parameters.Add("@MedicalIDNo", worker.MedicalIdNo, DbType.String);
 
-            parameters.Add("@GPHA_GroupId", dbType: DbType.String, direction: ParameterDirection.Output, size:50);
-            parameters.Add("@GPHA_JobId", dbType: DbType.String, direction: ParameterDirection.Output, size:50);
+            parameters.Add("@GPHA_GroupId", dbType: DbType.String, direction: ParameterDirection.Output, size: 50);
+            parameters.Add("@GPHA_JobId", dbType: DbType.String, direction: ParameterDirection.Output, size: 50);
             parameters.Add("@AutoID", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameters.Add("@return_value", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
@@ -175,6 +176,15 @@ namespace BusinessLogic.Repository
             var gphaGroupId = parameters.Get<string>("@GPHA_GroupId");
             var gphaJobId = parameters.Get<string>("@GPHA_JobId");
             return (autoNo, returnValue, gphaGroupId, gphaJobId);
+        }
+        public async Task<int> UpdateWorkerStatus(SetStatusRequest request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@WorkerID", request.WorkerID, DbType.String);
+            parameters.Add("@flag", request.Flag, DbType.String);
+            parameters.Add("@return_value", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+            await _db.ExecuteSP("spSetWorkerStatus", parameters);
+            return parameters.Get<int>("@return_value");
         }
     }
 }

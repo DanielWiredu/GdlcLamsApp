@@ -1,17 +1,138 @@
 ﻿@page "/tools-taguntag"
+@using AppModels.Workers
 @rendermode InteractiveServer
-@inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IJSRuntime JsRuntime
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Tools" Title="Tag/Untag Workers" />
 
+<div class="card">
+    <MudButton StartIcon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="OpenAddWorkerDialog"> Find Worker </MudButton>
+
+    <div class="card-body d-flex align-items-start">
+        <!-- Avatar -->
+        <img alt="avatar" class="rounded-circle me-3" height="64" src="/images/users/user-10.jpg" width="64" />
+        <div class="flex-grow-1">
+            <!-- Name & Role -->
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <a class="link-reset" href="/users-profile">@_worker?.Sname @_worker?.Oname</a>
+                </h5>
+                <span class="badge badge-label @( _worker?.Flags switch
+                    {
+                        "ACT" => "bg-success",
+                        "INA" => "bg-warning",
+                        "INC" => "bg-primary",
+                        "SUS" => "bg-danger",
+                        "DTH" => "bg-dark",
+                        _ => "bg-secondary"
+                    })">@_worker?.WorkerStatus</span>
+            </div>
+            <p class="mb-3 text-muted fs-xs">@_worker?.GangName</p>
+            <!-- Contact Info -->
+            <div class="mb-2">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h5 class="fs-base mb-0 fw-medium">
+                        <a class="link-reset"
+                        href="#">@_worker?.TradegroupName</a>
+                    </h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fs-base mb-0 fw-medium"><a class="link-reset" href="#">@_worker?.TradetypeName</a></h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fs-base mb-0 fw-medium"><a class="link-reset" href="#">@_worker?.DateBirth?.ToString("dd-MMM-yyyy")</a></h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fs-base mb-0 fw-medium"><a class="link-reset" href="#">@_worker?.NationalID</a></h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fs-base mb-0 fw-medium"><a class="link-reset" href="#">@_worker?.PhoneNo</a></h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fs-base mb-0 fw-medium"><a class="link-reset" href="#">@_worker?.Ssfno</a></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <MudChipSet T="string" @bind-SelectedValue="_workerStatus" Disabled="@(_worker is null ? true : false)" CheckMark="true">
+        <MudChip Color="Color.Success" Value=@("ACT")>Active</MudChip>
+        <MudChip Color="Color.Warning" Value=@("INA")>Inactive</MudChip>
+        <MudChip Color="Color.Primary" Value=@("INC")>Incapacitated</MudChip>
+        <MudChip Color="Color.Error" Value=@("SUS")>Suspended</MudChip>
+        <MudChip Color="Color.Dark" Value=@("DTH")>Death</MudChip>
+    </MudChipSet>
+
+    <MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end" Elevation="0">
+        <MudButton Variant="Variant.Filled" Color="Color.Info" Disabled="@(string.IsNullOrEmpty(_workerStatus) ? true : false)" OnClick="UpdateWorkerStatus"> Confirm </MudButton>
+    </MudPaper>
+</div>
+
+
+
+
 @code {
+    private VwWorker? _worker { get; set; }
+    private string _workerStatus = string.Empty;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+    private async Task OpenAddWorkerDialog()
+    {
+        var options = new DialogOptions
+            {
+                MaxWidth = MaxWidth.Large,
+                FullWidth = true,
+                CloseButton = true
+            };
+
+        var dialog = _dialogService.Show<FindWorkerDialog>("Workers", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is VwWorker worker)
+        {
+            _worker = worker;
+        }
+        else
+        {
+            _snackbar.Add("Worker not found", Severity.Error);
+            _worker = null;
+            _workerStatus = string.Empty;
+        }
+    }
+    private async Task UpdateWorkerStatus()
+    {
+        try
+        {
+            var request = new SetStatusRequest
+            {
+                WorkerID = _worker.WorkerId,
+                Flag = _workerStatus
+            };
+            var response = await _unitOfWork.Workers.UpdateWorkerStatus(request);
+            if (response == 0)
+            {
+                await JsRuntime.InvokeVoidAsync("ShowSwal", "success", "Worker Tagged_Untagged Successfully");
+                _worker.Flags = _workerStatus;
+                // _worker = null;
+                // _workerStatus = string.Empty;
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("ShowSwal", "error", "Status update failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
         }
     }
 }

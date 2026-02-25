@@ -50,7 +50,7 @@
         </MudGrid>
 
         <!-- TABS -->
-        <MudTabs KeepPanelsAlive="true">
+        <MudTabs KeepPanelsAlive="true" Elevation="1" Rounded="true" Centered="false" >
             <!-- PERSONAL TAB -->
             <MudTabPanel Text="Personal">
                 <MudGrid>
@@ -87,8 +87,11 @@
             <MudTabPanel Text="Official">
                 <MudGrid>
                     <MudItem xs="12" md="6">
-                        <MudCheckBox Label="Tax" @bind-Value="_model.Tax" />
-                        <MudCheckBox Label="Charge Premium" @bind-Value="_model.ChargePremium" />
+                        <MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-content-start" Elevation="0">
+                            <MudCheckBox Label="Tax" @bind-Value="_model.Tax" />
+                            <MudCheckBox Label="Charge Premium" @bind-Value="_model.ChargePremium" />
+                        </MudPaper>
+                        
                         <MudTextField Label="SSF No" @bind-Value="_model.SSFNo" Pattern="^[a-zA-Z0-9\s-]{8,15}$" Immediate="true" For="@(() => _model.SSFNo)" />
                         <MudTextField Label="NHIS Reg No" @bind-Value="_model.NHISRegNo" />
                         <MudTextField Label="New ID No" @bind-Value="_model.NewIDNo"  />
