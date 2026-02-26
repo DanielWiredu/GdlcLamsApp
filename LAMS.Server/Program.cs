@@ -29,6 +29,8 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -93,17 +95,33 @@ app.UseHttpsRedirection();
 
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = [new HangfireBasicAuthFilter(builder.Configuration.GetSection("HangfireLogin"))]
+    //Authorization = [new HangfireBasicAuthFilter(builder.Configuration.GetSection("HangfireLogin"))]
+    Authorization = new[] { new HangfireIdentityAuthFilter() }
 });
 
+app.UseWhen(
+    context => context.Request.Path.StartsWithSegments("/swagger"),
+    appBuilder =>
+    {
+        appBuilder.UseAuthentication();
+        appBuilder.UseAuthorization();
+
+        appBuilder.Use(async (context, next) =>
+        {
+            if (!context.User.Identity?.IsAuthenticated ?? true)
+            {
+                context.Response.Redirect("/account/login");
+                return;
+            }
+
+            await next();
+        });
+    });
+app.UseSwagger();
+app.UseSwaggerUI();
 app.MapControllers();
 
 app.UseStaticFiles();
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Files")),
-//    RequestPath = "/Files"
-//});
 
 app.UseAntiforgery();
 
