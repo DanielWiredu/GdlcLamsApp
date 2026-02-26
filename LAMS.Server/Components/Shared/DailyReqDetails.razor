@@ -41,14 +41,15 @@
             <MudCheckBox @bind-Value="Model.ShipSide" Label="Ship Side" />
             <MudCheckBox @bind-Value="Model.Weekend" Label="Weekend / Holiday" />
             <MudCheckBox @bind-Value="Model.Night" Label="Night" />
-            <MudNumericField T="double" Label="Normal Hrs" @bind-Value="Model.NormalHours" ReadOnly="true" Min="0" HideSpinButtons="true" />
-            <MudNumericField T="double" Label="Overtime Hrs" @bind-Value="Model.OvertimeHours" ReadOnly="true" Min="0" HideSpinButtons="true" />
+            <MudNumericField T="double" Label="Normal Hrs" @bind-Value="Model.NormalHours" ReadOnly="false" Min="0" Max="8" HideSpinButtons="true" />
+            <MudNumericField T="double" Label="Overtime Hrs" @bind-Value="Model.OvertimeHours" ReadOnly="false" Min="0" Max="8" HideSpinButtons="true" />
         </MudItem>
     </MudGrid>
 </MudPaper>
 
 @code {
-    [Parameter] public RequisitionModel Model { get; set; }
+    [Parameter] 
+    public RequisitionModel Model { get; set; }
     private List<string> ShiftTypes = new()
     {
         "Non-Shift",

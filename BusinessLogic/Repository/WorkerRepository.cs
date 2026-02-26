@@ -33,10 +33,6 @@ namespace BusinessLogic.Repository
             query: @"SELECT TOP(200) [WorkerID], [NationalID], [SName], [OName], [Date_Birth] AS DateBirth, [GangName], [SSFNo], [TradegroupNAME], [TradetypeNAME], [NHIS], [ezwichid], [RegDate], [PhoneNo], [Kin], BankNumber, [WorkerStatus] FROM [vwWorkers] 
                      WHERE WorkerID LIKE '%' + @SearchValue + '%' OR NationalID LIKE '%' + @SearchValue + '%' OR SName LIKE '%' + @SearchValue + '%' OR OName LIKE '%' + @SearchValue + '%' OR ezwichid LIKE '%' + @SearchValue + '%'", new { SearchValue = _searchValue });
 
-        public async Task<int> Remove(string Id) => await _db.SaveData(query: "Delete from tblLocation where LocationId=@LocationId", new { LocationId = int.Parse(Id) });
-
-        public async Task<int> Update(TblWorker model) => await _db.SaveData(query: "Update tblLocation set Location=@Location where LocationId=@LocationId", new { model.WorkerId, model.Sname });
-
         public async Task<IEnumerable<VwWorker>> Search(string _searchType, string _searchValue)
         {
             int searchLimit = 100;
@@ -101,7 +97,7 @@ namespace BusinessLogic.Repository
             parameters.Add("@Tax", worker.Tax, DbType.Boolean);
             parameters.Add("@ChargePremium", worker.ChargePremium, DbType.Boolean);
             parameters.Add("@Pics", worker.Pics, DbType.Binary);
-            parameters.Add("@WHO", "CurrentUser", DbType.String);
+            parameters.Add("@WHO", worker.Who, DbType.String);
             parameters.Add("@WHOtime", DateTime.Now, DbType.DateTime);
             parameters.Add("@ezwichid", worker.Ezwichid, DbType.String);
             parameters.Add("@NationalID", worker.NationalId, DbType.String);
@@ -156,7 +152,7 @@ namespace BusinessLogic.Repository
             parameters.Add("@Tax", worker.Tax, DbType.Boolean);
             parameters.Add("@ChargePremium", worker.ChargePremium, DbType.Boolean);
             parameters.Add("@Pics", worker.Pics, DbType.Binary);
-            parameters.Add("@WHO", "CurrentUser", DbType.String);
+            parameters.Add("@WHO", worker.Who, DbType.String);
             parameters.Add("@WHOtime", DateTime.Now, DbType.DateTime);
             parameters.Add("@ezwichid", worker.Ezwichid, DbType.String);
             parameters.Add("@NationalID", worker.NationalId, DbType.String);

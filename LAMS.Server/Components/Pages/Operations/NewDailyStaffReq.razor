@@ -6,6 +6,7 @@
 @inject IUnitOfWork _unitOfWork
 @inject ISnackbar _snackbar
 @inject IDialogService _dialogService
+@inject ICurrentUserService _currentUser
 
 <PageBreadcrumb Subtitle="Operations" Title="@($"{(IsEdit ? "Edit" : "New")} Daily Requisition Details")" />
 
@@ -21,7 +22,7 @@
 
     <MudCheckBox T="bool" Label="Approved" @bind-Value="Model.Approved" Disabled="true"  Class="ml-4"  Style="color:red;font-size:medium" />
     <MudText Class="mx-2" Style="color:green"> Approval Date </MudText>
-    <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="true" Disabled="true" DateFormat="yyyy-MM-dd" Dense="true" Style="max-width:150px;" />
+    <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="true" Disabled="true" DateFormat="yyyy-MM-dd" Dense="true" Style="max-width:200px;" ShowToolbar="false" />
     @if (!IsEdit)
     {
         <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="ResetState"> Add </MudButton>
@@ -143,6 +144,8 @@
 
         try
         {
+            var userId = await _currentUser.GetUserIdAsync();
+            Model.Preparedby = userId;
             if (IsEdit)
             {
                 var response = await _unitOfWork.DailyReq.UpdateDailyReq(Model);

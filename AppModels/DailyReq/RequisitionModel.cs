@@ -35,6 +35,10 @@ namespace AppModels.DailyReq
 
         public bool Approved { get; set; }
         public DateTime? ApprovedDate { get; set; }
+
+        public bool Processed { get; set; }
+        public bool Stored { get; set; }
+        public string? Preparedby { get; set; }
     }
 
 }

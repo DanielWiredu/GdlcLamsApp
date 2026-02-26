@@ -1,17 +1,187 @@
 ﻿@page "/operations-dailyhoursupdate"
 @rendermode InteractiveServer
-@inject IJSRuntime JsRuntime;
-
+@using AppModels.DailyReq
+@inject IJSRuntime JsRuntime
+@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+@inject IDialogService _dialogService
+@inject ICurrentUserService _currentUser
+@inject AuthenticationStateProvider _authStateProvider
 
 <PageBreadcrumb Subtitle="Operations" Title="Daily Hours Update" />
 
+<DailyReqDetails Model="@Model"></DailyReqDetails>
+
+<SubStaffReqGrid ReqNo="@Model.RequestNo" _readOnly="true" />
+
+<MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
+    <MudCheckBox T="bool" Label="Approved" @bind-Value="Model.Approved" ReadOnly="true" Class="ml-4" Style="color:red;font-size:medium" />
+    <MudText Class="mx-2" Style="color:green"> Approval Date </MudText>
+    <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="@(Model.Approved)" DateFormat="yyyy-MM-dd" Dense="true" ShowToolbar="false" Style="max-width:400px;" />
+    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)"
+               Href="@($"http://172.29.255.101/Reports/Daily/General/vwDailyCostSheet.aspx?reqno={Model.RequestNo}&st={Model.RequisitionDate:yyyy-MM-dd}&ed={Model.RequisitionDate:yyyy-MM-dd}")"
+               Target="_blank"> Print </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : Model.Approved)" OnClick="UpdateReqHours"> Update Hours </MudButton>
+</MudPaper>
+
+<AuthorizeView>
+    <Authorized>
+        <button class="btn btn-primary" @onclick=ApproveRequest>Approve</button>
+    </Authorized>
+   <NotAuthorized>
+        <p>You are not authorized to approve requests.</p>
+   </NotAuthorized>
+</AuthorizeView>
+<AuthorizeView Roles="Admin">
+    <p>Admins Only</p>
+</AuthorizeView>
+
 @code {
+    [Parameter]
+    public string? RequestNo { get; set; }
+    private RequisitionModel Model = new();
+    private bool IsEdit => !string.IsNullOrEmpty(RequestNo);
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadDataAsync();
+    }
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            if (IsEdit)
+            {
+                // EDIT MODE
+                var dailyReq = await _unitOfWork.DailyReq.GetDailyReq(RequestNo);
+                if (dailyReq == null)
+                {
+                    _snackbar.Add("This requisition number was not found", Severity.Error);
+                    return;
+                }
+                Model = new RequisitionModel
+                {
+                    AutoNo = dailyReq.AutoNo,
+                    RequestNo = dailyReq.ReqNo,
+                    Approved = dailyReq.Approved,
+                    ApprovedDate = dailyReq.Adate,
+                    RequisitionDate = dailyReq.Date,
+                    CompanyId = dailyReq.DlecodeCompanyId,
+                    VesselId = dailyReq.VesselberthId!.Value,
+                    ReportingPointId = dailyReq.ReportpointId!.Value,
+                    LocationId = dailyReq.LocationId!.Value,
+                    CargoId = dailyReq.CargoId!.Value,
+                    GangId = dailyReq.GangId!.Value,
+                    JobDescription = dailyReq.Job,
+                    GphaRequestId = dailyReq.GphaRequestId,
+                    ShipSide = dailyReq.OnBoardAllowance!.Value,
+                    Weekend = dailyReq.Weekends,
+                    Night = dailyReq.Night,
+                    ShiftType = dailyReq.ShiftType,
+                    NormalHours = dailyReq.Normal,
+                    OvertimeHours = dailyReq.Overtime,
+                };
+                if (Model.Approved)
+                {
+                    _snackbar.Add("This requisition has been approved", Severity.Warning);
+                }
+            }
+            else
+            {
+                await ResetState();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+    }
+    private async Task ResetState()
+    {
+        Model = new RequisitionModel
+        {
+            RequestNo = string.Empty,
+            Approved = false,
+            ApprovedDate = DateTime.UtcNow,
+        };
+    }
+    private async Task UpdateReqHours()
+    {
+        try
+        {
+            if (Model.NormalHours != 8.0)
+            {
+                _snackbar.Add("Cannot Approve..... Normal hours should not be more or less than 8", Severity.Warning);
+                return;
+            }
+            var userId = await _currentUser.GetUserIdAsync();
+            var request = new UpdateReqHoursRequest
+            {
+                Normal = Model.NormalHours,
+                Overtime = Model.OvertimeHours,
+                ReqNo = Model.RequestNo,
+                Hourby = userId,
+                HourDate = DateTime.UtcNow,
+            };
+            var response = await _unitOfWork.DailyReq.UpdateDailyReqHours(request);
+            if (response == 0)
+            {
+                _snackbar.Add("Hours Updated successfully", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error saving record: {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task FindReqNo()
+    {
+        var parameters = new DialogParameters<FindCostSheetDialog> { };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<FindCostSheetDialog>("Find Cost Sheet", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            RequestNo = result.Data.ToString();
+            await LoadDataAsync();
+        }
+    }
+    private async Task ApproveRequest()
+    {
+        var authState = await _authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var roles = user.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            // Example: Disable button based on user role
+            if (roles.Contains("Admin"))
+            {
+                // Allow the user to approve requests
+                var response = 0;
+                if (response == 0)
+                {
+                    _snackbar.Add("Approved successfully", Severity.Success);
+                    Model.Approved = true;
+                }
+            }
+            else
+            {
+                _snackbar.Add("You don't have permission to approve.", Severity.Error);
+            }
         }
     }
 }

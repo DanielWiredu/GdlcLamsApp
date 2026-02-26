@@ -67,7 +67,7 @@ namespace BusinessLogic.Repository
         {
             var results = await _db.LoadData<TblStaffReq, dynamic>(query: @"select AutoNo,ReqNo,DLEcodeCompanyID,VesselberthID,
                 locationID,ReportpointID,cargoID,gangID,job,GPHA_RequestID as GphaRequestId,date_ as [Date],Normal,Overtime,Weekends,ShiftType,
-                    Night,Approved,Adate,OnBoardAllowance
+                    Night,Approved,Adate,OnBoardAllowance,Processed,Stored
                         from tblStaffReq where ReqNo=@ReqNo or GPHA_RequestID=@ReqNo", new { ReqNo = ReqNo });
             return results.FirstOrDefault();
         }
@@ -90,7 +90,7 @@ namespace BusinessLogic.Repository
             parameters.Add("@ShiftType", request.ShiftType);
             parameters.Add("@Night", request.Night);
             parameters.Add("@Adate", request.ApprovedDate);
-            parameters.Add("@Preparedby", "UserID");
+            parameters.Add("@Preparedby", request.Preparedby);
             parameters.Add("@OnBoardAllowance", request.ShipSide);
             parameters.Add("@NormalHrsFrom", new TimeSpan());
             parameters.Add("@NormalHrsTo", new TimeSpan());
@@ -122,7 +122,7 @@ namespace BusinessLogic.Repository
             parameters.Add("@ShiftType", request.ShiftType);
             parameters.Add("@Night", request.Night);
             parameters.Add("@Adate", request.ApprovedDate);
-            parameters.Add("@Preparedby", "UserID");
+            parameters.Add("@Preparedby", request.Preparedby);
             parameters.Add("@OnBoardAllowance", request.ShipSide);
             parameters.Add("@ReqNo", request.RequestNo);
             parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
@@ -141,5 +141,44 @@ namespace BusinessLogic.Repository
             return parameters.Get<int>("@return_value");
         }
         public async Task<int> RemoveSubStaffReq(int AutoId) => await _db.SaveData(query: "DELETE FROM tblSubStaffReq WHERE AutoId=@AutoId", new { AutoId = AutoId });
+        public async Task<int> ApproveDailyReq(ApproveReqRequest request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@Adate", request.Adate);
+            parameters.Add("@ApprovedBy", request.ApprovedBy);
+            parameters.Add("@ReqNo", request.ReqNo);
+            parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _db.ExecuteSP(storedProcedure: "spApproveDailyReq", parameters);
+            return parameters.Get<int>("@return_value");
+        }
+        public async Task<int> DisapproveDailyReq(DisapproveReqRequest request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@Processed", request.Processed);
+            parameters.Add("@ReqNo", request.ReqNo);
+            parameters.Add("@DisApprovedBy", request.DisApprovedBy);
+            parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _db.ExecuteSP(storedProcedure: "spDisapproveDailyReq", parameters);
+            return parameters.Get<int>("@return_value");
+        }
+        public async Task<int> UpdateDailyReqHours(UpdateReqHoursRequest request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@Normal", request.Normal);
+            parameters.Add("@Overtime", request.Overtime);
+            parameters.Add("@Hourby", request.Hourby);
+            parameters.Add("@HourDate", request.HourDate);
+            parameters.Add("@NormalHrsFrom", new TimeSpan());
+            parameters.Add("@NormalHrsTo", new TimeSpan());
+            parameters.Add("@OvertimeHrsFrom", new TimeSpan());
+            parameters.Add("@OvertimeHrsTo", new TimeSpan());
+            parameters.Add("@ReqNo", request.ReqNo);
+            parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _db.ExecuteSP(storedProcedure: "spUpdateDailyReqHours", parameters);
+            return parameters.Get<int>("@return_value");
+        }
     }
 }

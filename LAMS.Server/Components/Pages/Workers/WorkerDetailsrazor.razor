@@ -6,6 +6,7 @@
 @inject IJSRuntime JsRuntime
 @inject IUnitOfWork _unitOfWork
 @inject ISnackbar _snackbar
+@inject ICurrentUserService _currentUser
 
 <PageBreadcrumb Subtitle="Workers" Title="Registration" />
 
@@ -375,51 +376,54 @@
         try
         {
             var worker = new TblWorker
-                {
-                    AutoId = _model.AutoNumber,
-                    WorkerId = _model.WorkerId,
-                    WorkerType = _model.WorkerType,
-                    Sname = _model.Surname,
-                    Oname = _model.OtherNames,
-                    Pname = _model.PreviousName,
-                    Addr1 = _model.Address1,
-                    Addr2 = _model.Address2,
-                    PhoneNo = _model.PhoneNumber,
-                    DateBirth = _model.DateOfBirth,
-                    RegDate = _model.RegistrationDate,
-                    NationalityId = _model.NationalityId,
-                    Education = _model.Education,
-                    Kin = _model.NextOfKin,
-                    Relation = _model.NOKRelation,
-                    KinAddr = _model.NOKAddress,
-                    KinAddrPhone = _model.NOKPhoneNo,
-                    ContPer = _model.ContactPerson,
-                    Contaddr = _model.ContactAddress,
-                    ContPhone = _model.ContactPhone,
-                    Ssfno = _model.SSFNo,
-                    Nhis = _model.NHISRegNo,
-                    Nat = _model.NewIDNo,
-                    ShoeSize = _model.ShoeSize,
-                    Height = _model.Height,
-                    TradegroupId = _model.TradeGroupId,
-                    TradetypeId = _model.TradeTypeId,
-                    GangId = _model.GangId,
-                    BankId = _model.BankId,
-                    BankBranchId = _model.BankBranchId,
-                    BankNumber = _model.BankAccountNumber,
-                    DepartmentId = _model.DepartmentId,
-                    PaymentOption = _model.PaymentOption,
-                    MedicalIdNo = _model.MedicalIdNo,
-                    OfficialComm = _model.Notes,
-                    Sex = _model.Gender,
-                    Tax = _model.Tax,
-                    ChargePremium = _model.ChargePremium,
-                    Ezwichid = _model.EzwichNo,
-                    Tin = _model.TIN,
-                    NationalId = _model.NationalIdNo,
-                    Who = "system",                // Set from logged-in user
-                    Whotime = DateTime.Now
-                };
+            {
+                AutoId = _model.AutoNumber,
+                WorkerId = _model.WorkerId,
+                WorkerType = _model.WorkerType,
+                Sname = _model.Surname,
+                Oname = _model.OtherNames,
+                Pname = _model.PreviousName,
+                Addr1 = _model.Address1,
+                Addr2 = _model.Address2,
+                PhoneNo = _model.PhoneNumber,
+                DateBirth = _model.DateOfBirth,
+                RegDate = _model.RegistrationDate,
+                NationalityId = _model.NationalityId,
+                Education = _model.Education,
+                Kin = _model.NextOfKin,
+                Relation = _model.NOKRelation,
+                KinAddr = _model.NOKAddress,
+                KinAddrPhone = _model.NOKPhoneNo,
+                ContPer = _model.ContactPerson,
+                Contaddr = _model.ContactAddress,
+                ContPhone = _model.ContactPhone,
+                Ssfno = _model.SSFNo,
+                Nhis = _model.NHISRegNo,
+                Nat = _model.NewIDNo,
+                ShoeSize = _model.ShoeSize,
+                Height = _model.Height,
+                TradegroupId = _model.TradeGroupId,
+                TradetypeId = _model.TradeTypeId,
+                GangId = _model.GangId,
+                BankId = _model.BankId,
+                BankBranchId = _model.BankBranchId,
+                BankNumber = _model.BankAccountNumber,
+                DepartmentId = _model.DepartmentId,
+                PaymentOption = _model.PaymentOption,
+                MedicalIdNo = _model.MedicalIdNo,
+                OfficialComm = _model.Notes,
+                Sex = _model.Gender,
+                Tax = _model.Tax,
+                ChargePremium = _model.ChargePremium,
+                Ezwichid = _model.EzwichNo,
+                Tin = _model.TIN,
+                NationalId = _model.NationalIdNo,
+                Who = "system",                // Set from logged-in user
+                Whotime = DateTime.Now
+            };
+
+            var userId = await _currentUser.GetUserIdAsync();
+            worker.Who = userId; // Set the logged-in user
             if (IsEdit)
             {
                 var response = await _unitOfWork.Workers.UpdateWorker(worker);
@@ -455,6 +459,7 @@
         [Required]
         public int AutoNumber { get; set; }
         [Required(ErrorMessage = "Worker ID is required")]
+        [MaxLength(10, ErrorMessage = "Worker ID cannot exceed 10 characters")]
         public string WorkerId { get; set; }
         [Required(ErrorMessage = "Gender is required")]
         public string Gender { get; set; }

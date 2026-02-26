@@ -5,6 +5,7 @@
 @inject IUnitOfWork _unitOfWork
 @inject IDialogService _dialogService
 @inject ISnackbar _snackbar
+@inject ICurrentUserService _currentUser
 
 <PageBreadcrumb Subtitle="Operations" Title="Daily Staff Requisition" />
 
@@ -121,7 +122,8 @@
         {
             try
             {
-                var request = new DeleteReqRequest { ReqNo = _selectedReq.ReqNo, DeleteBy = "UserID" };
+                var userId = await _currentUser.GetUserIdAsync();
+                var request = new DeleteReqRequest { ReqNo = _selectedReq.ReqNo, DeleteBy = userId };
                 var response = await _unitOfWork.DailyReq.DeleteDailyReq(request);
                 if (response == 1)
                 {

@@ -21,5 +21,8 @@ namespace BusinessLogic.Repository.IRepository
         Task<int> UpdateDailyReq(RequisitionModel request);
         Task<int> DeleteDailyReq(DeleteReqRequest request);
         Task<int> RemoveSubStaffReq(int AutoId);
+        Task<int> ApproveDailyReq(ApproveReqRequest request);
+        Task<int> DisapproveDailyReq(DisapproveReqRequest request);
+        Task<int> UpdateDailyReqHours(UpdateReqHoursRequest request);
     }
 }

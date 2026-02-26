@@ -5,6 +5,7 @@
 @inject IUnitOfWork _unitOfWork
 @inject ISnackbar _snackbar
 @inject IDialogService _dialogService
+@inject ICurrentUserService _currentUser
 
 <PageBreadcrumb Subtitle="Audit" Title="Daily Requisition Approval" />
 
@@ -13,15 +14,15 @@
 <SubStaffReqGrid ReqNo="@Model.RequestNo" _readOnly="true" />
 
 <MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
-    <MudCheckBox T="bool" Label="Approved" @bind-Value="Model.Approved" Disabled="true" Class="ml-4" Style="color:red;font-size:medium" />
+    <MudCheckBox T="bool" Label="Approved" @bind-Value="Model.Approved" ReadOnly="true" Class="ml-4" Style="color:red;font-size:medium" />
     <MudText Class="mx-2" Style="color:green"> Approval Date </MudText>
-    <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="true" Disabled="true" DateFormat="yyyy-MM-dd" Dense="true" Style="max-width:150px;" />
+    <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="@(Model.Approved)" DateFormat="yyyy-MM-dd" Dense="true" ShowToolbar="false" Style="max-width:400px;" />
     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)"
                Href="@($"http://172.29.255.101/Reports/Daily/General/vwDailyCostSheet.aspx?reqno={Model.RequestNo}&st={Model.RequisitionDate:yyyy-MM-dd}&ed={Model.RequisitionDate:yyyy-MM-dd}")"
                Target="_blank"> Print </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : Model.Approved)" OnClick="AddDailyReq"> Approve </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Disabled="@(!Model.Approved)" OnClick="AddDailyReq"> Disapprove </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : Model.Approved)" OnClick="ApproveDailyReq"> Approve </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Disabled="@(!Model.Approved)" OnClick="DisapproveDailyReq"> Disapprove </MudButton>
 </MudPaper>
 
 @code {
@@ -56,27 +57,29 @@
                     return;
                 }
                 Model = new RequisitionModel
-                    {
-                        AutoNo = dailyReq.AutoNo,
-                        RequestNo = dailyReq.ReqNo,
-                        Approved = dailyReq.Approved,
-                        ApprovedDate = dailyReq.Adate,
-                        RequisitionDate = dailyReq.Date,
-                        CompanyId = dailyReq.DlecodeCompanyId,
-                        VesselId = dailyReq.VesselberthId!.Value,
-                        ReportingPointId = dailyReq.ReportpointId!.Value,
-                        LocationId = dailyReq.LocationId!.Value,
-                        CargoId = dailyReq.CargoId!.Value,
-                        GangId = dailyReq.GangId!.Value,
-                        JobDescription = dailyReq.Job,
-                        GphaRequestId = dailyReq.GphaRequestId,
-                        ShipSide = dailyReq.OnBoardAllowance!.Value,
-                        Weekend = dailyReq.Weekends,
-                        Night = dailyReq.Night,
-                        ShiftType = dailyReq.ShiftType,
-                        NormalHours = dailyReq.Normal,
-                        OvertimeHours = dailyReq.Overtime,
-                    };
+                {
+                    AutoNo = dailyReq.AutoNo,
+                    RequestNo = dailyReq.ReqNo,
+                    Approved = dailyReq.Approved,
+                    ApprovedDate = dailyReq.Adate,
+                    RequisitionDate = dailyReq.Date,
+                    CompanyId = dailyReq.DlecodeCompanyId,
+                    VesselId = dailyReq.VesselberthId!.Value,
+                    ReportingPointId = dailyReq.ReportpointId!.Value,
+                    LocationId = dailyReq.LocationId!.Value,
+                    CargoId = dailyReq.CargoId!.Value,
+                    GangId = dailyReq.GangId!.Value,
+                    JobDescription = dailyReq.Job,
+                    GphaRequestId = dailyReq.GphaRequestId,
+                    ShipSide = dailyReq.OnBoardAllowance!.Value,
+                    Weekend = dailyReq.Weekends,
+                    Night = dailyReq.Night,
+                    ShiftType = dailyReq.ShiftType,
+                    NormalHours = dailyReq.Normal,
+                    OvertimeHours = dailyReq.Overtime,
+                    Processed = dailyReq.Processed!.Value,
+                    Stored = dailyReq.Stored!.Value,
+                };
                 if (Model.Approved)
                 {
                     _snackbar.Add("This requisition has been approved", Severity.Warning);
@@ -98,23 +101,61 @@
         Model = new RequisitionModel
             {
                 RequestNo = string.Empty,
-                // RequisitionDate = DateTime.UtcNow,
                 Approved = false,
                 ApprovedDate = DateTime.UtcNow,
-                // ShiftType = "Non-Shift"
             };
     }
-    private async Task AddDailyReq()
+    private async Task ApproveDailyReq()
     {
         try
         {
-            var result = await _unitOfWork.DailyReq.AddDailyReq(Model);
-
-            int returnValue = result.ReturnValue;
-            if (returnValue == 0)
+            if (Model.NormalHours != 8.0)
             {
-                _snackbar.Add("Saved successfully", Severity.Success);
-                Model.AutoNo = result.AutoNo;
+                _snackbar.Add("Cannot Approve..... Normal hours should not be more or less than 8", Severity.Warning);
+                return;
+            }
+            var userId = await _currentUser.GetUserIdAsync();
+            var request = new ApproveReqRequest
+            {
+                ReqNo = Model.RequestNo,
+                ApprovedBy = userId,
+                Adate = Model.ApprovedDate ?? DateTime.UtcNow,
+            };
+            var response = await _unitOfWork.DailyReq.ApproveDailyReq(request);
+            if (response == 0)
+            {
+                _snackbar.Add("Approved successfully", Severity.Success);
+                Model.Approved = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error saving record: {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task DisapproveDailyReq()
+    {
+        try
+        {
+            if (Model.Stored)
+            {
+                _snackbar.Add("Cost Sheet Stored...Changes Not Allowed", Severity.Error);
+                return;
+            };
+            ;
+            var userId = await _currentUser.GetUserIdAsync();
+            var request = new DisapproveReqRequest
+            {
+                Processed = true,
+                ReqNo = Model.RequestNo,
+                DisApprovedBy = userId,
+            };
+            var response = await _unitOfWork.DailyReq.DisapproveDailyReq(request);
+            if (response == 0)
+            {
+                _snackbar.Add("Disapproved successfully", Severity.Success);
+                Model.Approved = false;
+                Model.Processed = false;
             }
         }
         catch (Exception ex)
