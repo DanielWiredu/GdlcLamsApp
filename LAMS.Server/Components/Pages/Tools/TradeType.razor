@@ -1,11 +1,39 @@
 ﻿@page "/tools-tradetype"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
 
 <PageBreadcrumb Subtitle="Tools" Title="Trade Type" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblTradeType, bool>(FilterFunc1)">
+    <ToolBarContent>
+        @* <MudText Typo="Typo.h6">Locations</MudText> *@
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Trade Type</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Trade Type">@context.TradetypeName</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<TblTradeType> Elements = new List<TblTradeType>();
+    private TblTradeType? tradeType = new TblTradeType();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -13,5 +41,21 @@
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Workers.GetTradeTypes();
+    }
+
+    private bool FilterFunc1(TblTradeType element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblTradeType element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.TradetypeName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
     }
 }

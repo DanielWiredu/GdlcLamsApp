@@ -1,11 +1,41 @@
 ﻿@page "/tools-tradegroup"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
 
 <PageBreadcrumb Subtitle="Tools" Title="Trade Group" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblTradeGroup, bool>(FilterFunc1)">
+    <ToolBarContent>
+        @* <MudText Typo="Typo.h6">Locations</MudText> *@
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh></MudTh>
+        <MudTh>Trade Group</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudLink Href="@($"/tools-tradegrouprate/{context.TradegroupId}?groupName={Uri.EscapeDataString(context.TradegroupName)}")"> Rates </MudLink>
+        </MudTd>
+        <MudTd DataLabel="Trade Group">@context.TradegroupName</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="@(() => SelectGroup(context))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<TblTradeGroup> Elements = new List<TblTradeGroup>();
+    private TblTradeGroup? tradeGroup = new TblTradeGroup();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -13,5 +43,25 @@
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Workers.GetTradeGroups();
+    }
+
+    private bool FilterFunc1(TblTradeGroup element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblTradeGroup element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.TradegroupName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private void SelectGroup(TblTradeGroup group)
+    {
+        
     }
 }

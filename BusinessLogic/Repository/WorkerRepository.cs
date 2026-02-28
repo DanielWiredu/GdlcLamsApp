@@ -56,10 +56,20 @@ namespace BusinessLogic.Repository
             string query = $"SELECT * FROM tblTradeGroup";
             return await _db.LoadData<TblTradeGroup, dynamic>(query: query, new { });
         }
+        public async Task<IEnumerable<TblTradeGroupRate>> GetTradeGroupRates(int tradeGroupId)
+        {
+            string query = $"SELECT * FROM [tblTradeGroupRates] WHERE TradeGroupId=@TradeGroupID";
+            return await _db.LoadData<TblTradeGroupRate, dynamic>(query: query, new { TradeGroupID = tradeGroupId });
+        }
         public async Task<IEnumerable<TblTradeType>> GetTradeTypeByGroup(int tradeGroupId)
         {
             string query = $"SELECT TradetypeID,TradetypeNAME FROM [tblTradeType] WHERE TradegroupID=@TradeGroupID";
             return await _db.LoadData<TblTradeType, dynamic>(query: query, new { TradeGroupID = tradeGroupId });
+        }
+        public async Task<IEnumerable<TblTradeType>> GetTradeTypes()
+        {
+            string query = $"SELECT TradetypeID,TradetypeNAME FROM [tblTradeType]";
+            return await _db.LoadData<TblTradeType, dynamic>(query: query, new { });
         }
         public async Task<int> UpdateWorker(TblWorker worker)
         {

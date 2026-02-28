@@ -4,7 +4,6 @@
 @inject IJSRuntime JsRuntime;
 @inject IUnitOfWork _unitOfWork
 @inject IDialogService _dialogService
-@inject ISnackbar _snackbar
 @inject ICurrentUserService _currentUser
 
 <PageBreadcrumb Subtitle="CLMS" Title="Pending Request" />
@@ -28,7 +27,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info"  OnClick="@(() => OpenCostSheet(context.Id))">  Cost Sheet </MudButton>
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Primary"  OnClick="@(() => OpenCostSheet(context))">  Cost Sheet </MudButton>
         </MudTd>
         <MudTd DataLabel="LabourRequestID">@context.LabourRequestId</MudTd>
         <MudTd DataLabel="RequestDate">@context.RequestDate?.ToString("dd-MMM-yyyy")</MudTd>
@@ -116,33 +115,45 @@
         await table.ReloadServerData();
     }
 
-    private async Task OpenCostSheet(int id)
+    private async Task OpenCostSheet(TblGphaLabourRequest labourRequest)
     {
-        // NavigationManager.NavigateTo($"/operations-costsheet/{id}");
-        var userKey = "DW"; // get from auth/cookie properly
-        var newReqNo = await _unitOfWork.DailyReq.GetNewReqNo(userKey);
-        var model = new RequisitionModel
+        try
         {
-            RequestNo = newReqNo,
-            RequisitionDate = _selectedReq.RequestDate,
-            JobDescription = _selectedReq.JobRequested,
-            GphaRequestId = _selectedReq.LabourRequestId,
-            Weekend = _selectedReq.RDay == "Weekend" ? true : false,
-            Night = _selectedReq.RShift == "Night" ? true : false,
-            Approved = false,
-            ApprovedDate = new DateTime(2000, 01, 01),
-            ShiftType = "Non-Shift",
-            ShipSide = false,
-        };
-        var parameters = new DialogParameters<NewCostSheetDialog> { { x => x.Model, new RequisitionModel() } };
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-        var dialog = _dialogService.Show<NewCostSheetDialog>("Generate Cost Sheet", parameters, options);
-        var result = await dialog.Result;
+            _selectedReq = labourRequest;
+            var userKey = "DW"; // get from auth/cookie properly
+            var newReqNo = await _unitOfWork.DailyReq.GetNewReqNo(userKey);
+            var model = new RequisitionModel
+            {
+                RequestNo = newReqNo,
+                RequisitionDate = _selectedReq.RequestDate,
+                JobDescription = _selectedReq.JobRequested,
+                GphaRequestId = _selectedReq.LabourRequestId,
+                Weekend = _selectedReq.RDay == "Weekend" ? true : false,
+                Night = _selectedReq.RShift == "Night" ? true : false,
+                Approved = false,
+                ApprovedDate = new DateTime(2000, 01, 01),
+                ShiftType = "Non-Shift",
+                ShipSide = false,
+            };
+            var parameters = new DialogParameters<NewCostSheetDialog> { { x => x.Model, model } };
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+            var dialog = _dialogService.Show<NewCostSheetDialog>("Generate Cost Sheet", parameters, options);
+            var result = await dialog.Result;
 
-        if (!result.Canceled)
-        {
-            await table.ReloadServerData();
-            // StateHasChanged();
+            if (!result.Canceled)
+            {
+                await table.ReloadServerData();
+                // StateHasChanged();
+            }
         }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+        finally
+        {
+            _selectedReq = null;
+        }      
     }
 }

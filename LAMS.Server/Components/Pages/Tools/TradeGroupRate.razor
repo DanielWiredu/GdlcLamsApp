@@ -1,0 +1,73 @@
+﻿@page "/tools-tradegrouprate/{tradeGroupId:int}"
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime;
+@inject IUnitOfWork _unitOfWork
+
+<PageBreadcrumb Subtitle="Tools" Title="Trade Group Rate" />
+
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblTradeGroupRate, bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@groupName</MudText>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"> Add New </MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Warning" Size="Size.Medium" Href="/tools-tradegroup"> Return </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Effective Date</MudTh>
+        <MudTh>End Date</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="EffectiveDate">@context.EffectiveDate</MudTd>
+        <MudTd DataLabel="EndDate">@context.EndDate</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="@(() => SelectGroup(context))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    [Parameter]
+    public int tradeGroupId { get; set; }
+    [SupplyParameterFromQuery]
+    public string? groupName { get; set; }
+
+    private string searchString1 = "";
+    private IEnumerable<TblTradeGroupRate> Elements = new List<TblTradeGroupRate>();
+    private TblTradeGroupRate? tradeGroupRate = new TblTradeGroupRate();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Workers.GetTradeGroupRates(0);
+    }
+
+    private bool FilterFunc1(TblTradeGroupRate element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblTradeGroupRate element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.EffectiveDate.Value.ToString("dd-MMM-yyyy").Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.EndDate.Value.ToString("dd-MMM-yyyy").Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private void SelectGroup(TblTradeGroupRate groupRate)
+    {
+
+    }
+}

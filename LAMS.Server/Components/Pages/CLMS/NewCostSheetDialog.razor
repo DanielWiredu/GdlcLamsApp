@@ -2,8 +2,9 @@
 @inject IUnitOfWork _unitOfWork
 @inject ISnackbar _snackbar
 @inject ICurrentUserService _currentUser
+@inject IJSRuntime JsRuntime;
 
-<MudDialog>
+<MudDialog Class="draggable-dialog">
     <DialogContent>
         <DailyReqDetails Model="@Model"></DailyReqDetails>
     </DialogContent>
@@ -22,6 +23,14 @@
     protected override async Task OnInitializedAsync()
     {
        
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("makeDialogDraggable", ".draggable-dialog");
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();

@@ -211,7 +211,6 @@ namespace BusinessLogic.Repository
             parameters.Add("@Weekends", request.Weekend);
             parameters.Add("@ShiftType", request.ShiftType);
             parameters.Add("@Night", request.Night);
-            parameters.Add("@Adate", request.ApprovedDate);
             parameters.Add("@Preparedby", request.Preparedby);
             parameters.Add("@OnBoardAllowance", request.ShipSide);
             parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
