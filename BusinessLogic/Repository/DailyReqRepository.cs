@@ -180,5 +180,44 @@ namespace BusinessLogic.Repository
             await _db.ExecuteSP(storedProcedure: "spUpdateDailyReqHours", parameters);
             return parameters.Get<int>("@return_value");
         }
+        public async Task<IEnumerable<TblGphaLabourRequest>> GetGPHAPendingRequests(DateTime StartDate, DateTime EndDate, string SearchValue)
+        {
+            string query = @"SELECT *
+                            FROM tblGPHA_LabourRequests
+                            WHERE hasCostSheet = 0
+                            AND GPHA_Approved = 0
+                            AND rNeededOn BETWEEN @StartDate AND @EndDate
+                            AND (
+                                LabourRequestID LIKE '%' + @SearchValue + '%'
+                                OR JobRequested LIKE '%' + @SearchValue + '%'
+                                OR UnitDescription LIKE '%' + @SearchValue + '%'
+                            )
+                            ORDER BY Id DESC";
+            return await _db.LoadData<TblGphaLabourRequest, dynamic>(query: query, new { StartDate = StartDate, EndDate = EndDate, SearchValue = SearchValue });
+        }
+        public async Task<int> AddDailyReqGPHARequest(RequisitionModel request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@ReqNo", request.RequestNo);
+            parameters.Add("@DLEcodeCompanyID", request.CompanyId);
+            parameters.Add("@VesselberthID", request.VesselId);
+            parameters.Add("@locationID", request.LocationId);
+            parameters.Add("@ReportpointID", request.ReportingPointId);
+            parameters.Add("@cargoID", request.CargoId);
+            parameters.Add("@gangID", request.GangId);
+            parameters.Add("@job", request.JobDescription);
+            parameters.Add("@GPHA_RequestID", request.GphaRequestId);
+            parameters.Add("@date_", request.RequisitionDate);
+            parameters.Add("@Weekends", request.Weekend);
+            parameters.Add("@ShiftType", request.ShiftType);
+            parameters.Add("@Night", request.Night);
+            parameters.Add("@Adate", request.ApprovedDate);
+            parameters.Add("@Preparedby", request.Preparedby);
+            parameters.Add("@OnBoardAllowance", request.ShipSide);
+            parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _db.ExecuteSP(storedProcedure: "spAddDailyReq_GPHARequest", parameters);
+            return parameters.Get<int>("@return_value");
+        }
     }
 }

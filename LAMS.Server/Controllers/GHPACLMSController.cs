@@ -9,15 +9,45 @@ namespace LAMS.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GHPACostSheetController : ControllerBase
+    public class GHPACLMSController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public GHPACostSheetController(IConfiguration configuration)
+        public GHPACLMSController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+        [HttpPost("CreateLabourRequest")]
+        public async Task<IActionResult> CreateLabourRequest([FromBody] GPHACreateLabourRequest request)
+        {
+            var connectionString = _configuration.GetConnectionString("Default");
 
-        [HttpPost]
+            await using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync();
+
+            await using var transaction = await connection.BeginTransactionAsync();
+
+            try
+            {
+                var labourRequestSql = @"
+                INSERT INTO GPHALabourRequests
+                (Id, RequestDate, LabourRequestId, UnitDescription, JobDescription, NumberRequested, NeededOn, RequestId, DayType, WorkShift, GeoLocation)
+                VALUES
+                (@Id, @RequestDate, @LabourRequestId, @UnitDescription, @JobDescription, @NumberRequested, @NeededOn, @RequestId, @DayType, @WorkShift, @GeoLocation)";
+
+                await connection.ExecuteAsync(labourRequestSql, request,  transaction);
+
+                await transaction.CommitAsync();
+
+                return Ok(new { Message = "Labour request created successfully", LabourRequestId = request.LabourRequestId });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("CreateCostSheet")]
         public async Task<IActionResult> CreateCostSheet([FromBody] GPHACreateCostSheetRequest request)
         {
             var connectionString = _configuration.GetConnectionString("Default");

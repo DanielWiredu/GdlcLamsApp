@@ -6,6 +6,20 @@ using System.Threading.Tasks;
 
 namespace AppModels
 {
+    public class GPHACreateLabourRequest
+    {
+        public Guid Id { get; set; }
+        public DateTime RequestDate { get; set; }
+        public string? LabourRequestId { get; set; }
+        public string? UnitDescription { get; set; }
+        public string? JobDescription { get; set; }
+        public int NumberRequested { get; set; }
+        public DateTime NeededOn { get; set; }
+        public string? RequestId { get; set; }
+        public string? DayType { get; set; }
+        public string? WorkShift { get; set; }
+        public string? GeoLocation { get; set; }
+    }
     public class GPHACreateCostSheetRequest
     {
         public GPHAJobAssignmentDto JobAssignment { get; set; } = default!;

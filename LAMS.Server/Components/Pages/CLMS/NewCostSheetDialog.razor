@@ -1,0 +1,69 @@
+﻿@using AppModels.DailyReq
+@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+@inject ICurrentUserService _currentUser
+
+<MudDialog>
+    <DialogContent>
+        <DailyReqDetails Model="@Model"></DailyReqDetails>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Default">Cancel</MudButton>
+        <MudButton OnClick="Save" Color="Color.Success" Variant="Variant.Filled"> Save Cost Sheet </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public RequisitionModel Model { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+       
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Save()
+    {
+        if (Model.CompanyId == 0)
+        {
+            _snackbar.Add("DLE Company is required", Severity.Warning);
+            return;
+        }
+        if (Model.VesselId == 0)
+        {
+            _snackbar.Add("Vessel is required", Severity.Warning);
+            return;
+        }
+        if (Model.GangId == 0)
+        {
+            _snackbar.Add("Gang is required", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            var userId = await _currentUser.GetUserIdAsync();
+            Model.Preparedby = userId;
+            var returnValue = await _unitOfWork.DailyReq.AddDailyReqGPHARequest(Model);
+
+            if (returnValue == 0)
+            {
+                _snackbar.Add("Saved successfully", Severity.Success);
+            }
+            else if (returnValue == -23)
+            {
+                _snackbar.Add("Request ID already have an existing costsheet", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error saving record: {ex.Message}", Severity.Error);
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

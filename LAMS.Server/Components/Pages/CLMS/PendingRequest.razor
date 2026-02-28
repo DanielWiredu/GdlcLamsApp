@@ -1,17 +1,148 @@
-﻿@page "/clms-pendingrequest"
+﻿@using AppModels.DailyReq
+@page "/clms-pendingrequest"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
+@inject ICurrentUserService _currentUser
 
 <PageBreadcrumb Subtitle="CLMS" Title="Pending Request" />
 
+<MudTable ServerData="ServerReload" Dense="true" Hover="true" Striped="true" @ref="table" FixedHeader="true" Height="500px" RowsPerPage="50" @bind-SelectedItem="_selectedReq">
+    <ToolBarContent>
+        <MudDatePicker @bind-Date="startDate" Label="Start Date" DateFormat="dd-MMM-yyyy" Class="mr-2" />
+        <MudDatePicker @bind-Date="endDate" Label="End Date" DateFormat="dd-MMM-yyyy" Class="mr-4" />
+        <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Request ID, Job Requested, Unit..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Class="mr-2"  />
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Reload"> Reload </MudButton>
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="LabourRequestID" T="TblGphaLabourRequest">LabourRequestID</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="RequestDate" T="TblGphaLabourRequest">RequestDate</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="UnitDescription" T="TblGphaLabourRequest">UnitDescription</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="JobRequested" T="TblGphaLabourRequest">JobRequested</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="NumberRequested" T="TblGphaLabourRequest">NumberRequested</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="NeededOn" T="TblGphaLabourRequest">NeededOn</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudButton Variant="Variant.Outlined" Size="Size.Small" Color="Color.Info"  OnClick="@(() => OpenCostSheet(context.Id))">  Cost Sheet </MudButton>
+        </MudTd>
+        <MudTd DataLabel="LabourRequestID">@context.LabourRequestId</MudTd>
+        <MudTd DataLabel="RequestDate">@context.RequestDate?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="UnitDescription">@context.UnitDescription</MudTd>
+        <MudTd DataLabel="JobRequested">@context.JobRequested</MudTd>
+        <MudTd DataLabel="NumberRequested">@context.NumberRequested</MudTd>
+        <MudTd DataLabel="NeededOn">@context.RNeededOn?.ToString("dd-MMM-yyyy")</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+
+</MudTable>
+
 @code {
+    private MudTable<TblGphaLabourRequest> table;
+    private TblGphaLabourRequest _selectedReq;
+
+    private string searchString = "";
+    private DateTime? startDate = DateTime.Today.AddDays(-7);
+    private DateTime? endDate = DateTime.Today;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+    private async Task<TableData<TblGphaLabourRequest>> ServerReload(TableState state, CancellationToken token)
+    {
+        try
+        {
+            var data = await _unitOfWork.DailyReq.GetGPHAPendingRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString);
+            var totalItems = data.Count();
+            data = state.SortLabel switch
+            {
+                "LabourRequestID" => data.OrderByDirection(state.SortDirection, x => x.LabourRequestId),
+                "RequestDate" => data.OrderByDirection(state.SortDirection, x => x.RequestDate),
+                "UnitDescription" => data.OrderByDirection(state.SortDirection, x => x.UnitDescription),
+                "JobRequested" => data.OrderByDirection(state.SortDirection, x => x.JobRequested),
+                "NumberRequested" => data.OrderByDirection(state.SortDirection, x => x.NumberRequested),
+                "NeededOn" => data.OrderByDirection(state.SortDirection, x => x.RNeededOn),
+                _ => data.OrderByDescending(x => x.Id)
+            };
+
+            var items = data
+                .Skip(state.Page * state.PageSize)
+                .Take(state.PageSize)
+                .ToArray();
+
+            return new TableData<TblGphaLabourRequest>
+            {
+                TotalItems = totalItems,
+                Items = items
+            };
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+
+            return new TableData<TblGphaLabourRequest>
+            {
+                TotalItems = 0,
+                Items = Array.Empty<TblGphaLabourRequest>()
+            };
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        searchString = text;
+        await table.ReloadServerData();
+    }
+
+    private async Task Reload()
+    {
+        await table.ReloadServerData();
+    }
+
+    private async Task OpenCostSheet(int id)
+    {
+        // NavigationManager.NavigateTo($"/operations-costsheet/{id}");
+        var userKey = "DW"; // get from auth/cookie properly
+        var newReqNo = await _unitOfWork.DailyReq.GetNewReqNo(userKey);
+        var model = new RequisitionModel
+        {
+            RequestNo = newReqNo,
+            RequisitionDate = _selectedReq.RequestDate,
+            JobDescription = _selectedReq.JobRequested,
+            GphaRequestId = _selectedReq.LabourRequestId,
+            Weekend = _selectedReq.RDay == "Weekend" ? true : false,
+            Night = _selectedReq.RShift == "Night" ? true : false,
+            Approved = false,
+            ApprovedDate = new DateTime(2000, 01, 01),
+            ShiftType = "Non-Shift",
+            ShipSide = false,
+        };
+        var parameters = new DialogParameters<NewCostSheetDialog> { { x => x.Model, new RequisitionModel() } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<NewCostSheetDialog>("Generate Cost Sheet", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await table.ReloadServerData();
+            // StateHasChanged();
         }
     }
 }
