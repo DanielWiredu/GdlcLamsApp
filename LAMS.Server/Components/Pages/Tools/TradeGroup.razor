@@ -19,7 +19,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudLink Href="@($"/tools-tradegrouprate/{context.TradegroupId}?groupName={Uri.EscapeDataString(context.TradegroupName)}")"> Rates </MudLink>
+            <MudLink Href="@($"/tools-tradegrouprate/{context.TradegroupId}?groupName={Uri.EscapeDataString(context.TradegroupName)}")" Color="Color.Error" Underline="Underline.Always"> Rates </MudLink>
         </MudTd>
         <MudTd DataLabel="Trade Group">@context.TradegroupName</MudTd>
         <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">

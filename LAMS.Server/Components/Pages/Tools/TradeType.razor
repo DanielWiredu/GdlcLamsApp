@@ -5,7 +5,7 @@
 
 <PageBreadcrumb Subtitle="Tools" Title="Trade Type" />
 
-<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblTradeType, bool>(FilterFunc1)">
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<VwTradeType, bool>(FilterFunc1)">
     <ToolBarContent>
         @* <MudText Typo="Typo.h6">Locations</MudText> *@
         <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"> Add New </MudButton>
@@ -13,10 +13,12 @@
         <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
+        <MudTh>Group</MudTh>
         <MudTh>Trade Type</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
+        <MudTd DataLabel="Trade Type">@context.TradegroupName</MudTd>
         <MudTd DataLabel="Trade Type">@context.TradetypeName</MudTd>
         <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small"></MudIconButton>
@@ -31,7 +33,7 @@
 
 @code {
     private string searchString1 = "";
-    private IEnumerable<TblTradeType> Elements = new List<TblTradeType>();
+    private IEnumerable<VwTradeType> Elements = new List<VwTradeType>();
     private TblTradeType? tradeType = new TblTradeType();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -48,11 +50,13 @@
         Elements = await _unitOfWork.Workers.GetTradeTypes();
     }
 
-    private bool FilterFunc1(TblTradeType element) => FilterFunc(element, searchString1);
+    private bool FilterFunc1(VwTradeType element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(TblTradeType element, string searchString)
+    private bool FilterFunc(VwTradeType element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.TradegroupName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if (element.TradetypeName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;

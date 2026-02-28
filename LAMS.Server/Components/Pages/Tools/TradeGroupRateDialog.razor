@@ -7,29 +7,10 @@
         <MudGrid>
             <!-- LEFT COLUMN -->
             <MudItem xs="12" md="6">
-                <MudTextField Label="DLE Name"  @bind-Value="Model.DlecodeCompanyName" Required="true" RequiredError="DLE Name is required" />
-                <MudTextField Label="DLE Address" @bind-Value="Model.Dleaddr" />
-                <MudTextField Label="DLE Telephone" @bind-Value="Model.Dletel" />
-                <MudTextField Label="Email Address" @bind-Value="Model.Email" />
-                <MudSelect T="string" Label="Pattern" @bind-Value="Model.Pattern" Required="true" RequiredError="Pattern is required">
-                    @foreach (var pattern in Patterns)
-                    {
-                        <MudSelectItem Value="@pattern">@pattern</MudSelectItem>
-                    }
-                </MudSelect>
-                <MudNumericField T="double?" Label="Share %" @bind-Value="Model.SharePerc" Adornment="Adornment.End" AdornmentText="%" Immediate="true" HideSpinButtons="true"/>
+                <MudNumericField T="double?" Label="Share %" @bind-Value="Model.Dbwage" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
             </MudItem>
             <!-- RIGHT COLUMN -->
             <MudItem xs="12" md="6">
-                <MudTextField Label="Finance Contact" @bind-Value="Model.Fcontp" />
-                <MudTextField Label="Finance Telephone" @bind-Value="Model.Ftel" />
-                <MudTextField Label="Finance Email" @bind-Value="Model.Femail" />
-                <MudTextField Label="Operation Contact" @bind-Value="Model.Ocontp" />
-                <MudTextField Label="Operation Telephone" @bind-Value="Model.Otel" />
-                <MudTextField Label="Operation Email" @bind-Value="Model.Oemail" />
-                <MudTextField Label="Admin Contact" @bind-Value="Model.Acontp" />
-                <MudTextField Label="Admin Telephone" @bind-Value="Model.Atel" />
-                <MudTextField Label="Admin Email" @bind-Value="Model.Aemail" />
             </MudItem>
         </MudGrid>
     </DialogContent>
@@ -45,18 +26,10 @@
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-    [Parameter] public TblDlecompany Model { get; set; } = new();
+    [Parameter] public TblTradeGroupRate Model { get; set; } = new();
     [Parameter] public bool IsEdit { get; set; }
 
     private bool _isEdit;
-    private List<string> Patterns = new()
-    {
-        "Share Holder",
-        "Non Share Holder",
-        "Non Share Holder Agencies",
-        "Members without Transport",
-        "Others"
-    };
 
     protected override void OnInitialized()
     {
@@ -75,22 +48,16 @@
 
     private async Task Save()
     {
-        if (string.IsNullOrWhiteSpace(Model.DlecodeCompanyName))
-        {
-            _snackbar.Add("DLE Name is required", Severity.Warning);
-            return;
-        }
-
         try
         {
             if (_isEdit)
             {
-                await _unitOfWork.Setups.UpdateDLECompany(Model);
+                // await _unitOfWork.Setups.UpdateDLECompany(Model);
                 _snackbar.Add("DLE Company updated successfully", Severity.Success);
             }
             else
             {
-                await _unitOfWork.Setups.AddDLECompany(Model);
+                // await _unitOfWork.Setups.AddDLECompany(Model);
                 _snackbar.Add("DLE Company added successfully", Severity.Success);
             }
 

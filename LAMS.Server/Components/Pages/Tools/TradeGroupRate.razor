@@ -2,14 +2,16 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
 @inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
 
 <PageBreadcrumb Subtitle="Tools" Title="Trade Group Rate" />
 
+<MudAlert Severity="Severity.Info" Variant="Variant.Filled" Dense="true"> @groupName </MudAlert>
+
 <MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblTradeGroupRate, bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">@groupName</MudText>
-        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"> Add New </MudButton>
-        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Warning" Size="Size.Medium" Href="/tools-tradegroup"> Return </MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord"> Add New </MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Filled" Color="Color.Warning" Size="Size.Medium" Href="/tools-tradegroup"> Return </MudButton>
         <MudSpacer />
         <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -19,10 +21,10 @@
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="EffectiveDate">@context.EffectiveDate</MudTd>
-        <MudTd DataLabel="EndDate">@context.EndDate</MudTd>
+        <MudTd DataLabel="EffectiveDate">@context.EffectiveDate.Value.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="EndDate">@context.EndDate.Value.ToString("dd-MMM-yyyy")</MudTd>
         <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="@(() => SelectGroup(context))"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="@(() => EditRecord(context))"></MudIconButton>
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -51,7 +53,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Elements = await _unitOfWork.Workers.GetTradeGroupRates(0);
+        Elements = await _unitOfWork.Workers.GetTradeGroupRates(tradeGroupId);
     }
 
     private bool FilterFunc1(TblTradeGroupRate element) => FilterFunc(element, searchString1);
@@ -66,8 +68,30 @@
             return true;
         return false;
     }
-    private void SelectGroup(TblTradeGroupRate groupRate)
+    private async Task AddRecord()
     {
+        var parameters = new DialogParameters<TradeGroupRateDialog> { { x => x.Model, new TblTradeGroupRate { Dbwage = 0 } }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = _dialogService.Show<TradeGroupRateDialog>("Add Rate", parameters, options);
+        var result = await dialog.Result;
 
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Workers.GetTradeGroupRates(tradeGroupId);
+            StateHasChanged();
+        }
+    }
+    private async Task EditRecord(TblTradeGroupRate groupRate)
+    {
+        var parameters = new DialogParameters<TradeGroupRateDialog> { { x => x.Model, groupRate }, { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = _dialogService.Show<TradeGroupRateDialog>("Edit Rate", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Workers.GetTradeGroupRates(tradeGroupId);
+            StateHasChanged();
+        }
     }
 }

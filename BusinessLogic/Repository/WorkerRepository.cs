@@ -66,10 +66,10 @@ namespace BusinessLogic.Repository
             string query = $"SELECT TradetypeID,TradetypeNAME FROM [tblTradeType] WHERE TradegroupID=@TradeGroupID";
             return await _db.LoadData<TblTradeType, dynamic>(query: query, new { TradeGroupID = tradeGroupId });
         }
-        public async Task<IEnumerable<TblTradeType>> GetTradeTypes()
+        public async Task<IEnumerable<VwTradeType>> GetTradeTypes()
         {
-            string query = $"SELECT TradetypeID,TradetypeNAME FROM [tblTradeType]";
-            return await _db.LoadData<TblTradeType, dynamic>(query: query, new { });
+            string query = $"SELECT * FROM [vwTradeType]";
+            return await _db.LoadData<VwTradeType, dynamic>(query: query, new { });
         }
         public async Task<int> UpdateWorker(TblWorker worker)
         {
