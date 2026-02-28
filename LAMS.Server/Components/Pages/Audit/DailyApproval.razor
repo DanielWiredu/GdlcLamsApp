@@ -6,6 +6,7 @@
 @inject ISnackbar _snackbar
 @inject IDialogService _dialogService
 @inject ICurrentUserService _currentUser
+@inject IConfiguration _config
 
 <PageBreadcrumb Subtitle="Audit" Title="Daily Requisition Approval" />
 
@@ -18,9 +19,7 @@
     <MudText Class="mx-2" Style="color:green"> Approval Date </MudText>
     <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="@(Model.Approved)" DateFormat="yyyy-MM-dd" Dense="true" ShowToolbar="false" Style="max-width:400px;" />
     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)"
-               Href="@($"http://172.29.255.101/Reports/Daily/General/vwDailyCostSheet.aspx?reqno={Model.RequestNo}&st={Model.RequisitionDate:yyyy-MM-dd}&ed={Model.RequisitionDate:yyyy-MM-dd}")"
-               Target="_blank"> Print </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)" Href="@ReportUrl" Target="_blank"> Print </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : Model.Approved)" OnClick="ApproveDailyReq"> Approve </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Disabled="@(!Model.Approved)" OnClick="DisapproveDailyReq"> Disapprove </MudButton>
 </MudPaper>
@@ -30,7 +29,19 @@
     public string? RequestNo { get; set; }
     private RequisitionModel Model = new();
     private bool IsEdit => !string.IsNullOrEmpty(RequestNo);
+    private string ReportUrl
+    {
+        get
+        {
+            if (Model?.RequisitionDate is not DateTime date)
+                return string.Empty;
 
+            return $"{_config["ReportAppUrl"]}/Reports/Daily/General/vwDailyCostSheet.aspx" +
+                   $"?reqno={Model.RequestNo}" +
+                   $"&st={date:yyyy-MM-dd 00:00:00}" +
+                   $"&ed={date.AddDays(1).AddSeconds(-1):yyyy-MM-dd 23:59:59}";
+        }
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
