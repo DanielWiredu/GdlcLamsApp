@@ -6,7 +6,9 @@
 
 <PageBreadcrumb Subtitle="Tools" Title="Trade Group Rate" />
 
-<MudAlert Severity="Severity.Info" Variant="Variant.Filled" Dense="true"> @groupName </MudAlert>
+<div class="alert alert-info text-bg-secondary alert-dismissible" role="alert">
+    <div> @groupName </div>
+</div>
 
 <MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblTradeGroupRate, bool>(FilterFunc1)">
     <ToolBarContent>
@@ -22,7 +24,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="EffectiveDate">@context.EffectiveDate.Value.ToString("dd-MMM-yyyy")</MudTd>
-        <MudTd DataLabel="EndDate">@context.EndDate.Value.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="EndDate">@context.EndDate?.ToString("dd-MMM-yyyy")</MudTd>
         <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="@(() => EditRecord(context))"></MudIconButton>
         </MudTd>
@@ -70,7 +72,26 @@
     }
     private async Task AddRecord()
     {
-        var parameters = new DialogParameters<TradeGroupRateDialog> { { x => x.Model, new TblTradeGroupRate { Dbwage = 0 } }, { x => x.IsEdit, false } };
+        var groupRate = new TblTradeGroupRate
+        {
+            Dbwage = 0,
+            DbwageWkend = 0,
+            DBWageHday = 0,
+            HourOtimeWkday = 0,
+            HourOtimeWkend = 0,
+            HourOtimeHday = 0,
+            Nawkday = 0,
+            Nawkend = 0,
+            NAHday = 0,
+            ShiftAllowance = 0,
+            Transport = 0,
+            Subsidy = 0,
+            Ppemedical = 0,
+            Bussing = 0
+        };
+        groupRate = (await _unitOfWork.Workers.GetTradeGroupRates(tradeGroupId)).OrderByDescending(x => x.Id).FirstOrDefault() ?? groupRate;
+        groupRate.EffectiveDate = DateTime.Now;
+        var parameters = new DialogParameters<TradeGroupRateDialog> { { x => x.Model, groupRate }, { x => x.IsEdit, false } };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Large, FullWidth = true };
         var dialog = _dialogService.Show<TradeGroupRateDialog>("Add Rate", parameters, options);
         var result = await dialog.Result;

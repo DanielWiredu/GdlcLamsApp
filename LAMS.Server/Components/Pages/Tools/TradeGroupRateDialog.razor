@@ -7,11 +7,33 @@
         <MudGrid>
             <!-- LEFT COLUMN -->
             <MudItem xs="12" md="6">
-                <MudNumericField T="double?" Label="Share %" @bind-Value="Model.Dbwage" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Basic Wage (Non-Shift)" @bind-Value="Model.Dbwage" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Basic Wage (S-80%)" @bind-Value="Model.DbwageWkend" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Basic Wage (S-100%)" @bind-Value="Model.DBWageHday" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Incentive (Non-Shift)" @bind-Value="Model.HourOtimeWkday" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Incentive (S-80%)" @bind-Value="Model.HourOtimeWkend" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Incentive (S-100%)" @bind-Value="Model.HourOtimeHday" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Night Allowance (Non-Shift)" @bind-Value="Model.Nawkday" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Night Allowance (S-80%)" @bind-Value="Model.Nawkend" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Night Allowance (S-100%)" @bind-Value="Model.NAHday" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
             </MudItem>
             <!-- RIGHT COLUMN -->
             <MudItem xs="12" md="6">
+                <MudNumericField T="double?" Label="Shift Allowance" @bind-Value="Model.ShiftAllowance" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Transport Allowance" @bind-Value="Model.Transport" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Subsidy" @bind-Value="Model.Subsidy" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="PPE Medicals" @bind-Value="Model.Ppemedical" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+                <MudNumericField T="double?" Label="Bussing" @bind-Value="Model.Bussing" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
             </MudItem>
+            <MudItem xs="12" md="12">
+                <MudDatePicker Label="Effective Date" @bind-Date="Model.EffectiveDate" Required="true" RequiredError="Field is required" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+            </MudItem>
+            @if (_isEdit)
+            {
+                <MudItem xs="12" md="12">
+                    <MudDatePicker Label="End Date" @bind-Date="Model.EndDate" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+                </MudItem>
+            }
         </MudGrid>
     </DialogContent>
     <DialogActions>
@@ -53,12 +75,12 @@
             if (_isEdit)
             {
                 // await _unitOfWork.Setups.UpdateDLECompany(Model);
-                _snackbar.Add("DLE Company updated successfully", Severity.Success);
+                // _snackbar.Add("DLE Company updated successfully", Severity.Success);
             }
             else
             {
                 // await _unitOfWork.Setups.AddDLECompany(Model);
-                _snackbar.Add("DLE Company added successfully", Severity.Success);
+                // _snackbar.Add("DLE Company added successfully", Severity.Success);
             }
 
             MudDialog.Close(DialogResult.Ok(true));

@@ -54,4 +54,9 @@ public partial class TblTradeGroupRate
     public string? UpdatedBy { get; set; }
 
     public DateTime? UpdatedDate { get; set; }
+    public double? DBWageHday { get; set; }
+    public double? HourOtimeHday { get; set; }
+    public double? NAHday { get; set; }
+    public double? ShiftAllowance { get; set; }
+
 }

@@ -1,4 +1,5 @@
-﻿using AppModels.DailyReq;
+﻿using AppModels;
+using AppModels.DailyReq;
 using DataAccess.DbAccess;
 using DataAccess.Models;
 using System;
@@ -26,5 +27,6 @@ namespace BusinessLogic.Repository.IRepository
         Task<int> UpdateDailyReqHours(UpdateReqHoursRequest request);
         Task<IEnumerable<TblGphaLabourRequest>> GetGPHAPendingRequests(DateTime StartDate, DateTime EndDate, string SearchValue);
         Task<int> AddDailyReqGPHARequest(RequisitionModel request);
+        Task<(int costSheets, int returnValue)> ProcessDailyReq(PayrollProcessRequest request);
     }
 }

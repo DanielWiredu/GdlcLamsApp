@@ -1,17 +1,92 @@
 ﻿@page "/audit-dailypayroll"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject ICurrentUserService _currentUser
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Audit" Title="Daily Payroll Process" />
 
+<div class="alert alert-info text-bg-info alert-dismissible" role="alert">
+    <div> NOTE : Current Date is   @DateTime.UtcNow.ToLongDateString(); </div>
+</div>
+
+<MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
+    <MudGrid>
+        <MudItem xs="12" md="3"></MudItem>
+        <MudItem xs="12" md="3">
+            <MudDatePicker Label="Start Date" @bind-Date="_startdate" Required="true" RequiredError="Field is required" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudDatePicker Label="End Date" @bind-Date="_enddate" Required="true" RequiredError="Field is required" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+        </MudItem>
+        <MudItem xs="12" md="3"></MudItem>
+    </MudGrid>
+
+    <MudDivider></MudDivider>
+    <br />
+    <br />
+    <br />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Medium" Disabled="_isProcessing" OnClick="ProcessPayroll"> 
+        @if (_isProcessing)
+        {
+            <MudProgressCircular Size="Size.Small" Color="Color.Inherit" Indeterminate="true" Class="ml-2" />
+            <MudText Class="ms-2">Processing...</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.body2"> PROCESS PAYROLL </MudText>
+        }
+    </MudButton>
+
+</MudPaper>
+
 @code {
+    private DateTime? _startdate = DateTime.Today;
+    private DateTime? _enddate = DateTime.Today;
+    private bool _isProcessing = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+    private async Task ProcessPayroll()
+    {
+        try
+        {
+             _isProcessing = true;
+            StateHasChanged();
+
+            var userId = await _currentUser.GetUserIdAsync();
+            var request = new PayrollProcessRequest
+            {
+                startdate = _startdate.Value,
+                enddate = _enddate.Value,
+                processedby = userId
+            };
+            var response = await _unitOfWork.DailyReq.ProcessDailyReq(request);
+            if (response.costSheets == 0)
+            {
+                _snackbar.Add("There are No Approved Cost Sheets within the selected date range", Severity.Warning);
+                return;
+            }
+            if (response.returnValue == 0)
+                _snackbar.Add($"{response.costSheets} Cost Sheets Processed Successfully", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged();
         }
     }
 }

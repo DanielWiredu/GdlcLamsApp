@@ -1,4 +1,5 @@
-﻿using AppModels.DailyReq;
+﻿using AppModels;
+using AppModels.DailyReq;
 using BusinessLogic.Repository.IRepository;
 using Dapper;
 using DataAccess.DbAccess;
@@ -217,6 +218,20 @@ namespace BusinessLogic.Repository
 
             await _db.ExecuteSP(storedProcedure: "spAddDailyReq_GPHARequest", parameters);
             return parameters.Get<int>("@return_value");
+        }
+        public async Task<(int costSheets, int returnValue)> ProcessDailyReq(PayrollProcessRequest request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@startdate", request.startdate);
+            parameters.Add("@enddate", request.enddate);
+            parameters.Add("@processedby", request.processedby);
+            parameters.Add("@processedCostSheets", null, dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _db.ExecuteSP(storedProcedure: "spProcessDailyReq", parameters);
+            var costSheets = parameters.Get<int>("@processedCostSheets");
+            var returnValue = parameters.Get<int>("@return_value");
+            return (costSheets, returnValue);
         }
     }
 }
