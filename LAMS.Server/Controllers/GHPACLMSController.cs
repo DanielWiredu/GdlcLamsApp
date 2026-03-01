@@ -30,9 +30,9 @@ namespace LAMS.Server.Controllers
             {
                 var labourRequestSql = @"
                 INSERT INTO GPHALabourRequests
-                (Id, RequestDate, LabourRequestId, UnitDescription, JobDescription, NumberRequested, NeededOn, RequestId, DayType, WorkShift, GeoLocation)
+                (Id, RequestDate, LabourRequestId, UnitDescription, JobDescription, NumberRequested, NeededOn, RequestId, CompanySecret, CompanyKey, GeoLocation, WeekType, Shift)
                 VALUES
-                (@Id, @RequestDate, @LabourRequestId, @UnitDescription, @JobDescription, @NumberRequested, @NeededOn, @RequestId, @DayType, @WorkShift, @GeoLocation)";
+                (@Id, @RequestDate, @LabourRequestId, @UnitDescription, @JobDescription, @NumberRequested, @NeededOn, @RequestId, @CompanySecret, @CompanyKey, @GeoLocation, @WeekType, @Shift)";
 
                 await connection.ExecuteAsync(labourRequestSql, request,  transaction);
 

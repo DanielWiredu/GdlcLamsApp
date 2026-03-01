@@ -16,9 +16,12 @@ namespace AppModels
         public int NumberRequested { get; set; }
         public DateTime NeededOn { get; set; }
         public string? RequestId { get; set; }
-        public string? DayType { get; set; }
-        public string? WorkShift { get; set; }
+        public string? CompanySecret { get; set; }
+        public string? CompanyKey { get; set; }
         public string? GeoLocation { get; set; }
+        public string? Shift { get; set; }
+        public string? WeekType { get; set; }
+
     }
     public class GPHACreateCostSheetRequest
     {
