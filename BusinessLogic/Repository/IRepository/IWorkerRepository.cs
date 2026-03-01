@@ -20,5 +20,7 @@ namespace BusinessLogic.Repository.IRepository
         Task<int> UpdateWorker(TblWorker worker);
         Task<(int AutoNo, int ReturnValue, string GPHAGroupId, string GPHAJobId)> AddWorker(TblWorker worker);
         Task<int> UpdateWorkerStatus(SetStatusRequest request);
+        Task<int> AddTradeGroupRate(TblTradeGroupRate request);
+        Task<int> UpdateTradeGroupRate(TblTradeGroupRate request);
     }
 }

@@ -1,0 +1,121 @@
+﻿@page "/reports-dailyreq"
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime;
+@inject IConfiguration _config
+
+<PageBreadcrumb Subtitle="Reports" Title="Daily Requisitions" />
+
+<div class="alert alert-info text-bg-info alert-dismissible" role="alert">
+    <div> Generate All Daily Reports Here </div>
+</div>
+
+<MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
+    <MudGrid>
+        <MudItem xs="12" md="1"></MudItem>
+        <MudItem xs="12" md="4">
+            <MudSelect T="string" Label="Report Type" @bind-Value="selectedReportType" Required="true" RequiredError="Pattern is required">
+                @foreach (var report in reportTypes)
+                {
+                    <MudSelectItem Value="@report">@report</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudDatePicker Label="Start Date" @bind-Date="_startdate" Required="true" RequiredError="Field is required" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudDatePicker Label="End Date" @bind-Date="_enddate" Required="true" RequiredError="Field is required" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+        </MudItem>
+        <MudItem xs="12" md="1"></MudItem>
+    </MudGrid>
+
+    <MudDivider></MudDivider>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Medium" OnClick="GenerateReport"> Generate Report </MudButton>
+
+</MudPaper>
+
+@code {
+    private DateTime? _startdate = DateTime.Today;
+    private DateTime? _enddate = DateTime.Today;
+    private List<string> reportTypes = new()
+    {
+    "Daily Worker List",
+    "Daily Active Worker List",
+    "Daily Active Worker List - SSF",
+    "Daily Active Vessel List",
+    "Daily Cost Sheet",
+    "Daily Cost Sheet - Unapproved",
+    "Daily Approved Cost Sheet",
+    "Daily Processed",
+    "Daily Invoice",
+    "Daily Payroll",
+    "Daily Report Listing",
+    };
+    private string selectedReportType;
+
+    // Dynamically build the report URL based on the selected report type
+    private string ReportUrl
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(selectedReportType) || _startdate is not DateTime startDate || _enddate is not DateTime endDate)
+                return string.Empty;
+
+            string baseUrl = _config["ReportAppUrl"] ?? "";
+            string dateRange = GetDateRange(startDate, endDate);
+            // Logic to return different URLs based on report type
+            return selectedReportType switch
+            {
+                "Daily Worker List" => $"{baseUrl}/Reports/Daily/General/vwWorkerList.aspx",
+
+                "Daily Active Worker List" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveWorkerList.aspx?" + dateRange,
+
+                "Daily Active Worker List - SSF" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveWorkerListSSF.aspx?" + dateRange,  
+                
+                "Daily Active Vessel List" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveVessel.aspx?" + dateRange,
+
+                "Daily Cost Sheet" => $"{baseUrl}/Reports/Daily/General/vwDailyCostSheet_All.aspx?" + dateRange,
+
+                "Daily Processed" => $"{baseUrl}/Reports/Daily/Approved/vwDailyProcessedNew.aspx?" + dateRange,
+
+                _ => string.Empty // Default case if no match
+            };
+        }
+    }
+    // Common date formatting logic
+    private string GetDateRange(DateTime startDate, DateTime endDate)
+    {
+        string start = startDate.ToString("M/d/yyyy 00:00:00");
+        string end = endDate.ToString("M/d/yyyy 23:59:59");
+        return $"st={start}&ed={end}";
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+
+    // Call this method to trigger the report generation
+    private async Task GenerateReport()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(ReportUrl))
+            {
+                await JsRuntime.InvokeVoidAsync("ShowSwal", "error", "Please select a valid report type.");
+                return;
+            }
+
+            // Redirect to the generated URL for the selected report
+            await JsRuntime.InvokeVoidAsync("open", ReportUrl, "_blank");
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+        }
+    }
+}

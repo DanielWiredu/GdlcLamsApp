@@ -192,5 +192,71 @@ namespace BusinessLogic.Repository
             await _db.ExecuteSP("spSetWorkerStatus", parameters);
             return parameters.Get<int>("@return_value");
         }
+        public async Task<int> AddTradeGroupRate(TblTradeGroupRate request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@TradegroupID", request.TradegroupId, DbType.Int32);
+            parameters.Add("@DBWage", request.Dbwage, DbType.Double);
+            parameters.Add("@DBWageWkend", request.DbwageWkend, DbType.Double);
+            parameters.Add("@DBWageHday", request.DBWageHday, DbType.Double);
+            parameters.Add("@HourOtimeWkday", request.HourOtimeWkday, DbType.Double);
+            parameters.Add("@HourOtimeWkend", request.HourOtimeWkend, DbType.Double);
+            parameters.Add("@HourOtimeHday", request.HourOtimeHday, DbType.Double);
+            parameters.Add("@NAWkday", request.Nawkday, DbType.Double);
+            parameters.Add("@NAWkend", request.Nawkend, DbType.Double);
+            parameters.Add("@NAHday", request.NAHday, DbType.Double);
+            parameters.Add("@ShiftAllowance", request.ShiftAllowance, DbType.Double);
+            parameters.Add("@Transport", request.Transport, DbType.Double);
+            parameters.Add("@DBWageDLE", request.DbwageDle, DbType.Double);
+            parameters.Add("@DBWageWkendDLE", request.DbwageWkendDle, DbType.Double);
+            parameters.Add("@HourOtimeWkdayDLE", request.HourOtimeWkdayDle, DbType.Double);
+            parameters.Add("@HourOtimeWkendDLE", request.HourOtimeWkendDle, DbType.Double);
+            parameters.Add("@NAWkdayDLE", request.NawkdayDle, DbType.Double);
+            parameters.Add("@NAWkendDLE", request.NawkendDle, DbType.Double);
+            parameters.Add("@Subsidy", request.Subsidy, DbType.Double);
+            parameters.Add("@PPEMedical", request.Ppemedical, DbType.Double);
+            parameters.Add("@Bussing", request.Bussing, DbType.Double);
+            parameters.Add("@EffectiveDate", request.EffectiveDate, DbType.DateTime);
+            parameters.Add("@CreatedBy", request.CreatedBy, DbType.String);
+            parameters.Add("@return_value", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+            await _db.ExecuteSP("spAddTradeGroupRate", parameters);
+            return parameters.Get<int>("@return_value");
+        }
+        public async Task<int> UpdateTradeGroupRate(TblTradeGroupRate request)
+        {
+            string query = @"UPDATE tblTradeGroupRates SET DBWage=@DBWage, DBWageWkend=@DBWageWkend, DBWageHday=@DBWageHday, HourOtimeWkday=@HourOtimeWkday, 
+            HourOtimeWkend=@HourOtimeWkend, HourOtimeHday=@HourOtimeHday, NAWkday=@NAWkday, NAWkend=@NAWkend, NAHday=@NAHday, ShiftAllowance=@ShiftAllowance, 
+            Transport=@Transport, DBWageDLE=@DBWageDLE, DBWageWkendDLE=@DBWageWkendDLE, HourOtimeWkdayDLE=@HourOtimeWkdayDLE, HourOtimeWkendDLE=@HourOtimeWkendDLE,
+            NAWkdayDLE=@NAWkdayDLE, NAWkendDLE=@NAWkendDLE, Subsidy=@Subsidy, PPEMedical=@PPEMedical, Bussing=@Bussing, UpdateStatus=@UpdateStatus, 
+            UpdatedBy=@UpdatedBy, UpdatedDate=@UpdatedDate WHERE ID=@ID";
+            var parameters = new DynamicParameters();
+            parameters.Add("@DBWage", request.Dbwage, DbType.Double);
+            parameters.Add("@DBWageWkend", request.DbwageWkend, DbType.Double);
+            parameters.Add("@DBWageHday", request.DBWageHday, DbType.Double);
+            parameters.Add("@HourOtimeWkday", request.HourOtimeWkday, DbType.Double);
+            parameters.Add("@HourOtimeWkend", request.HourOtimeWkend, DbType.Double);
+            parameters.Add("@HourOtimeHday", request.HourOtimeHday, DbType.Double);
+            parameters.Add("@NAWkday", request.Nawkday, DbType.Double);
+            parameters.Add("@NAWkend", request.Nawkend, DbType.Double);
+            parameters.Add("@NAHday", request.NAHday, DbType.Double);
+            parameters.Add("@ShiftAllowance", request.ShiftAllowance, DbType.Double);
+            parameters.Add("@Transport", request.Transport, DbType.Double);
+            parameters.Add("@DBWageDLE", request.DbwageDle, DbType.Double);
+            parameters.Add("@DBWageWkendDLE", request.DbwageWkendDle, DbType.Double);
+            parameters.Add("@HourOtimeWkdayDLE", request.HourOtimeWkdayDle, DbType.Double);
+            parameters.Add("@HourOtimeWkendDLE", request.HourOtimeWkendDle, DbType.Double);
+            parameters.Add("@NAWkdayDLE", request.NawkdayDle, DbType.Double);
+            parameters.Add("@NAWkendDLE", request.NawkendDle, DbType.Double);
+            parameters.Add("@Subsidy", request.Subsidy, DbType.Double);
+            parameters.Add("@PPEMedical", request.Ppemedical, DbType.Double);
+            parameters.Add("@Bussing", request.Bussing, DbType.Double);
+            parameters.Add("@UpdateStatus", 1, DbType.Int32);
+            parameters.Add("@UpdatedBy", request.UpdatedBy, DbType.String);
+            parameters.Add("@UpdatedDate", request.UpdatedDate, DbType.DateTime);
+            parameters.Add("@ID", request.Id, DbType.Int32);
+            parameters.Add("@return_value", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+            await _db.SaveData(query, parameters);
+            return parameters.Get<int>("@return_value");
+        }
     }
 }

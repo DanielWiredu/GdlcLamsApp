@@ -1,6 +1,7 @@
 ﻿@inject IUnitOfWork _unitOfWork
 @inject ISnackbar _snackbar
 @inject IJSRuntime JsRuntime;
+@inject ICurrentUserService _currentUser
 
 <MudDialog MaxWidth="MaxWidth.ExtraLarge" FullWidth="true" Class="draggable-dialog">
     <DialogContent>
@@ -25,12 +26,12 @@
                 <MudNumericField T="double?" Label="PPE Medicals" @bind-Value="Model.Ppemedical" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
                 <MudNumericField T="double?" Label="Bussing" @bind-Value="Model.Bussing" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
             </MudItem>
-            <MudItem xs="12" md="12">
+            <MudItem xs="12" md="6">
                 <MudDatePicker Label="Effective Date" @bind-Date="Model.EffectiveDate" Required="true" RequiredError="Field is required" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
             </MudItem>
             @if (_isEdit)
             {
-                <MudItem xs="12" md="12">
+                <MudItem xs="12" md="6">
                     <MudDatePicker Label="End Date" @bind-Date="Model.EndDate" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
                 </MudItem>
             }
@@ -72,15 +73,25 @@
     {
         try
         {
+            var userId = await _currentUser.GetUserIdAsync();
             if (_isEdit)
             {
-                // await _unitOfWork.Setups.UpdateDLECompany(Model);
-                // _snackbar.Add("DLE Company updated successfully", Severity.Success);
+                Model.UpdatedBy = userId;
+                Model.UpdatedDate = DateTime.UtcNow;
+                int response = await _unitOfWork.Workers.UpdateTradeGroupRate(Model);
+                if (response == 1)
+                    _snackbar.Add("Trade Group Rate Updated Successfully", Severity.Success);
             }
             else
             {
-                // await _unitOfWork.Setups.AddDLECompany(Model);
-                // _snackbar.Add("DLE Company added successfully", Severity.Success);
+                Model.CreatedBy = userId;
+                int response = await _unitOfWork.Workers.AddTradeGroupRate(Model);
+                if (response == 0)
+                    _snackbar.Add("Trade Group Rate Saved Successfully", Severity.Success);
+                else if (response == -20)
+                    _snackbar.Add("A rate with the same effective date already exist for this Group", Severity.Error);
+                else if (response == -19)
+                    _snackbar.Add("Effective Date should be greater than that of existing rate for this Group", Severity.Error);
             }
 
             MudDialog.Close(DialogResult.Ok(true));

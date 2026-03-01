@@ -503,15 +503,43 @@
             </li>
 
             <li class="side-nav-item">
+                <a data-bs-toggle="collapse" href="#sidebarMiscellaneous" aria-expanded="false"
+                   aria-controls="sidebarMiscellaneous" class="side-nav-link">
+                    <span class="menu-icon"><i data-lucide="house-plug"></i></span>
+                    <span class="menu-text" data-lang=""> Reports </span>
+                    <span class="menu-arrow"></span>
+                </a>
+                <div class="collapse" id="sidebarMiscellaneous">
+                    <ul class="sub-menu">
+                        <li class="side-nav-item">
+                            <a href="/reports-dailyreq" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Daily Reports</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="#" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Weekly Reports</span>
+                            </a>
+                        </li>
+                        <li class="side-nav-item">
+                            <a href="#" class="side-nav-link">
+                                <span class="menu-text" data-lang="">Monthly Reports</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            @* <li class="side-nav-item">
                 <a href="/landing" target="_blank" class="side-nav-link">
                     <span class="menu-icon"><i data-lucide="earth"></i></span>
                     <span class="menu-text" data-lang="">Customize Payroll</span>
                 </a>
-            </li>
+            </li> *@
 
             <li class="side-nav-item">
                 <a href="/hangfire" target="_blank" class="side-nav-link">
-                    <span class="menu-icon"><i data-lucide="handshake"></i></span>
+                    <span class="menu-icon"><i data-lucide="life-buoy"></i></span>
                     <span class="menu-text" data-lang="">Background Services</span>
                 </a>
             </li>
