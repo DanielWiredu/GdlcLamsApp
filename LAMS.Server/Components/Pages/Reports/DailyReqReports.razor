@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
 @inject IConfiguration _config
+@inject IDialogService _dialogService
 
 <PageBreadcrumb Subtitle="Reports" Title="Daily Requisitions" />
 
@@ -45,7 +46,7 @@
     "Daily Active Worker List - SSF",
     "Daily Active Vessel List",
     "Daily Cost Sheet",
-    "Daily Cost Sheet - Unapproved",
+    // "Daily Cost Sheet - Unapproved",
     "Daily Approved Cost Sheet",
     "Daily Processed",
     "Daily Invoice",
@@ -53,35 +54,44 @@
     "Daily Report Listing",
     };
     private string selectedReportType;
-
+    private string workerType;
     // Dynamically build the report URL based on the selected report type
-    private string ReportUrl
+    private string ReportUrl;
+    private void BuildReportUrl()
     {
-        get
+        if (string.IsNullOrEmpty(selectedReportType) || _startdate is not DateTime startDate || _enddate is not DateTime endDate)
         {
-            if (string.IsNullOrEmpty(selectedReportType) || _startdate is not DateTime startDate || _enddate is not DateTime endDate)
-                return string.Empty;
-
-            string baseUrl = _config["ReportAppUrl"] ?? "";
-            string dateRange = GetDateRange(startDate, endDate);
-            // Logic to return different URLs based on report type
-            return selectedReportType switch
-            {
-                "Daily Worker List" => $"{baseUrl}/Reports/Daily/General/vwWorkerList.aspx",
-
-                "Daily Active Worker List" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveWorkerList.aspx?" + dateRange,
-
-                "Daily Active Worker List - SSF" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveWorkerListSSF.aspx?" + dateRange,  
-                
-                "Daily Active Vessel List" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveVessel.aspx?" + dateRange,
-
-                "Daily Cost Sheet" => $"{baseUrl}/Reports/Daily/General/vwDailyCostSheet_All.aspx?" + dateRange,
-
-                "Daily Processed" => $"{baseUrl}/Reports/Daily/Approved/vwDailyProcessedNew.aspx?" + dateRange,
-
-                _ => string.Empty // Default case if no match
-            };
+            ReportUrl = string.Empty;
+            return;
         }
+
+        string baseUrl = _config["ReportAppUrl"] ?? "";
+        string dateRange = GetDateRange(startDate, endDate);
+
+        ReportUrl = selectedReportType switch
+        {
+            "Daily Worker List" => $"{baseUrl}/Reports/Daily/General/vwWorkerList.aspx",
+
+            "Daily Active Worker List" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveWorkerList.aspx?" + dateRange,
+
+            "Daily Active Worker List - SSF" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveWorkerListSSF.aspx?" + dateRange,
+
+            "Daily Active Vessel List" => $"{baseUrl}/Reports/Daily/General/vwDailyActiveVessel.aspx?" + dateRange,
+
+            "Daily Cost Sheet" => $"{baseUrl}/Reports/Daily/General/vwDailyCostSheet_All.aspx?" + dateRange,
+
+            "Daily Approved Cost Sheet" => $"{baseUrl}/Reports/Daily/Approved/vwDailyApprovedCostSheet.aspx?workerType={workerType}&" + dateRange,
+
+            "Daily Processed" => $"{baseUrl}/Reports/Daily/Approved/vwDailyProcessedNew.aspx?" + dateRange,
+
+            "Daily Invoice" => $"{baseUrl}/Reports/Daily/Approved/vwDailyInvoiceNew.aspx?" + dateRange,
+
+            "Daily Payroll" => $"{baseUrl}/Reports/Daily/Approved/vwDailyPayroll.aspx?workerType={workerType}&" + dateRange,
+
+            "Daily Report Listing" => $"{baseUrl}/Reports/Daily/Approved/vwDailyReportListing.aspx?" + dateRange,
+
+            _ => string.Empty // Default case if no match
+        };
     }
     // Common date formatting logic
     private string GetDateRange(DateTime startDate, DateTime endDate)
@@ -100,10 +110,63 @@
     }
 
     // Call this method to trigger the report generation
+    // private async Task GenerateReport()
+    // {
+    //     try
+    //     {
+    //         if (string.IsNullOrEmpty(ReportUrl))
+    //         {
+    //             await JsRuntime.InvokeVoidAsync("ShowSwal", "error", "Please select a valid report type.");
+    //             return;
+    //         }
+
+    //         // Redirect to the generated URL for the selected report
+    //         await JsRuntime.InvokeVoidAsync("open", ReportUrl, "_blank");
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+    //     }
+    // }
+
+    // Call this method to trigger the report generation
     private async Task GenerateReport()
     {
         try
         {
+            // If the selected report type requires extra parameters (workerType), open the dialog
+            if (selectedReportType == "Daily Approved Cost Sheet" || selectedReportType == "Daily Payroll")
+            {
+                var parameters = new DialogParameters<WorkerTypeDialog> { };
+                var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+                var dialog = _dialogService.Show<WorkerTypeDialog>("Select Worker Type", parameters, options);
+                var result = await dialog.Result;
+                if (!result.Canceled && result.Data is string selectedWorkerType)
+                {
+                    workerType = selectedWorkerType;
+                }
+                else
+                {
+                    workerType = string.Empty;
+                }
+
+                if (string.IsNullOrEmpty(workerType))
+                {
+                    await JsRuntime.InvokeVoidAsync("ShowSwal", "error", "Worker type selection is required for this report.");
+                    return;
+                }
+            }
+
+            BuildReportUrl();
+
+            if (selectedReportType == "Daily Approved Cost Sheet" && !string.IsNullOrEmpty(workerType))
+            {
+                if (workerType == "W" || workerType == "M")
+                {
+                    ReportUrl = ReportUrl.Replace("vwDailyApprovedCostSheet", "vwDailyPayslip");
+                }
+            }
+
             if (string.IsNullOrEmpty(ReportUrl))
             {
                 await JsRuntime.InvokeVoidAsync("ShowSwal", "error", "Please select a valid report type.");

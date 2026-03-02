@@ -1,0 +1,110 @@
+﻿@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+@inject IJSRuntime JsRuntime;
+@inject ICurrentUserService _currentUser
+
+<MudDialog MaxWidth="MaxWidth.ExtraLarge" FullWidth="true" Class="draggable-dialog">
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12" md="3">
+                <MudNumericField T="double?" Label="Union Dues" @bind-Value="Model.UnionDues" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="PF Employee" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.ProvidentFundEmployee" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Premium ShareHolder" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.PremiumShareHolder" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Tax On Basic" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.TaxOnBasic" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="On Board Allowance" @bind-Value="Model.OnBoardAllowance" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Medicals" @bind-Value="Model.Medicals" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudNumericField T="double?" Label="Welfare" @bind-Value="Model.Welfare" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="PF Employer" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.ProvidentFundEmployer" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Premium Non Shareholder" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.PremiumNonShareHolder" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Tax On Overtime" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.TaxOnOvertime" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="VAT" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.Vat" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Tax on Night" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.TaxOnNight" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudNumericField T="double?" Label="SSF Employee" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.Ssfemployee" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Annual Bonus" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.AnnualBonus" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Premium Without Transport" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.PremiumWithoutTt" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Tax on Provident Fund" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.TaxOnProvidentFund" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Get Fund" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.GetFund" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudDatePicker Label="Effective Date" @bind-Date="Model.EffectiveDate" Required="true" RequiredError="Field is required" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudNumericField T="double?" Label="SSF Employer" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.Ssfemployer" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Annual Leave" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.AnnualLeave" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Tax on Bonus" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.TaxOnBonus" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="Tax on Transport" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.TaxOnTransport" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                <MudNumericField T="double?" Label="NHIL" Adornment="Adornment.End" AdornmentText="%" @bind-Value="Model.Nhil" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F3" />
+                @if (_isEdit)
+                {
+                    <MudDatePicker Label="End Date" @bind-Date="Model.EndDate" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+                }
+            </MudItem>         
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Default"> Cancel </MudButton>
+        <MudButton OnClick="Save" Color="Color.Success"  Variant="Variant.Filled">
+            @(_isEdit ? "Update" : "Save")
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public TblPayrollSetup Model { get; set; } = new();
+    [Parameter] public bool IsEdit { get; set; }
+
+    private bool _isEdit;
+
+    protected override void OnInitialized()
+    {
+        _isEdit = IsEdit;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("makeDialogDraggable", ".draggable-dialog");
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task Save()
+    {
+        // try
+        // {
+        //     var userId = await _currentUser.GetUserIdAsync();
+        //     if (_isEdit)
+        //     {
+        //         Model.UpdatedBy = userId;
+        //         Model.UpdatedDate = DateTime.UtcNow;
+        //         int response = await _unitOfWork.Workers.UpdateTradeGroupRate(Model);
+        //         if (response == 1)
+        //             _snackbar.Add("Trade Group Rate Updated Successfully", Severity.Success);
+        //     }
+        //     else
+        //     {
+        //         Model.CreatedBy = userId;
+        //         int response = await _unitOfWork.Workers.AddTradeGroupRate(Model);
+        //         if (response == 0)
+        //             _snackbar.Add("Trade Group Rate Saved Successfully", Severity.Success);
+        //         else if (response == -20)
+        //             _snackbar.Add("A rate with the same effective date already exist for this Group", Severity.Error);
+        //         else if (response == -19)
+        //             _snackbar.Add("Effective Date should be greater than that of existing rate for this Group", Severity.Error);
+        //     }
+
+        //     MudDialog.Close(DialogResult.Ok(true));
+        // }
+        // catch (Exception ex)
+        // {
+        //     _snackbar.Add($"Error saving record: {ex.Message}", Severity.Error);
+        // }
+    }
+}

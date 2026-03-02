@@ -71,6 +71,11 @@ namespace BusinessLogic.Repository
             string query = $"SELECT * FROM [vwTradeType]";
             return await _db.LoadData<VwTradeType, dynamic>(query: query, new { });
         }
+        public async Task<IEnumerable<TblPayrollSetup>> GetPayrollSetup()
+        {
+            string query = $"SELECT * FROM [tblPayrollSetup]";
+            return await _db.LoadData<TblPayrollSetup, dynamic>(query: query, new { });
+        }
         public async Task<int> UpdateWorker(TblWorker worker)
         {
             var parameters = new DynamicParameters();

@@ -17,6 +17,7 @@ namespace BusinessLogic.Repository.IRepository
         Task<IEnumerable<TblTradeGroupRate>> GetTradeGroupRates(int tradeGroupId);
         Task<IEnumerable<TblTradeType>> GetTradeTypeByGroup(int tradeGroupId);
         Task<IEnumerable<VwTradeType>> GetTradeTypes();
+        Task<IEnumerable<TblPayrollSetup>> GetPayrollSetup();
         Task<int> UpdateWorker(TblWorker worker);
         Task<(int AutoNo, int ReturnValue, string GPHAGroupId, string GPHAJobId)> AddWorker(TblWorker worker);
         Task<int> UpdateWorkerStatus(SetStatusRequest request);

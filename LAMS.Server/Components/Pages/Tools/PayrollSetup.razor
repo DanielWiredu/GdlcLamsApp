@@ -1,17 +1,76 @@
 ﻿@page "/tools-payrollsetup"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
 
 <PageBreadcrumb Subtitle="Tools" Title="Payroll Setup" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblPayrollSetup, bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Effective Date</MudTh>
+        <MudTh>End Date</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="EffectiveDate">@context.EffectiveDate.Value.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="EndDate">@context.EndDate?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="@(() => EditRecord(context))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<TblPayrollSetup> Elements = new List<TblPayrollSetup>();
+    private TblPayrollSetup? payrollSetup = new TblPayrollSetup();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Workers.GetPayrollSetup();
+    }
+
+    private bool FilterFunc1(TblPayrollSetup element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblPayrollSetup element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.EffectiveDate.Value.ToString("dd-MMM-yyyy").Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.EndDate.Value.ToString("dd-MMM-yyyy").Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task EditRecord(TblPayrollSetup payrollSetup)
+    {
+        var parameters = new DialogParameters<PayrollSetupDialog> { { x => x.Model, payrollSetup }, { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
+        var dialog = _dialogService.Show<PayrollSetupDialog>("Edit Rate", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Workers.GetPayrollSetup();
+            StateHasChanged();
         }
     }
 }
