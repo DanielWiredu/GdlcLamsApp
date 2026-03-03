@@ -34,7 +34,7 @@
     }
     <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Href="/operations-dailystaffreq"> Return </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)" Href="@ReportUrl" Target="_blank"> Print </MudButton>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? false : true)" OnClick="AddDailyReq"> @(IsEdit ? "Save Changes" : "Save")</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? false : Model.Approved)" OnClick="AddDailyReq"> @(IsEdit ? "Save Changes" : "Save")</MudButton>
 
 </MudPaper>
 
