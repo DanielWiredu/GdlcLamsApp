@@ -120,7 +120,7 @@
         try
         {
             _selectedReq = labourRequest;
-            var userKey = "DW"; // get from auth/cookie properly
+            var userKey = await _currentUser.GetUserKeyAsync();
             var newReqNo = await _unitOfWork.DailyReq.GetNewReqNo(userKey);
 
             var userId = await _currentUser.GetUserIdAsync();

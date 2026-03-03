@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace LAMS.Server.Controllers
 {
@@ -28,6 +29,14 @@ namespace LAMS.Server.Controllers
 
             try
             {
+                var exists = await LabourRequestExistsAsync(connection, transaction, request.Id);
+
+                if (exists)
+                {
+                    await transaction.RollbackAsync();
+                    return Ok(new { Message = "Record with this Id already exists." });
+                }
+
                 var labourRequestSql = @"
                 INSERT INTO GPHALabourRequests
                 (Id, RequestDate, LabourRequestId, UnitDescription, JobDescription, NumberRequested, NeededOn, RequestId, CompanySecret, CompanyKey, GeoLocation, WeekType, Shift)
@@ -45,6 +54,18 @@ namespace LAMS.Server.Controllers
                 await transaction.RollbackAsync();
                 return StatusCode(500, new { Error = ex.Message });
             }
+        }
+        private async Task<bool> LabourRequestExistsAsync(SqlConnection connection, IDbTransaction transaction, Guid id)
+        {
+            var sql = @"SELECT COUNT(1)  FROM GPHALabourRequests WHERE Id = @Id";
+
+            var count = await connection.ExecuteScalarAsync<int>(
+                sql,
+                new { Id = id },
+                transaction
+            );
+
+            return count > 0;
         }
 
         [HttpPost("CreateCostSheet")]

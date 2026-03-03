@@ -122,8 +122,9 @@
     private async Task ResetState()
     {
         // Reset your state variables here
-        // NEW MODE
-        var userKey = "DW"; // get from auth/cookie properly
+        // NEW MODE      
+        // var userKey = "DW"; 
+        var userKey = await _currentUser.GetUserKeyAsync();
         var newReqNo = await _unitOfWork.DailyReq.GetNewReqNo(userKey);
 
         Model = new RequisitionModel

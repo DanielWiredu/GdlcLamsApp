@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using LAMS.Server.Data;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace LAMS.Server.Services
@@ -6,10 +8,11 @@ namespace LAMS.Server.Services
     public class CurrentUserService : ICurrentUserService
     {
         private readonly AuthenticationStateProvider _authProvider;
-
-        public CurrentUserService(AuthenticationStateProvider authProvider)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public CurrentUserService(AuthenticationStateProvider authProvider, UserManager<ApplicationUser> userManager)
         {
             _authProvider = authProvider;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -62,6 +65,21 @@ namespace LAMS.Server.Services
         {
             var roles = await GetUserRolesAsync();
             return roles.Contains(role);
+        }
+        private async Task<ApplicationUser?> GetUserAsync()
+        {
+            var authState = await _authProvider.GetAuthenticationStateAsync();
+            var principal = authState.User;
+
+            if (principal?.Identity?.IsAuthenticated != true)
+                return null;
+
+            return await _userManager.GetUserAsync(principal);
+        }
+        public async Task<string?> GetUserKeyAsync()
+        {
+            var user = await GetUserAsync();
+            return user?.UserKey; 
         }
     }
 }

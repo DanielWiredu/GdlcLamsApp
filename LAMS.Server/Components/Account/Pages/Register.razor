@@ -49,6 +49,11 @@
                                         UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } })" />
                 </MudItem>
                 <MudItem md="12">
+                    <MudStaticTextField For="@(() => Input.UserKey)" @bind-Value="Input.UserKey"
+                                        Label="User Key" Placeholder="Your user key" MaxLength="2"
+                                        UserAttributes="@(new() { { "autocomplete", "true" }, { "aria-required", "true" } })" />
+                </MudItem>
+                <MudItem md="12">
                     <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Register</MudStaticButton>
                 </MudItem>
             </MudGrid>
@@ -75,6 +80,7 @@
     {
         var user = CreateUser();
         user.Name = Input.Name;
+        user.UserKey = Input.UserKey;
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
@@ -152,5 +158,9 @@
         [Required]
         [Display(Name = "Name")]
         public string Name { get; set; } = "";
+
+        [Required]
+        [Display(Name = "User Key")]
+        public string UserKey { get; set; } = "";
     }
 }

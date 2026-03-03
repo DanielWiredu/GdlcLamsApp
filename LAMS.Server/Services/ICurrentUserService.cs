@@ -3,5 +3,6 @@
     public interface ICurrentUserService
     {
         Task<string?> GetUserIdAsync();
+        Task<string?> GetUserKeyAsync();
     }
 }

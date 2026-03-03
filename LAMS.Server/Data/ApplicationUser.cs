@@ -6,6 +6,7 @@ namespace LAMS.Server.Data
     public class ApplicationUser : IdentityUser
     {
         public string Name { get; set; }
+        public string UserKey { get; set; }
     }
 
 }

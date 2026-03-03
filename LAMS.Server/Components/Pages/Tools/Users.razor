@@ -1,11 +1,82 @@
 ﻿@page "/tools-users"
+@using LAMS.Server.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
 @rendermode InteractiveServer
-@inject IJSRuntime JsRuntime;
+@* @attribute [Authorize(Roles = "Admin")] *@
 
+@inject IJSRuntime JsRuntime;
+@inject UserManager<ApplicationUser> UserManager
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Tools" Title="Users Management" />
 
+<MudPaper Class="pa-4">
+    <MudTable Items="_users" Hover="true" Striped="true" Dense="true" Filter="FilterFunc">
+        <ToolBarContent>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Href="Account/Register"> Add New </MudButton>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search users..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Class="mb-4" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Email</MudTh>
+            <MudTh>Username</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>User Key</MudTh>
+            <MudTh>Email Confirmed</MudTh>
+            <MudTh>Lockout Enabled</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Username">@context.UserName</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="UserKey">@context.UserKey</MudTd>
+            <MudTd DataLabel="Email Confirmed">
+                <MudChip T="string" Color="@(context.EmailConfirmed ? Color.Success : Color.Error)"> @(context.EmailConfirmed ? "Yes" : "No") </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Lockout Enabled">
+                @(context.LockoutEnabled ? "Yes" : "No")
+            </MudTd>
+            <MudTd>
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary"  OnClick="() => ViewUser(context.Id)"> View </MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+</MudPaper>
+
 @code {
+    private List<ApplicationUser> _users = new();
+    private string _searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _users = await UserManager.Users.OrderBy(u => u.Email).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error loading users: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private bool FilterFunc(ApplicationUser user)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        return user.Email?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true
+            || user.UserName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    private void ViewUser(string userId)
+    {
+        _snackbar.Add($"User ID: {userId}", Severity.Info);
+        // Later: Navigate to details page
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
