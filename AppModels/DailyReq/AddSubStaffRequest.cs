@@ -13,5 +13,7 @@ namespace AppModels.DailyReq
         public int? TradegroupID { get; set; }
         public string transport { get; set; } = string.Empty;
         public int? TradetypeID { get; set; }
+        public double? Normal { get; set; } = 0;
+        public double? Overtime { get; set; } = 0;
     }
 }

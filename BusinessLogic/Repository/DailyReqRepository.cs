@@ -233,5 +233,62 @@ namespace BusinessLogic.Repository
             var returnValue = parameters.Get<int>("@return_value");
             return (costSheets, returnValue);
         }
+        public async Task<IEnumerable<GPHAJobAssignmentDto>> GetGPHAPendingApprovedRequests()
+        {
+            string query = @"SELECT TOP(100) * FROM GPHAJobAssignments WHERE Processed = 0";
+            return await _db.LoadData<GPHAJobAssignmentDto, dynamic>(query: query, new { });
+        }
+        public async Task<TblGphaLabourRequest> GetGPHARequestByID(string LabourRequestID)
+        {
+            string query = @"SELECT * FROM tblGPHA_LabourRequests WHERE hasCostSheet = 1 AND GPHA_Approved = 0 AND LabourRequestID = @LabourRequestID";
+            var result = await _db.LoadData<TblGphaLabourRequest, dynamic>(query: query, new { LabourRequestID });
+            return result.FirstOrDefault();
+        }
+        public async Task<IEnumerable<GPHACostSheetDetailDto>> GetGPHACostSheetDetails(string costSheetId)
+        {
+            string query = @"SELECT * FROM GPHACostSheetDetails WHERE CostSheetId = @CostSheetId";
+            return await _db.LoadData<GPHACostSheetDetailDto, dynamic>(query: query, new { CostSheetId = costSheetId });
+        }
+        public async Task<int> UpdateDailyReqGPHAHours(UpdateReqGPHAHoursRequest request)
+        {
+            return await _db.SaveData(query: "UPDATE tblStaffReq SET Normal=@Normal,Overtime=@Overtime,GPHA_RequestID=@GPHA_RequestID WHERE ReqNo=@ReqNo", 
+                new { request.Normal, request.Overtime, request.GPHA_RequestID, request.ReqNo });
+        }
+        public async Task<int> AddGPHASubStaff(AddSubStaffRequest request)
+        {
+            var sql = @"
+                    IF NOT EXISTS 
+                        (SELECT 1  FROM tblSubStaffReq  WHERE ReqNo = @ReqNo AND WorkerID = @WorkerID)
+                    BEGIN
+                        INSERT INTO tblSubStaffReq (ReqNo, WorkerID, TradegroupID, transport, Normal, Overtime) VALUES (@ReqNo, @WorkerID, @TradegroupID, @transport, @Normal, @Overtime)
+                    END";
+            return await _db.SaveData(query: sql, new { request.ReqNo, request.WorkerId, request.TradegroupID, request.transport, request.Normal, request.Overtime });
+        }
+        public async Task<int?> UpdateProcessedGPHARequests(List<string> requestNumbers)
+        {
+            using (var connection = _db.CreateConnection())
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        var sql1 = @"UPDATE tblGPHA_LabourRequests SET GPHA_Approved = 1, GPHA_ApprovedDate = GETUTCDATE() WHERE LabourRequestID IN @RequestNumbers";
+                        var sql2 = @"UPDATE GPHAJobAssignments SET Processed = 1 WHERE RequestNumber IN @RequestNumbers";
+
+                        var affectedRows1 = await connection.ExecuteAsync(sql1, new { RequestNumbers = requestNumbers }, transaction);
+                        var affectedRows2 = await connection.ExecuteAsync(sql2, new { RequestNumbers = requestNumbers }, transaction);
+
+                        transaction.Commit();
+                        return affectedRows1 + affectedRows2;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
     }
 }

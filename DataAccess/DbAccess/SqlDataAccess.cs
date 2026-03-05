@@ -12,21 +12,21 @@ namespace DataAccess.DbAccess
         {
             _config = config;
         }
-
+        public IDbConnection CreateConnection(string _connectionString = "Default") => new SqlConnection(_config.GetConnectionString(_connectionString));
         public async Task<IEnumerable<T>> LoadData<T, U>(string query, U parameters, string connectionId = "Default", CommandType cmdType = CommandType.Text)
         {
-            using IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId));
+            using IDbConnection connection = CreateConnection(connectionId);
             return await connection.QueryAsync<T>(query, parameters, commandType: cmdType);
         }
 
         public async Task<int> SaveData<T>(string query, T parameters, string connectionId = "Default", CommandType cmdType = CommandType.Text)
         {
-            using IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId));
+            using IDbConnection connection = CreateConnection(connectionId);
             return await connection.ExecuteAsync(query, parameters, commandType: cmdType);
         }
         public async Task ExecuteSP<T>(string storedProcedure, T parameters, string connectionId = "Default")
         {
-            using IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId));
+            using IDbConnection connection = CreateConnection(connectionId);
             await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
         }
     }

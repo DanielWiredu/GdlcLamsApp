@@ -54,7 +54,7 @@
 
     private string searchString = "";
     private DateTime? startDate = DateTime.Today.AddDays(-7);
-    private DateTime? endDate = DateTime.Today;
+    private DateTime? endDate = DateTime.Today.AddDays(1).AddSeconds(-1);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
