@@ -11,6 +11,7 @@ namespace AppModels.DailyReq
         public double Normal { get; set; }
         public double Overtime { get; set; }
         public string GPHA_RequestID { get; set; }
+        public string ShiftType { get; set; }
         public string ReqNo { get; set; }
     }
 }

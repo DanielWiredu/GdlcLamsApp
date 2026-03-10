@@ -5,6 +5,7 @@ using Dapper;
 using DataAccess.DbAccess;
 using DataAccess.Models;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -196,6 +197,20 @@ namespace BusinessLogic.Repository
                             ORDER BY Id DESC";
             return await _db.LoadData<TblGphaLabourRequest, dynamic>(query: query, new { StartDate = StartDate, EndDate = EndDate, SearchValue = SearchValue });
         }
+        public async Task<IEnumerable<VmApprovedGPHARequest>> GetGPHAApprovedRequests(DateTime StartDate, DateTime EndDate, string SearchValue)
+        {
+            string query = @"SELECT r.LabourRequestID, r.RequestDate, r.UnitDescription, r.JobRequested, r.NumberRequested, r.rNeededOn, r.rDay, r.rShift,
+                            r.CostSheetNo, c.CreatedDate as PreparedOn, r.GPHA_ApprovedDate as GphaApprovedDate, r.GDLC_Approved as GdlcApproved, r.GDLC_ApprovedDate as GdlcApprovedDate
+                            FROM tblGPHA_LabourRequests r left join tblStaffReq c on r.CostSheetNo = c.ReqNo 
+                            WHERE r.hasCostSheet=1 AND r.GPHA_Approved=1 AND (r.GPHA_ApprovedDate BETWEEN @StartDate AND @EndDate) 
+                            AND (
+                                r.LabourRequestID LIKE '%' + @SearchValue + '%'
+                                OR r.JobRequested LIKE '%' + @SearchValue + '%'
+                                OR r.UnitDescription LIKE '%' + @SearchValue + '%'
+                            ) 
+                            ORDER BY r.Id DESC";
+            return await _db.LoadData<VmApprovedGPHARequest, dynamic>(query: query, new { StartDate = StartDate, EndDate = EndDate, SearchValue = SearchValue });
+        }
         public async Task<int> AddDailyReqGPHARequest(RequisitionModel request)
         {
             var parameters = new DynamicParameters();
@@ -251,8 +266,8 @@ namespace BusinessLogic.Repository
         }
         public async Task<int> UpdateDailyReqGPHAHours(UpdateReqGPHAHoursRequest request)
         {
-            return await _db.SaveData(query: "UPDATE tblStaffReq SET Normal=@Normal,Overtime=@Overtime,GPHA_RequestID=@GPHA_RequestID WHERE ReqNo=@ReqNo", 
-                new { request.Normal, request.Overtime, request.GPHA_RequestID, request.ReqNo });
+            return await _db.SaveData(query: "UPDATE tblStaffReq SET Normal=@Normal,Overtime=@Overtime,GPHA_RequestID=@GPHA_RequestID,ShiftType=@ShiftType WHERE ReqNo=@ReqNo", 
+                new { request.Normal, request.Overtime, request.GPHA_RequestID, request.ShiftType, request.ReqNo });
         }
         public async Task<int> AddGPHASubStaff(AddSubStaffRequest request)
         {
@@ -289,6 +304,20 @@ namespace BusinessLogic.Repository
                     }
                 }
             }
+        }
+        public async Task<(int costSheets, int returnValue)> StoreDailyReq(PayrollProcessRequest request)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@startdate", request.startdate);
+            parameters.Add("@enddate", request.enddate);
+            parameters.Add("@storedby", request.processedby);
+            parameters.Add("@storedCostSheets", null, dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("@return_value", null, dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _db.ExecuteSP(storedProcedure: "spStoreDailyReq", parameters);
+            var costSheets = parameters.Get<int>("@storedCostSheets");
+            var returnValue = parameters.Get<int>("@return_value");
+            return (costSheets, returnValue);
         }
     }
 }

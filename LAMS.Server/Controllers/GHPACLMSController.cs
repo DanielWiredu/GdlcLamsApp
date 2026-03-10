@@ -80,6 +80,8 @@ namespace LAMS.Server.Controllers
 
             try
             {
+                var costSheetId = Guid.NewGuid();
+
                 // 1️ Insert JobAssignment
                 var jobAssignmentSql = @"
                 INSERT INTO GPHAJobAssignments
@@ -89,14 +91,14 @@ namespace LAMS.Server.Controllers
                 (@Id, @NumberToSupply, @Job, @CostSheetId, @NeededOn, @Shift, @DayType,
                  @GeoLocation, @Unit, @RequestNumber, @DateAdded, @NumberToSupplied)";
 
+                request.JobAssignment.CostSheetId = costSheetId; // Link JobAssignment to CostSheet
                 await connection.ExecuteAsync(
                     jobAssignmentSql,
                     request.JobAssignment,
                     transaction
                 );
 
-                // 2️ Insert CostSheet
-                var costSheetId = Guid.NewGuid();
+                // 2️ Insert CostSheet              
 
                 var costSheetSql = @"
                 INSERT INTO GPHACostSheets

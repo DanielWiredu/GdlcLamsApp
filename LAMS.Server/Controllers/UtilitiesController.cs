@@ -51,6 +51,8 @@ namespace LAMS.Server.Controllers
                     {
                         if (_worker == null || _worker.HoursWorked == 0) continue;
 
+                        var shiftType = GetShiftType(_worker.RateType);
+
                         if (staffReq.Normal == 0 || String.IsNullOrEmpty(staffReq.GphaRequestId))
                         {
                             await _unitOfWork.DailyReq.UpdateDailyReqGPHAHours(new UpdateReqGPHAHoursRequest
@@ -58,24 +60,25 @@ namespace LAMS.Server.Controllers
                                 Normal = Convert.ToDouble(_worker.HoursWorked),
                                 Overtime = Convert.ToDouble(_worker.OverTimeHours),
                                 GPHA_RequestID = gdlcRequest.LabourRequestId,
+                                ShiftType = shiftType,
                                 ReqNo = reqno
                             });
-
-                            var gdlcWorker = await _unitOfWork.Workers.Find(_worker.WorkerId);
-                            if (gdlcWorker == null)
-                                continue;
-
-                            int tradeGroupId = gdlcWorker.TradegroupId.Value;
-
-                            await _unitOfWork.DailyReq.AddGPHASubStaff(new AddSubStaffRequest
-                            {
-                                ReqNo = reqno,
-                                WorkerId = _worker.WorkerId,
-                                TradegroupID = tradeGroupId,
-                                Normal = Convert.ToDouble(_worker.HoursWorked),
-                                Overtime = Convert.ToDouble(_worker.OverTimeHours)
-                            });
                         }
+
+                        var gdlcWorker = await _unitOfWork.Workers.Find(_worker.WorkerId);
+                        if (gdlcWorker == null)
+                            continue;
+
+                        int tradeGroupId = gdlcWorker.TradegroupId.Value;
+
+                        await _unitOfWork.DailyReq.AddGPHASubStaff(new AddSubStaffRequest
+                        {
+                            ReqNo = reqno,
+                            WorkerId = _worker.WorkerId,
+                            TradegroupID = tradeGroupId,
+                            Normal = Convert.ToDouble(_worker.HoursWorked),
+                            Overtime = Convert.ToDouble(_worker.OverTimeHours)
+                        });
                     }
                     processedRequests.Add(request.RequestNumber);
                 }
@@ -90,6 +93,20 @@ namespace LAMS.Server.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        private string GetShiftType(string rateType)
+        {
+            if (rateType.EndsWith("80%"))
+                return "Shift 80%";
+
+            if (rateType.EndsWith("100%"))
+                return "Shift 100%";
+
+            if (rateType.EndsWith("120%"))
+                return "Shift 120%";
+
+            return "Non-Shift";
         }
 
         [AllowAnonymous]

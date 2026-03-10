@@ -6,7 +6,7 @@
 @* @attribute [Authorize(Roles = "Admin")] *@
 
 @inject IJSRuntime JsRuntime;
-@inject UserManager<ApplicationUser> UserManager
+@inject UserManager<ApplicationUser> _userManager
 @inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Tools" Title="Users Management" />
@@ -24,8 +24,9 @@
             <MudTh>Name</MudTh>
             <MudTh>User Key</MudTh>
             <MudTh>Email Confirmed</MudTh>
-            <MudTh>Lockout Enabled</MudTh>
+            <MudTh>Status</MudTh>
             <MudTh></MudTh>
+            @* <MudTh>Lockout Enabled</MudTh> *@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Email">@context.Email</MudTd>
@@ -35,12 +36,23 @@
             <MudTd DataLabel="Email Confirmed">
                 <MudChip T="string" Color="@(context.EmailConfirmed ? Color.Success : Color.Error)"> @(context.EmailConfirmed ? "Yes" : "No") </MudChip>
             </MudTd>
-            <MudTd DataLabel="Lockout Enabled">
-                @(context.LockoutEnabled ? "Yes" : "No")
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Color="@(context.LockoutEnd.HasValue && context.LockoutEnd.Value > DateTimeOffset.Now ? Color.Error : Color.Success)"> 
+                    @(context.LockoutEnd.HasValue && context.LockoutEnd.Value > DateTimeOffset.Now ? "Locked" : "Active") </MudChip>
             </MudTd>
             <MudTd>
-                <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary"  OnClick="() => ViewUser(context.Id)"> View </MudButton>
+                @* <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => DisableUser(context.Id)"> Disable </MudButton> *@
+                <MudButtonGroup Color="Color.Primary" Variant="Variant.Text">
+                    <MudButton OnClick="() => EnableUser(context.Id)">Enable</MudButton>
+                    <MudButton OnClick="() => DisableUser(context.Id)">Disable</MudButton>
+                </MudButtonGroup>
             </MudTd>
+            @* <MudTd DataLabel="Lockout Enabled">
+                @(context.LockoutEnabled ? "Yes" : "No")
+            </MudTd> *@
+            @* <MudTd>
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary"  OnClick="() => ViewUser(context.Id)"> View </MudButton>
+            </MudTd> *@
         </RowTemplate>
     </MudTable>
 
@@ -54,7 +66,7 @@
     {
         try
         {
-            _users = await UserManager.Users.OrderBy(u => u.Email).ToListAsync();
+            _users = await _userManager.Users.OrderBy(u => u.Email).ToListAsync();
         }
         catch (Exception ex)
         {
@@ -68,13 +80,50 @@
             return true;
 
         return user.Email?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true
-            || user.UserName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true;
+            || user.UserName?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true
+            || user.Name?.Contains(_searchString, StringComparison.OrdinalIgnoreCase) == true;
     }
 
     private void ViewUser(string userId)
     {
         _snackbar.Add($"User ID: {userId}", Severity.Info);
         // Later: Navigate to details page
+    }
+
+    private async Task EnableUser(string userId)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+
+            _users = await _userManager.Users.OrderBy(u => u.Email).ToListAsync();
+
+            _snackbar.Add($"User {user.Email} has been enabled.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error enabling user: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DisableUser(string userId)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            await _userManager.SetLockoutEnabledAsync(user, true);
+            await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+
+            _users = await _userManager.Users.OrderBy(u => u.Email).ToListAsync();
+
+            _snackbar.Add($"User {user.Email} has been disabled.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error disabling user: {ex.Message}", Severity.Error);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
