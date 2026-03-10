@@ -22,6 +22,11 @@
         <MudTh><MudTableSortLabel SortLabel="JobRequested" T="VmApprovedGPHARequest">JobRequested</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="NumberRequested" T="VmApprovedGPHARequest">NumberRequested</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortLabel="RNeededOn" T="VmApprovedGPHARequest">NeededOn</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="CostSheetNo" T="VmApprovedGPHARequest">Cost Sheet</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="PreparedOn" T="VmApprovedGPHARequest">Prepared On</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="GphaApprovedDate" T="VmApprovedGPHARequest">GPHA ApprovedDate</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="GDLCApproved" T="VmApprovedGPHARequest">GDLC Approved</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="GDLCApprovedDate" T="VmApprovedGPHARequest">GDLC ApprovedDate</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="LabourRequestID">@context.LabourRequestId</MudTd>
@@ -30,6 +35,11 @@
         <MudTd DataLabel="JobRequested">@context.JobRequested</MudTd>
         <MudTd DataLabel="NumberRequested">@context.NumberRequested</MudTd>
         <MudTd DataLabel="RNeededOn">@context.RNeededOn?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="CostSheetNo">@context.CostSheetNo</MudTd>
+        <MudTd DataLabel="PreparedOn">@context.PreparedOn?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="GPHAApprovedDate">@context.GphaApprovedDate</MudTd>
+        <MudTd DataLabel="GDLCApproved">@(context.GdlcApproved ? "Yes" : "No")</MudTd>
+        <MudTd DataLabel="GDLCApprovedDate">@context.GdlcApprovedDate</MudTd>
     </RowTemplate>
     <NoRecordsContent>
         <MudText>No matching records found</MudText>

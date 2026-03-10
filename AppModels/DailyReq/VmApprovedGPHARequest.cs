@@ -18,9 +18,9 @@ namespace AppModels.DailyReq
         public string? RShift { get; set; }
         public string? CostSheetNo { get; set; }
         public DateTime? PreparedOn { get; set; }
-        public bool? GphaApproved { get; set; }
+        public bool GphaApproved { get; set; }
         public DateTime? GphaApprovedDate { get; set; }
-        public bool? GdlcApproved { get; set; }
+        public bool GdlcApproved { get; set; }
         public DateTime? GdlcApprovedDate { get; set; }
     }
 }
