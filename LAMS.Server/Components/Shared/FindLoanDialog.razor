@@ -1,0 +1,22 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField Label="Enter Loan No" @bind-Value="LoanNo" Required="true" RequiredError="Loan No is required" />
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Default">Cancel</MudButton>
+        <MudButton OnClick="FindLoanNo" Color="Color.Success" Variant="Variant.Filled"> Find </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    public string LoanNo { get; set; }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void FindLoanNo()
+    {
+        MudDialog.Close(DialogResult.Ok(LoanNo));
+    }
+}

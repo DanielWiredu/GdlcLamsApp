@@ -51,6 +51,24 @@ namespace BusinessLogic.Repository
                 query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE OName LIKE '%' + @SearchValue + '%' ORDER BY [SName]";
             return await _db.LoadData<VwWorker, dynamic>(query: query, new { SearchValue = _searchValue });
         }
+        public async Task<IEnumerable<VwWorker>> SearchMulti(string _searchType, List<string> _searchValues)
+        {
+            int searchLimit = 100;
+            string query = $"SELECT top({searchLimit}) [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE WorkerID IN @SearchValues";
+            if (_searchType == "WorkerID")
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE WorkerID IN @SearchValues";
+            else if (_searchType == "SSFNo")
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE SSFNo IN @SearchValues";
+            else if (_searchType == "NHISNo")
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE NHIS IN @SearchValues";
+            else if (_searchType == "Gang")
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE GangName IN @SearchValues";
+            else if (_searchType == "Surname")
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE SName IN @SearchValues ORDER BY [OName]";
+            else if (_searchType == "Othernames")
+                query = $"SELECT top({searchLimit})  [WorkerID], [SName], [OName], [GangName], [SSFNo], [TradegroupID], [TradegroupNAME], [TradetypeNAME], [NHIS], [flags], [TradetypeID], NationalID, WorkerStatus FROM [vwWorkers] WHERE OName IN @SearchValues ORDER BY [SName]";
+            return await _db.LoadData<VwWorker, dynamic>(query: query, new { SearchValues = _searchValues });
+        }
         public async Task<IEnumerable<TblTradeGroup>> GetTradeGroups()
         {
             string query = $"SELECT * FROM tblTradeGroup";

@@ -13,5 +13,6 @@ namespace BusinessLogic.Repository.IRepository
         IWorkerRepository Workers { get; }
         ISetupRepository Setups { get; }
         IDailyReqRepository DailyReq { get; }
+        ILoanRepository Loans { get; }
     }
 }

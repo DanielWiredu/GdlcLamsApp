@@ -13,6 +13,7 @@ namespace BusinessLogic.Repository.IRepository
         Task<VwTblWorker> Find(string WorkerID);
         Task<IEnumerable<VwWorker>> GetAll(string _searchValue);
         Task<IEnumerable<VwWorker>> Search(string _searchType, string _searchValue);
+        Task<IEnumerable<VwWorker>> SearchMulti(string _searchType, List<string> _searchValues);
         Task<IEnumerable<TblTradeGroup>> GetTradeGroups();
         Task<IEnumerable<TblTradeGroupRate>> GetTradeGroupRates(int tradeGroupId);
         Task<IEnumerable<TblTradeType>> GetTradeTypeByGroup(int tradeGroupId);

@@ -1,17 +1,143 @@
 ﻿@page "/loans-management"
 @rendermode InteractiveServer
-@inject IJSRuntime JsRuntime;
-
+@inject IJSRuntime JsRuntime
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
+@inject ICurrentUserService _currentUser
 
 <PageBreadcrumb Subtitle="Loans" Title="Management" />
 
+<MudTable ServerData="ServerReload" Dense="true" Hover="true" Striped="true" @ref="table" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="50" @bind-SelectedItem="_selectedLoan">
+    <ToolBarContent>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Href="/loans-loandetails"> Add New </MudButton>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="LoanNo" T="VwLoan">LoanNo</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="LoanDate" T="VwLoan">LoanDate</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="WorkerId" T="VwLoan">WorkerId</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="WorkerName" T="VwLoan">WorkerName</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="LoanScheme" T="VwLoan">LoanScheme</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="LoanAmount" T="VwLoan">LoanAmount</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="RepaidAmount" T="VwLoan">RepaidAmount</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="LoanBalance" T="VwLoan">LoanBalance</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="MonthlyLimit" T="VwLoan">MonthlyLimit</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Approved" T="VwLoan">Approved</MudTableSortLabel></MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="LoanNo">@context.LoanNo</MudTd>
+        <MudTd DataLabel="LoanDate">@context.LoanDate.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="WorkerId">@context.WorkerId</MudTd>
+        <MudTd DataLabel="WorkerName">@context.WorkerName</MudTd>
+        <MudTd DataLabel="LoanScheme">@context.LoanScheme</MudTd>
+        <MudTd DataLabel="LoanAmount">@context.LoanAmount?.ToString("N2")</MudTd>
+        <MudTd DataLabel="RepaidAmount">@context.RepaidAmount?.ToString("N2")</MudTd>
+        <MudTd DataLabel="LoanBalance">@context.LoanBalance?.ToString("N2")</MudTd>
+        <MudTd DataLabel="MonthlyLimit">@context.MonthlyLimit?.ToString("N2")</MudTd>
+        <MudTd DataLabel="Approved"> <MudCheckBox T="bool?" Value="@context.Approved" Disabled="true" Color="Color.Success" /> </MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" Href="@($"/loans-loandetails/{context.LoanNo}")"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.LoanNo))" Disabled="@(context.Approved.HasValue)"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private MudTable<VwLoan> table;
+    private VwLoan _selectedLoan;
+    private string searchString = "";
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender) return;
+
+        await JsRuntime.InvokeVoidAsync("loadConfig");
+        await JsRuntime.InvokeVoidAsync("loadApps");
+    }
+
+    private async Task<TableData<VwLoan>> ServerReload(TableState state, CancellationToken token)
+    {
+        try
         {
-            await JsRuntime.InvokeVoidAsync("loadConfig");
-            await JsRuntime.InvokeVoidAsync("loadApps");
+            var data = await _unitOfWork.Loans.GetLoans(searchString);
+            var totalItems = data.Count();
+
+            data = state.SortLabel switch
+            {
+                "LoanNo" => data.OrderByDirection(state.SortDirection, o => o.LoanNo),
+                "LoanDate" => data.OrderByDirection(state.SortDirection, o => o.LoanDate),
+                "WorkerId" => data.OrderByDirection(state.SortDirection, o => o.WorkerId),
+                "WorkerName" => data.OrderByDirection(state.SortDirection, o => o.WorkerName),
+                "LoanScheme" => data.OrderByDirection(state.SortDirection, o => o.LoanScheme),
+                _ => data
+            };
+
+            var items = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
+            return new TableData<VwLoan> { TotalItems = totalItems, Items = items };
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return new TableData<VwLoan> { TotalItems = 0, Items = Array.Empty<VwLoan>() };
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        searchString = text;
+        await table.ReloadServerData();
+    }
+    private async Task ConfirmRecordDelete(string LoanNo)
+    {
+        _selectedLoan.LoanNo = LoanNo;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            _selectedLoan.LoanNo = string.Empty;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && !string.IsNullOrEmpty(_selectedLoan.LoanNo))
+        {
+            try
+            {
+                var userId = await _currentUser.GetUserIdAsync();
+                var request = _selectedLoan.LoanNo;
+                var response = await _unitOfWork.Loans.DeleteLoan(request);
+                if (response == 1)
+                {
+                    _snackbar.Add("Loan Deleted Successfully!", Severity.Success);
+                    await table.ReloadServerData();
+                    _selectedLoan.LoanNo = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting loan: {ex.Message}", Severity.Error);
+                _selectedLoan.LoanNo = string.Empty;
+            }
         }
     }
 }

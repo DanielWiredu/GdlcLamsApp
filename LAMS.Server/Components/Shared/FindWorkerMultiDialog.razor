@@ -1,0 +1,163 @@
+﻿@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+
+<MudDialog>
+    <DialogContent>
+        <!-- Search Type -->
+        <MudRadioGroup T="string" @bind-Value="_searchType" Row="true">
+            @foreach (var type in _searchTypes)
+            {
+                <MudRadio Value="@type">@type</MudRadio>
+            }
+        </MudRadioGroup>
+        <MudCheckBox @bind-Value="_multiSearch" Label="Multi Search" />
+        <!-- Search -->
+        <form @onsubmit="SearchWorkers">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="app-search">
+                        <input class="form-control" id="SearchInput" placeholder="Search multiple workers separated by commas..." @bind="_searchValue" type="search" />
+                        <i class="app-search-icon text-muted" data-lucide="search"></i>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Workers Table -->
+        <MudTable Items="_workers"
+                  Dense="true"
+                  Hover="true"
+                  Bordered="true"
+                  FixedHeader="true"
+                  Height="380px"
+                  Class="mt-4">
+            <HeaderContent>
+                <MudTh></MudTh>
+                <MudTh>Worker ID</MudTh>
+                <MudTh>Surname</MudTh>
+                <MudTh>Other Names</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Gang</MudTh>
+                <MudTh>SSF No</MudTh>
+                <MudTh>Trade Group</MudTh>
+                <MudTh>Trade Category</MudTh>
+                <MudTh>NHIS No</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                <MudTd>
+                    @* <MudCheckBox T="bool" Disabled="@(context.WorkerStatus != "Active")" Value="@_selectedWorkers.Contains(context)" ValueChanged="@(v => ToggleWorker(context, v))" /> *@
+                    <MudCheckBox T="bool" Disabled="@(context.WorkerStatus != "Active")" Value="@_selectedWorkers.Any(w => w.WorkerId == context.WorkerId)" ValueChanged="@(v => ToggleWorker(context, v))" />
+                </MudTd>
+                <MudTd>@context.WorkerId</MudTd>
+                <MudTd>@context.Sname</MudTd>
+                <MudTd>@context.Oname</MudTd>
+                <MudTd>
+                    <MudChip T="string" Color="@(context.WorkerStatus == "Active" ? Color.Success : Color.Error)" Variant="Variant.Filled" Size="Size.Small">
+                        @context.WorkerStatus
+                    </MudChip>
+                </MudTd>
+                <MudTd>@context.GangName</MudTd>
+                <MudTd>@context.Ssfno</MudTd>
+                <MudTd>@context.TradegroupName</MudTd>
+                <MudTd>@context.TradetypeName</MudTd>
+                <MudTd>@context.Nhis</MudTd>
+            </RowTemplate>
+
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudText> @(_selectedWorkers == null ? "" : string.Join(", ", _selectedWorkers.OrderBy(x => x.WorkerId).Select(x => x.WorkerId)))</MudText>
+
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="ConfirmSelection">
+            Select Workers (@_selectedWorkers.Count)
+        </MudButton>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="Cancel">
+            Close
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private string _searchType = "WorkerID";
+    private string _searchValue;
+    private bool _multiSearch = true;
+    private List<VwWorker> _workers = new();
+    private HashSet<VwWorker> _selectedWorkers = new();
+    private List<string> _searchTypes = new()
+    {
+        "WorkerID",
+        "SSFNo",
+        "NHISNo",
+        "Gang",
+        "Surname",
+        "Othernames"
+    };
+    private List<string> ParseWorkerIds(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return new List<string>();
+
+        return input
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)   // split by comma
+            .Select(x => x.Trim())                                // remove extra spaces
+            .Where(x => !string.IsNullOrEmpty(x))                  // keep only non-empty strings
+            .ToList();
+    }
+    private async Task SearchWorkers()
+    {
+        if (string.IsNullOrWhiteSpace(_searchValue))
+        {
+            _snackbar.Add("Search value required", Severity.Warning);
+            return;
+        }
+
+        if (_multiSearch)
+        {
+            var workerKeys = ParseWorkerIds(_searchValue);
+            _workers = (await _unitOfWork.Workers.SearchMulti(_searchType, workerKeys)).ToList();
+        }
+        else
+        {
+            _workers = (await _unitOfWork.Workers.Search(_searchType, _searchValue)).ToList();
+        }
+    }
+
+    private void ToggleWorker(VwWorker worker, bool selected)
+    {
+        if (worker.WorkerStatus != "Active")
+            return;
+
+        var existing = _selectedWorkers.FirstOrDefault(w => w.WorkerId == worker.WorkerId);
+
+        if (selected)
+        {
+            if (existing == null)
+                _selectedWorkers.Add(worker);
+        }
+        else
+        {
+            if (existing != null)
+                _selectedWorkers.Remove(existing);
+        }
+    }
+
+    private void ConfirmSelection()
+    {
+        if (_selectedWorkers.Count == 0)
+        {
+            _snackbar.Add("Please select at least one worker", Severity.Warning);
+            return;
+        }
+
+        MudDialog.Close(DialogResult.Ok(_selectedWorkers.ToList()));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

@@ -1,0 +1,377 @@
+﻿@page "/loans-loandetails"
+@page "/loans-loandetails/{loanNo}"
+@using AppModels.Loans
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime;
+@inject IUnitOfWork _unitOfWork
+@inject ISnackbar _snackbar
+@inject ICurrentUserService _currentUser
+@inject IDialogService _dialogService
+
+<PageBreadcrumb Subtitle="Loans" Title="Details" />
+
+<MudPaper Class="pa-4">
+    <MudGrid>
+        <!-- LEFT COLUMN -->
+        <MudItem xs="12" md="4">
+            <div class="card">
+                <MudButton StartIcon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="OpenAddWorkerDialog"> Find Worker </MudButton>
+                <div class="card-body d-flex align-items-start">
+                    <!-- Avatar -->
+                    @* <img alt="avatar" class="rounded-circle me-3" height="64" src="/images/users/user-10.jpg" width="64" /> *@
+                    <div class="flex-grow-1">
+                        <!-- Name & Role -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <a class="link-reset" href="/users-profile">@_worker?.Sname @_worker?.Oname</a>
+                            </h5>
+                            <span class="badge badge-label @( _worker?.Flags switch
+                                   {
+                                       "ACT" => "bg-success",
+                                       "INA" => "bg-warning",
+                                       "INC" => "bg-primary",
+                                       "SUS" => "bg-danger",
+                                       "DTH" => "bg-dark",
+                                       _ => "bg-secondary"
+                                   })">@_worker?.WorkerStatus</span>
+                        </div>
+                        <p class="mb-3 text-muted fs-xs">@_worker?.WorkerId</p>
+                        <!-- Contact Info -->
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h5 class="fs-base mb-0 fw-medium">
+                                    <a class="link-reset"
+                                       href="#">@_worker?.TradegroupName</a>
+                                </h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="fs-base mb-0 fw-medium"><a class="link-reset">@_worker?.TradetypeName</a></h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="fs-base mb-0 fw-medium"><a class="link-reset">@_worker?.DateBirth?.ToString("dd-MMM-yyyy")</a></h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="fs-base mb-0 fw-medium"><a class="link-reset">@_worker?.NationalID</a></h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="fs-base mb-0 fw-medium"><a class="link-reset">@_worker?.PhoneNo</a></h5>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h5 class="fs-base mb-0 fw-medium"><a class="link-reset">@_worker?.WorkerType</a></h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </MudItem>
+        <!-- RIGHT COLUMN -->
+        <MudItem xs="12" md="4">
+            <MudTextField Label="Loan No" @bind-Value="Model.LoanNo" ReadOnly="true" />
+            <MudAutocomplete MaxItems="50" T="TblLoanScheme" Label="Loan Scheme" @bind-Value="SelectedScheme" ToStringFunc="@(c => c?.LoanScheme)" CoerceText="true"
+                             Clearable="true" Dense="true" SearchFunc="SearchSchemes" Required="true" RequiredError="Required"></MudAutocomplete>
+            <MudDatePicker Label="Loan Date" @bind-Date="Model.LoanDate" Required="true" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
+            <MudNumericField T="double" Label="Loan Amount" @bind-Value="Model.LoanAmount" Min="0" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+            <MudCheckBox @bind-Value="Model.AutoDeduct" Label="Auto Detect" />
+        </MudItem>
+        <!-- MIDDLE COLUMN -->
+        <MudItem xs="12" md="4">
+            <MudNumericField T="double" Label="Repayment Amount" @bind-Value="Model.RepayAmount" Min="0" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+            <MudNumericField T="double" Label="Monthly Limit" @bind-Value="Model.MonthlyLimit" Min="0" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" />
+            <MudNumericField T="double" Label="Repaid Amount" @bind-Value="Model.RepaidAmount" Min="0" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" ReadOnly="true" />
+            <MudNumericField T="double" Label="Loan Balance" @bind-Value="Model.LoanBalance" Min="0" Immediate="true" HideSpinButtons="true" Required="true" RequiredError="Field is required" Format="F2" ReadOnly="true" />
+            <MudCheckBox @bind-Value="Model.Approved" Label="Approved" ReadOnly="true" />
+            @if (IsEdit)
+            {
+                <MudDatePicker Label="Approved Date" @bind-Date="Model.ApprovedDate" DateFormat="yyyy-MM-dd" ShowToolbar="false" ReadOnly="Model.Approved" />
+            }         
+        </MudItem>
+    </MudGrid> 
+</MudPaper>
+<MudPaper Class="pa-3 d-flex flex-wrap gap-2 justify-end">
+    @if (!IsEdit)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="ResetState"> Add </MudButton>
+    }
+    @if (IsEdit)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="FindLoanNo"> Find </MudButton>
+    }
+    <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Href="/loans-management"> Return </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(string.IsNullOrEmpty(Model.LoanNo) ? false : Model.Approved)" Onclick="AddLoan"> @(IsEdit ? "Save Changes" : "Save")</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" Disabled="@(string.IsNullOrEmpty(Model.LoanNo) ? true : Model.Approved)" OnClick="ApproveLoan"> Approve </MudButton>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? loanNo { get; set; }
+    public TblLoan Model { get; set; }
+    private bool IsEdit => !string.IsNullOrEmpty(loanNo);
+    private VwWorker? _worker { get; set; }
+    private List<TblLoanScheme> Schemes = new();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await ResetState();
+            Schemes = (await _unitOfWork.Loans.GetAllLoanSchemes()).ToList();
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadDataAsync();
+    }
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            if (IsEdit)
+            {
+                // EDIT MODE
+                var loan = await _unitOfWork.Loans.GetLoan(loanNo);
+                if (loan == null)
+                {
+                    _snackbar.Add("This loan number was not found", Severity.Error);
+                    return;
+                }
+                Model = loan;
+                // Model = new TblLoan
+                // {
+                //     AutoId = loan.AutoId,
+                //     LoanNo = loan.LoanNo,
+                //     WorkerId = loan.WorkerId,
+                //     LoanSchemeId = loan.LoanSchemeId,
+                //     LoanDate = loan.LoanDate,
+                //     LoanAmount = loan.LoanAmount,
+                //     RepayAmount = loan.RepayAmount,
+                //     MonthlyLimit = loan.MonthlyLimit,
+                //     RepaidAmount = loan.RepaidAmount,
+                //     LoanBalance = loan.LoanBalance,
+                //     Repaid = loan.Repaid,
+                //     AutoDeduct = loan.AutoDeduct,
+                //     Approved = loan.Approved,
+                //     ApprovedDate = loan.ApprovedDate,
+                //     ApprovedBy = loan.ApprovedBy,
+                // };
+                _worker = (await _unitOfWork.Workers.Search("WorkerID", Model.WorkerId)).FirstOrDefault();
+                if (Model.Approved)
+                {
+                    _snackbar.Add("This loan has been approved", Severity.Warning);
+                }
+            }
+            else
+            {
+                await ResetState();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+            return;
+        }
+    }
+    private async Task ResetState()
+    {
+        Model = new TblLoan
+        {
+            AutoDeduct = true,
+            LoanDate = DateTime.UtcNow,
+            Approved = false,
+            ApprovedDate = new DateTime(2000, 01, 01),
+        };
+    }
+    private TblLoanScheme SelectedScheme
+    {
+        get => Schemes.FirstOrDefault(c => c.Id == Model.LoanSchemeId);
+        set => Model.LoanSchemeId = value.Id;
+    }
+    private async Task<IEnumerable<TblLoanScheme>> SearchSchemes(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return Schemes;
+        }
+        // filter locally first
+        var localResults = Schemes.Where(c => c.LoanScheme.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        if (localResults.Any())
+            return localResults;
+        // If not found locally, fetch from server
+        var serverResults = await _unitOfWork.Loans.GetAllLoanSchemes();
+        // add new results to cache, avoid duplicates
+        foreach (var scheme in serverResults)
+        {
+            if (!Schemes.Any(c => c.Id == scheme.Id))
+                Schemes.Add(scheme);
+        }
+        return serverResults;
+    }
+    private async Task OpenAddWorkerDialog()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true, CloseButton = true };
+        var dialog = _dialogService.Show<FindWorkerDialog>("Workers", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is VwWorker worker)
+        {
+            if (worker.Flags != "ACT")
+            {
+                _snackbar.Add($"Worker {worker.WorkerId} is tagged. Please contact the Administrator", Severity.Error);
+                _worker = null;
+                return;
+            }
+            _worker = worker;
+
+            var outstandingLoans = await _unitOfWork.Loans.GetOutstandingLoans(worker.WorkerId);
+            _snackbar.Add($"Worker has {outstandingLoans} outstanding loan(s).", Severity.Info);
+        }
+        else
+        {
+            _snackbar.Add("Worker not found", Severity.Error);
+            _worker = null;
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("loadConfig");
+            await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+    private async Task AddLoan()
+    {
+        if (Model.Approved)
+        {
+            _snackbar.Add("Approved loans cannot be modified", Severity.Warning);
+            return;
+        }
+        if (Model.LoanAmount < Model.RepaidAmount)
+        {
+            _snackbar.Add("Loan Amount cannot be less that Repaid Amount", Severity.Warning);
+            return;
+        }
+        if (_worker == null)
+        {
+            _snackbar.Add("Worker ID is required", Severity.Warning);
+            return;
+        }
+        if (Model.LoanSchemeId == 0)
+        {
+            _snackbar.Add("Loan Scheme is required", Severity.Warning);
+            return;
+        }
+        if (Model.LoanDate == null)
+        {
+            _snackbar.Add("Loan Date is required", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            var userId = await _currentUser.GetUserIdAsync();
+            Model.WorkerId = _worker.WorkerId;
+            if (IsEdit)
+            {
+                // Model.UpdatedBy = userId;
+                var request = new UpdateLoanRequest
+                {
+                    LoanNo = Model.LoanNo,
+                    WorkerId = Model.WorkerId,
+                    LoanSchemeId = Model.LoanSchemeId,
+                    LoanDate = Model.LoanDate!.Value,
+                    LoanAmount = Model.LoanAmount,
+                    RepayAmount = Model.RepayAmount,
+                    MonthlyLimit = Model.MonthlyLimit,
+                    RepaidAmount = Model.RepaidAmount,
+                    AutoDeduct = Model.AutoDeduct,
+                    UpdatedBy = userId
+                };
+                var response = await _unitOfWork.Loans.UpdateLoan(request);
+                if (response == 0)
+                    _snackbar.Add("Changes Saved Successfully", Severity.Success);
+            }
+            else
+            {
+                // Model.CreatedBy = userId;
+                var request = new AddLoanRequest
+                {
+                    WorkerId = Model.WorkerId,
+                    LoanSchemeId = Model.LoanSchemeId,
+                    LoanDate = Model.LoanDate!.Value,
+                    LoanAmount = Model.LoanAmount,
+                    RepayAmount = Model.RepayAmount,
+                    MonthlyLimit = Model.MonthlyLimit,
+                    AutoDeduct = Model.AutoDeduct,
+                    CreatedBy = userId,
+
+                };
+                var result = await _unitOfWork.Loans.AddLoan(request);
+
+                int returnValue = result.ReturnValue;
+                if (returnValue == 0)
+                {
+                    _snackbar.Add("Loan Created successfully", Severity.Success);
+                    Model.LoanNo = result.LoanNo;
+                    loanNo = result.LoanNo;
+                }
+                else if (returnValue == -19)
+                {
+                    _snackbar.Add("Worker has a pending loan on the same scheme. Cannot Save", Severity.Error);
+                }
+                else if (returnValue == -27)
+                {
+                    _snackbar.Add("Worker has a pending loan. Cannot take any more loans", Severity.Error);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error saving record: {ex.Message}", Severity.Error);
+        }
+    }
+    private async Task FindLoanNo()
+    {
+        var parameters = new DialogParameters<FindLoanDialog> { };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<FindLoanDialog>("Find Loan", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            loanNo = result.Data.ToString();
+            await LoadDataAsync();
+        }
+    }
+    private async Task ApproveLoan()
+    {
+        if (Model.Approved)
+        {
+            _snackbar.Add("Approved loans cannot be modified", Severity.Warning);
+            return;
+        }
+        try
+        {
+            var userId = await _currentUser.GetUserIdAsync();
+            var request = new ApproveLoanRequest
+            {
+                LoanNo = Model.LoanNo,
+                ApprovedDate = Model.ApprovedDate!.Value,
+                ApprovedBy = userId
+            };
+            var response = await _unitOfWork.Loans.ApproveLoan(request);
+            if (response == 0)
+            {
+                _snackbar.Add("Approved successfully", Severity.Success);
+                Model.Approved = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error approving loan: {ex.Message}", Severity.Error);
+        }
+    }
+}

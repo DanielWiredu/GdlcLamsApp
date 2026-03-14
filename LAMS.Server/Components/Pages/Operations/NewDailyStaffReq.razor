@@ -167,12 +167,13 @@
             else
             {
                 var result = await _unitOfWork.DailyReq.AddDailyReq(Model);
-                
+
                 int returnValue = result.ReturnValue;
                 if (returnValue == 0)
                 {
                     _snackbar.Add("Saved successfully", Severity.Success);
                     Model.AutoNo = result.AutoNo;
+                    RequestNo = Model.RequestNo;
                 }
             }
         }

@@ -1,17 +1,133 @@
 ﻿@page "/loans-scheme"
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IDialogService _dialogService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="Loans" Title="Scheme Setup" />
 
+<MudTable Items="@Elements" Dense="true" Hover="true" Striped="true" FixedHeader="true" FixedFooter="true" Height="450px" RowsPerPage="20" Filter="new Func<TblLoanScheme, bool>(FilterFunc1)">
+    <ToolBarContent>
+        @* <MudText Typo="Typo.h6">Locations</MudText> *@
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddRecord" > Add New </MudButton>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Loan Scheme</MudTh>
+        <MudTh>Account No</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="LoanScheme">@context.LoanScheme</MudTd>
+        <MudTd DataLabel="AccountNo">@context.AccountNo</MudTd>
+        <MudTd DataLabel="" Class="d-flex justify-content-center gap-1">
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Dark" aria-label="edit" Size="Size.Small" OnClick="(() => EditRecord(context))"></MudIconButton>
+            <MudDivider Vertical="true" FlexItem="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" Size="Size.Small" OnClick="(() => ConfirmRecordDelete(context.Id))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
+    private string searchString1 = "";
+    private IEnumerable<TblLoanScheme> Elements = new List<TblLoanScheme>();
+    private TblLoanScheme? loanScheme = new TblLoanScheme();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await JsRuntime.InvokeVoidAsync("loadConfig");
             await JsRuntime.InvokeVoidAsync("loadApps");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _unitOfWork.Loans.GetAllLoanSchemes();
+    }
+
+    private bool FilterFunc1(TblLoanScheme element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(TblLoanScheme element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.LoanScheme.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+    private async Task AddRecord()
+    {
+        var parameters = new DialogParameters<SchemeSetupDialog> { { x => x.Model, new TblLoanScheme() }, { x => x.IsEdit, false } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<SchemeSetupDialog>("Add Loan Scheme", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Loans.GetAllLoanSchemes();
+            StateHasChanged();
+        }
+    }
+
+    private async Task EditRecord(TblLoanScheme editScheme)
+    {
+        var parameters = new DialogParameters<SchemeSetupDialog> { { x => x.Model,
+            new TblLoanScheme { LoanScheme = editScheme.LoanScheme, AccountNo = editScheme.AccountNo } },
+            { x => x.IsEdit, true } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = _dialogService.Show<SchemeSetupDialog>("Edit Loan Scheme", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Elements = await _unitOfWork.Loans.GetAllLoanSchemes();
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmRecordDelete(int loanSchemeId)
+    {
+        loanScheme.Id = loanSchemeId;
+        var parameters = new DialogParameters<DeleteConfirm> { { x => x.ContentText, "Are you sure you want to delete?" } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+        var dialog = _dialogService.Show<Shared.DeleteConfirm>("Delete", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await DeleteRecord_Click(true);
+        }
+        else
+        {
+            loanScheme.Id = 0;
+        }
+    }
+    public async Task DeleteRecord_Click(bool isConfirmed)
+    {
+        if (isConfirmed && loanScheme.Id != 0)
+        {
+            try
+            {
+                var response = await _unitOfWork.Loans.RemoveLoanScheme(loanScheme.Id);
+                if (response == 1)
+                {
+                    _snackbar.Add("Loan Scheme Deleted Successfully!", Severity.Success);
+                    Elements = await _unitOfWork.Loans.GetAllLoanSchemes();
+                    StateHasChanged();
+                    loanScheme.Id = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                _snackbar.Add($"Error deleting loan scheme: {ex.Message}", Severity.Error);
+                loanScheme.Id = 0;
+            }
         }
     }
 }

@@ -34,6 +34,7 @@
                 <MudTh>Worker ID</MudTh>
                 <MudTh>Surname</MudTh>
                 <MudTh>Other Names</MudTh>
+                <MudTh>Status</MudTh>
                 <MudTh>Gang</MudTh>
                 <MudTh>SSF No</MudTh>
                 <MudTh>Trade Group</MudTh>
@@ -48,6 +49,11 @@
                 </MudTd>
                 <MudTd>@context.Sname</MudTd>
                 <MudTd>@context.Oname</MudTd>
+                <MudTd>
+                    <MudChip T="string" Color="@(context.WorkerStatus == "Active" ? Color.Success : Color.Error)" Variant="Variant.Filled" Size="Size.Small">
+                        @context.WorkerStatus
+                    </MudChip>
+                </MudTd>
                 <MudTd>@context.GangName</MudTd>
                 <MudTd>@context.Ssfno</MudTd>
                 <MudTd>@context.TradegroupName</MudTd>

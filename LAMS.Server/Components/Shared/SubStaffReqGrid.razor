@@ -8,7 +8,7 @@
 
    <MudGrid>
         <MudItem xs="12" md="6">
-            <MudButton Disabled="_readOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="OpenAddWorkerDialog"> Add Worker </MudButton>
+            <MudButton Disabled="_readOnly" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="OpenAddWorkersDialog"> Add Worker </MudButton>
             </MudItem>
         <MudItem xs="12" md="6" Class="d-flex justify-end">
             <MudText Typo="Typo.subtitle1" Class="mb-2">
@@ -154,6 +154,61 @@
                 return;
             }
         
+        }
+    }
+    private async Task OpenAddWorkersDialog()
+    {
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = _dialogService.Show<FindWorkerMultiDialog>("Workers", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is List<VwWorker> workers)
+        {
+            // TODO: Add worker to requisition
+            foreach (var worker in workers)
+            {
+                if (worker.Flags != "ACT")
+                {
+                    _snackbar.Add($"Worker {worker.WorkerId} is tagged. Please contact the Administrator", Severity.Error);
+                    continue;
+                }
+                var addRequest = new AddSubStaffRequest
+                {
+                    ReqNo = ReqNo,
+                    WorkerId = worker.WorkerId,
+                    TradegroupID = worker.TradegroupId,
+                    transport = "*",
+                    TradetypeID = worker.TradetypeId
+                };
+                try
+                {
+                    int response = await _unitOfWork.DailyReq.AddSubStaff(addRequest);
+                    if (response == 0)
+                    {
+                        _snackbar.Add($"Worker {worker.WorkerId} added successfully", Severity.Success);
+                    }
+                    else if (response == -73)
+                    {
+                        _snackbar.Add($"Only one Headman is permitted to work on a requisition. Worker {worker.WorkerId} was not added.", Severity.Error);
+                    }
+                    else
+                    {
+                        _snackbar.Add($"An error occurred while adding worker {worker.WorkerId}", Severity.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _snackbar.Add(ex.Message.Replace("'", "").Replace("\r\n", ""), Severity.Error);
+                    continue;
+                }
+            }
+            await LoadData();
         }
     }
 }

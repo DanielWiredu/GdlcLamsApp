@@ -76,6 +76,7 @@ namespace LAMS.Server.Controllers
                             ReqNo = reqno,
                             WorkerId = _worker.WorkerId,
                             TradegroupID = tradeGroupId,
+                            transport = "*",
                             Normal = Convert.ToDouble(_worker.HoursWorked),
                             Overtime = Convert.ToDouble(_worker.OverTimeHours)
                         });
@@ -97,13 +98,13 @@ namespace LAMS.Server.Controllers
 
         private string GetShiftType(string rateType)
         {
-            if (rateType.EndsWith("80%"))
+            if (rateType.Contains("80"))
                 return "Shift 80%";
 
-            if (rateType.EndsWith("100%"))
+            if (rateType.Contains("100"))
                 return "Shift 100%";
 
-            if (rateType.EndsWith("120%"))
+            if (rateType.Contains("120"))
                 return "Shift 120%";
 
             return "Non-Shift";

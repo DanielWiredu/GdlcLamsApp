@@ -127,7 +127,7 @@
             var model = new RequisitionModel
             {
                 RequestNo = newReqNo,
-                RequisitionDate = _selectedReq.RequestDate,
+                RequisitionDate = _selectedReq.RNeededOn,
                 JobDescription = _selectedReq.JobRequested,
                 GphaRequestId = _selectedReq.LabourRequestId,
                 Weekend = _selectedReq.RDay == "Weekend" ? true : false,
