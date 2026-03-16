@@ -1,11 +1,73 @@
 ﻿@page "/clms-allrequest"
+@using AppModels.DailyReq
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
-
+@inject IUnitOfWork _unitOfWork
+@inject IExportService _exportService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="CLMS" Title="All Request" />
 
+<MudTable ServerData="ServerReload" Dense="true" Hover="true" Striped="true" @ref="table" FixedHeader="true" Height="500px" RowsPerPage="50">
+    <ToolBarContent>
+        <MudDatePicker @bind-Date="startDate" Label="Start Date" DateFormat="dd-MMM-yyyy" Class="mr-2" ShowToolbar=false />
+        <MudDatePicker @bind-Date="endDate" Label="End Date" DateFormat="dd-MMM-yyyy" Class="mr-2" ShowToolbar=false />
+        <MudCheckBox @bind-Value="HasCostSheet" Label="Prepared" />
+        <MudCheckBox @bind-Value="GphaApproved" Label="GPHA Approved" />
+        <MudCheckBox @bind-Value="GdlcApproved" Label="GDLC Approved" />
+        <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Request ID, Job Requested, Unit..." Variant="Variant.Outlined" Margin="Margin.Dense" Class="mr-4" />
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Reload" Size="Size.Small"> Reload </MudButton>
+        @* <MudSpacer /> *@
+        <MudFab StartIcon="@Icons.Material.Filled.Download" Color="Color.Tertiary" Size="Size.Small" OnClick="ExportCsv" Label="CSV" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="LabourRequestID" T="VmApprovedGPHARequest">LabourRequestID</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="RequestDate" T="VmApprovedGPHARequest">RequestDate</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="UnitDescription" T="VmApprovedGPHARequest">UnitDescription</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="JobRequested" T="VmApprovedGPHARequest">JobRequested</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="NumberRequested" T="VmApprovedGPHARequest">NumberRequested</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="RNeededOn" T="VmApprovedGPHARequest">NeededOn</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="CostSheetNo" T="VmApprovedGPHARequest">Cost Sheet</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="PreparedOn" T="VmApprovedGPHARequest">Prepared On</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="GphaApprovedDate" T="VmApprovedGPHARequest">GPHA ApprovedDate</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="GDLCApproved" T="VmApprovedGPHARequest">GDLC Approved</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="GDLCApprovedDate" T="VmApprovedGPHARequest">GDLC ApprovedDate</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="LabourRequestID">@context.LabourRequestId</MudTd>
+        <MudTd DataLabel="RequestDate">@context.RequestDate?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="UnitDescription">@context.UnitDescription</MudTd>
+        <MudTd DataLabel="JobRequested">@context.JobRequested</MudTd>
+        <MudTd DataLabel="NumberRequested">@context.NumberRequested</MudTd>
+        <MudTd DataLabel="RNeededOn">@context.RNeededOn?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="CostSheetNo">@context.CostSheetNo</MudTd>
+        <MudTd DataLabel="PreparedOn">@context.PreparedOn?.ToString("dd-MMM-yyyy")</MudTd>
+        <MudTd DataLabel="GPHAApprovedDate">@context.GphaApprovedDate</MudTd>
+        <MudTd DataLabel="GDLCApproved">@(context.GdlcApproved ? "Yes" : "No")</MudTd>
+        <MudTd DataLabel="GDLCApprovedDate">@context.GdlcApprovedDate</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+
+</MudTable>
+
 @code {
+    private MudTable<VmApprovedGPHARequest> table;
+
+    private string searchString = "";
+    private DateTime? startDate = DateTime.Today.AddDays(-7);
+    private DateTime? endDate = DateTime.Today.AddDays(1).AddSeconds(-1);
+    private bool HasCostSheet = false;
+    private bool GphaApproved = false;
+    private bool GdlcApproved = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -14,4 +76,69 @@
             await JsRuntime.InvokeVoidAsync("loadApps");
         }
     }
+    private async Task<TableData<VmApprovedGPHARequest>> ServerReload(TableState state, CancellationToken token)
+    {
+        try
+        {
+            var data = await _unitOfWork.DailyReq.GetGPHARequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString, HasCostSheet, GphaApproved, GdlcApproved);
+            var totalItems = data.Count();
+            data = state.SortLabel switch
+            {
+                "LabourRequestID" => data.OrderByDirection(state.SortDirection, x => x.LabourRequestId),
+                "RequestDate" => data.OrderByDirection(state.SortDirection, x => x.RequestDate),
+                "UnitDescription" => data.OrderByDirection(state.SortDirection, x => x.UnitDescription),
+                "JobRequested" => data.OrderByDirection(state.SortDirection, x => x.JobRequested),
+                "NumberRequested" => data.OrderByDirection(state.SortDirection, x => x.NumberRequested),
+                "NeededOn" => data.OrderByDirection(state.SortDirection, x => x.RNeededOn),
+                _ => data.OrderByDescending(x => x.CostSheetNo)
+            };
+
+            var items = data
+                .Skip(state.Page * state.PageSize)
+                .Take(state.PageSize)
+                .ToArray();
+
+            return new TableData<VmApprovedGPHARequest>
+            {
+                TotalItems = totalItems,
+                Items = items
+            };
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("ShowSwal", "error", ex.Message);
+
+            return new TableData<VmApprovedGPHARequest>
+            {
+                TotalItems = 0,
+                Items = Array.Empty<VmApprovedGPHARequest>()
+            };
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        searchString = text;
+        await table.ReloadServerData();
+    }
+
+    private async Task Reload()
+    {
+        await table.ReloadServerData();
+    }
+
+    private async Task ExportCsv()
+    {
+        try
+        {
+            var data = await _unitOfWork.DailyReq.GetGPHARequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString, HasCostSheet, GphaApproved, GdlcApproved);
+
+            await _exportService.ExportToCsv(data, "ApprovedRequests.csv");
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error exporting to CSV: {ex.Message}", Severity.Error);
+        }
+    }
 }
+

@@ -27,6 +27,7 @@ namespace BusinessLogic.Repository.IRepository
         Task<int> UpdateDailyReqHours(UpdateReqHoursRequest request);
         Task<IEnumerable<TblGphaLabourRequest>> GetGPHAPendingRequests(DateTime StartDate, DateTime EndDate, string SearchValue);
         Task<IEnumerable<VmApprovedGPHARequest>> GetGPHAApprovedRequests(DateTime StartDate, DateTime EndDate, string SearchValue);
+        Task<IEnumerable<VmApprovedGPHARequest>> GetGPHARequests(DateTime StartDate, DateTime EndDate, string SearchValue, bool hasCostSheet, bool GPHA_Approved, bool GDLC_Approved);
         Task<int> AddDailyReqGPHARequest(RequisitionModel request);
         Task<(int costSheets, int returnValue)> ProcessDailyReq(PayrollProcessRequest request);
         Task<IEnumerable<GPHAJobAssignmentDto>> GetGPHAPendingApprovedRequests();

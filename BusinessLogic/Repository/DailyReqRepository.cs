@@ -211,6 +211,34 @@ namespace BusinessLogic.Repository
                             ORDER BY r.Id DESC";
             return await _db.LoadData<VmApprovedGPHARequest, dynamic>(query: query, new { StartDate = StartDate, EndDate = EndDate, SearchValue = SearchValue });
         }
+        public async Task<IEnumerable<VmApprovedGPHARequest>> GetGPHARequests(
+        DateTime StartDate,
+        DateTime EndDate,
+        string SearchValue,
+        bool hasCostSheet,
+        bool GPHA_Approved,
+        bool GDLC_Approved)
+        {
+            string query = @"SELECT r.LabourRequestID, r.RequestDate, r.UnitDescription, r.JobRequested, r.NumberRequested, r.rNeededOn, r.rDay, r.rShift,
+                    r.CostSheetNo, c.CreatedDate as PreparedOn, r.GPHA_ApprovedDate as GphaApprovedDate, r.GDLC_Approved as GdlcApproved, r.GDLC_ApprovedDate as GdlcApprovedDate
+                    FROM tblGPHA_LabourRequests r 
+                    LEFT JOIN tblStaffReq c ON r.CostSheetNo = c.ReqNo 
+                    WHERE r.hasCostSheet = @hasCostSheet 
+                    AND r.GPHA_Approved = @GPHA_Approved 
+                    AND r.GDLC_Approved = @GDLC_Approved
+                    AND (r.rNeededOn  BETWEEN @StartDate AND @EndDate) 
+                    AND (
+                        r.LabourRequestID LIKE '%' + @SearchValue + '%'
+                        OR r.JobRequested LIKE '%' + @SearchValue + '%'
+                        OR r.UnitDescription LIKE '%' + @SearchValue + '%'
+                    ) 
+                    ORDER BY r.Id DESC";
+
+            return await _db.LoadData<VmApprovedGPHARequest, dynamic>(
+                query: query,
+                new { StartDate, EndDate, SearchValue, hasCostSheet, GPHA_Approved, GDLC_Approved }
+            );
+        }
         public async Task<int> AddDailyReqGPHARequest(RequisitionModel request)
         {
             var parameters = new DynamicParameters();
