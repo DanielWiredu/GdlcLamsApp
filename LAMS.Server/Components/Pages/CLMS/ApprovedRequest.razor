@@ -3,6 +3,8 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JsRuntime;
 @inject IUnitOfWork _unitOfWork
+@inject IExportService _exportService
+@inject ISnackbar _snackbar
 
 <PageBreadcrumb Subtitle="CLMS" Title="Approved Request" />
 
@@ -14,6 +16,8 @@
         <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Request ID, Job Requested, Unit..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Class="mr-2"  />
         <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Reload"> Reload </MudButton>
         <MudSpacer />
+        @* <MudFab StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Success" Size="Size.Small" OnClick="ExportExcel" Label="Xcel" /> *@
+        <MudFab StartIcon="@Icons.Material.Filled.Download" Color="Color.Tertiary" Size="Size.Small" OnClick="ExportCsv" Label="CSV" />
     </ToolBarContent>
     <HeaderContent>
         <MudTh><MudTableSortLabel SortLabel="LabourRequestID" T="VmApprovedGPHARequest">LabourRequestID</MudTableSortLabel></MudTh>
@@ -118,5 +122,32 @@
     private async Task Reload()
     {
         await table.ReloadServerData();
+    }
+    private async Task ExportExcel()
+    {
+        try
+        {
+            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString);
+
+            await _exportService.ExportToExcel(data, "ApprovedRequests.xlsx");
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error exporting to Excel: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ExportCsv()
+    {
+        try
+        {
+            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString);
+
+            await _exportService.ExportToCsv(data, "ApprovedRequests.csv");
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add($"Error exporting to CSV: {ex.Message}", Severity.Error);
+        }
     }
 }

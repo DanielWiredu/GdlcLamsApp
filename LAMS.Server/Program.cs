@@ -77,6 +77,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 //builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IExportService, ExportService>();
 
 builder.Services.AddHangfire(x =>
     x.UseSimpleAssemblyNameTypeSerializer()
