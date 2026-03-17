@@ -12,7 +12,7 @@
     <ToolBarContent>
         <MudDatePicker @bind-Date="startDate" Label="Start Date" DateFormat="dd-MMM-yyyy" Class="mr-2" ShowToolbar=false />
         <MudDatePicker @bind-Date="endDate" Label="End Date" DateFormat="dd-MMM-yyyy" Class="mr-4" ShowToolbar=false />
-        @* <MudCheckBox @bind-Value="_GdlcApproved" Label="GDLC Approved" /> *@
+        <MudCheckBox @bind-Value="_GdlcApproved" Label="GDLC Approved" />
         <MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Immediate="false" Placeholder="Request ID, Job Requested, Unit..." Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Class="mr-2"  />
         <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Reload"> Reload </MudButton>
         <MudSpacer />
@@ -63,7 +63,7 @@
     private string searchString = "";
     private DateTime? startDate = DateTime.Today.AddDays(-7);
     private DateTime? endDate = DateTime.Today.AddDays(1).AddSeconds(-1);
-    // private bool _GdlcApproved = false;
+    private bool _GdlcApproved = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -77,7 +77,7 @@
     {
         try
         {
-            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString);
+            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, _GdlcApproved, searchString);
             var totalItems = data.Count();
             data = state.SortLabel switch
             {
@@ -127,7 +127,7 @@
     {
         try
         {
-            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString);
+            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, _GdlcApproved, searchString);
 
             await _exportService.ExportToExcel(data, "ApprovedRequests.xlsx");
         }
@@ -141,7 +141,7 @@
     {
         try
         {
-            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString);
+            var data = await _unitOfWork.DailyReq.GetGPHAApprovedRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, _GdlcApproved, searchString);
 
             await _exportService.ExportToCsv(data, "ApprovedRequests.csv");
         }

@@ -66,7 +66,7 @@
         </MudItem>
         <!-- RIGHT COLUMN -->
         <MudItem xs="12" md="4">
-            <MudTextField Label="Loan No" @bind-Value="Model.LoanNo" ReadOnly="true" />
+            <MudTextField Label="Loan No" @bind-Value="Model.LoanNo" Disabled="true" />
             <MudAutocomplete MaxItems="50" T="TblLoanScheme" Label="Loan Scheme" @bind-Value="SelectedScheme" ToStringFunc="@(c => c?.LoanScheme)" CoerceText="true"
                              Clearable="true" Dense="true" SearchFunc="SearchSchemes" Required="true" RequiredError="Required"></MudAutocomplete>
             <MudDatePicker Label="Loan Date" @bind-Date="Model.LoanDate" Required="true" DateFormat="yyyy-MM-dd" ShowToolbar="false" />
@@ -316,7 +316,7 @@
                 {
                     _snackbar.Add("Loan Created successfully", Severity.Success);
                     Model.LoanNo = result.LoanNo;
-                    loanNo = result.LoanNo;
+                    // loanNo = result.LoanNo;
                 }
                 else if (returnValue == -19)
                 {

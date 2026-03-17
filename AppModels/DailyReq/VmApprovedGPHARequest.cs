@@ -22,5 +22,6 @@ namespace AppModels.DailyReq
         public DateTime? GphaApprovedDate { get; set; }
         public bool GdlcApproved { get; set; }
         public DateTime? GdlcApprovedDate { get; set; }
+        public bool HasCostSheet { get; set; }
     }
 }
