@@ -39,7 +39,7 @@
 @code {
     IEnumerable<VmApprovedGPHARequest> Elements = new List<VmApprovedGPHARequest>();
     private MudDataGrid<VmApprovedGPHARequest> _grid;
-    private DateTime? startDate = DateTime.Today.AddDays(-7);
+    private DateTime? startDate = DateTime.Today.AddDays(-3);
     private DateTime? endDate = DateTime.Today.AddDays(1).AddSeconds(-1);
 
     protected override async Task OnInitializedAsync()
@@ -58,6 +58,7 @@
 
     private async Task Reload()
     {
+        endDate = endDate.Value.AddDays(1).AddSeconds(-1);
         Elements = await _unitOfWork.DailyReq.GetGPHARequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now);
     }
 

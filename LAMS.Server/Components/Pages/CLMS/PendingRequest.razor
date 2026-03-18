@@ -53,7 +53,7 @@
     private TblGphaLabourRequest _selectedReq;
 
     private string searchString = "";
-    private DateTime? startDate = DateTime.Today.AddDays(-7);
+    private DateTime? startDate = DateTime.Today.AddDays(-3);
     private DateTime? endDate = DateTime.Today.AddDays(1).AddSeconds(-1);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -68,6 +68,7 @@
     {
         try
         {
+            endDate = endDate.Value.AddDays(1).AddSeconds(-1);
             var data = await _unitOfWork.DailyReq.GetGPHAPendingRequests(startDate ?? DateTime.Now, endDate ?? DateTime.Now, searchString);
             var totalItems = data.Count();
             data = state.SortLabel switch

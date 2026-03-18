@@ -19,7 +19,7 @@
     <MudCheckBox T="bool" Label="Approved" @bind-Value="Model.Approved" ReadOnly="true" Class="ml-4" Style="color:red;font-size:medium" />
     <MudText Class="mx-2" Style="color:green"> Approval Date </MudText>
     <MudDatePicker @bind-Date="Model.ApprovedDate" ReadOnly="@(Model.Approved)" DateFormat="yyyy-MM-dd" Dense="true" ShowToolbar="false" Style="max-width:400px;" />
-    <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)" Href="@ReportUrl" Target="_blank"> Print </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : Model.Approved)" OnClick="UpdateReqHours"> Update Hours </MudButton>
 </MudPaper>

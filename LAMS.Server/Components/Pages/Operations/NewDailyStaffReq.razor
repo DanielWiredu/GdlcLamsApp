@@ -30,7 +30,7 @@
     }
     @if (IsEdit)
     {
-        <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="FindReqNo"> Find </MudButton>
     }
     <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Small" Href="/operations-dailystaffreq"> Return </MudButton>
     <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Small" Disabled="@(Model.AutoNo == 0 ? true : false)" Href="@ReportUrl" Target="_blank"> Print </MudButton>
